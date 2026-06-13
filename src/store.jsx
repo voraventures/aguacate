@@ -42,6 +42,9 @@ export function StoreProvider({ children }) {
   const [brief, setBrief] = useState(null); // pre-meeting intelligence payload
   const [muted, setMuted] = useState(false);
   const [markerCount, setMarkerCount] = useState(0);
+  const [liveTranscriptChunks, setLiveTranscriptChunks] = useState([]);
+  const [activeCall, setActiveCall] = useState(null); // { app, process, detected_at }
+  const [workspace, setWorkspace] = useState(null);
   const selectedIdRef = useRef(null);
   selectedIdRef.current = selectedId;
 
@@ -164,8 +167,14 @@ export function StoreProvider({ children }) {
             setCoachData(null);
             setMuted(false);
             setMarkerCount(0);
+            setLiveTranscriptChunks([]);
             refreshMeetings();
             notify("Recording started", "Aguacate is capturing this meeting locally.");
+            break;
+          case "transcript_chunk":
+            if (data.text) {
+              setLiveTranscriptChunks((prev) => [...prev, data.text]);
+            }
             break;
           case "coach_update":
             setCoachData(data);
@@ -199,6 +208,7 @@ export function StoreProvider({ children }) {
           case "recording_stopped":
             setRecording({ active: false, meetingId: null });
             setRecordingLevel(0);
+            setLiveTranscriptChunks([]);
             break;
           case "recording_level":
             setRecordingLevel(data.rms || 0);
@@ -306,6 +316,40 @@ export function StoreProvider({ children }) {
     window.aguacate?.setRecordingState?.(recording.active);
   }, [recording.active]);
 
+  // Feature 3: poll for active video-call apps every 30 seconds
+  const activeCallDismissed = useRef(new Set());
+  useEffect(() => {
+    if (!ready) return;
+    const poll = async () => {
+      try {
+        const r = await api.get("/api/system/active-calls");
+        const calls = r.active_calls || [];
+        const newCall = calls.find((c) => !activeCallDismissed.current.has(c.app));
+        setActiveCall(newCall || null);
+      } catch {
+        // ignore — backend may not support yet
+      }
+    };
+    poll();
+    const id = setInterval(poll, 30000);
+    return () => clearInterval(id);
+  }, [ready]);
+
+  const dismissActiveCall = useCallback((appName) => {
+    activeCallDismissed.current.add(appName);
+    setActiveCall(null);
+  }, []);
+
+  // Feature 4: load workspace on boot
+  const refreshWorkspace = useCallback(
+    () => api.get("/api/workspace").then((r) => setWorkspace(r)).catch(() => {}),
+    []
+  );
+
+  useEffect(() => {
+    if (ready) refreshWorkspace();
+  }, [ready, refreshWorkspace]);
+
   const toggleMute = useCallback(async () => {
     try {
       const r = await api.post("/api/recording/mute", { muted: !muted });
@@ -372,6 +416,11 @@ export function StoreProvider({ children }) {
     toggleMute,
     markerCount,
     dropMarker,
+    liveTranscriptChunks,
+    activeCall,
+    dismissActiveCall,
+    workspace,
+    refreshWorkspace,
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

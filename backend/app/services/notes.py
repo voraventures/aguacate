@@ -40,10 +40,19 @@ def generate_notes(
     hub.emit("notes_started", {"meeting_id": meeting_id, "template": template["name"]})
 
     attendee_line = f"Attendees: {', '.join(attendees)}\n" if attendees else ""
+
+    # Detect if transcript contains speaker labels so Claude can attribute decisions
+    has_speakers = bool(transcript and "Speaker " in transcript[:500])
+    speaker_note = (
+        "\n\nNote: The transcript uses 'Speaker N:' labels. When attributing action items "
+        "or decisions, reference the speaker label (e.g. 'Speaker 1 to follow up on...')."
+        if has_speakers else ""
+    )
+
     message = client.messages.create(
         model=current_model(),
         max_tokens=2400,
-        system=templates_svc.compose_system_prompt(template),
+        system=templates_svc.compose_system_prompt(template) + speaker_note,
         messages=[
             {
                 "role": "user",

@@ -96,10 +96,34 @@ CREATE TABLE IF NOT EXISTS shares (
     created_at TEXT NOT NULL,
     expires_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS workspaces (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    invite_code TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    owner_install_id TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS workspace_members (
+    workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    install_id TEXT NOT NULL,
+    display_name TEXT NOT NULL DEFAULT '',
+    joined_at TEXT NOT NULL,
+    PRIMARY KEY (workspace_id, install_id)
+);
+CREATE TABLE IF NOT EXISTS mobile_sessions (
+    id TEXT PRIMARY KEY,
+    mobile_token TEXT NOT NULL UNIQUE,
+    device_id TEXT NOT NULL,
+    device_name TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    revoked INTEGER NOT NULL DEFAULT 0
+);
 CREATE INDEX IF NOT EXISTS idx_actions_meeting ON action_items(meeting_id);
 CREATE INDEX IF NOT EXISTS idx_topics_meeting ON topics(meeting_id);
 CREATE INDEX IF NOT EXISTS idx_topics_name ON topics(name);
 CREATE INDEX IF NOT EXISTS idx_shares_token ON shares(token);
+CREATE INDEX IF NOT EXISTS idx_mobile_token ON mobile_sessions(mobile_token);
 """
 
 # Idempotent column additions for existing databases.
@@ -109,6 +133,7 @@ _MIGRATIONS = {
         ("followup_sent", "INTEGER NOT NULL DEFAULT 0"),
         ("coach", "TEXT"),                    # JSON coaching summary
         ("markers", "TEXT NOT NULL DEFAULT '[]'"),  # JSON [seconds,...]
+        ("workspace_id", "TEXT"),             # NULL = personal, set = shared to workspace
     ],
     "transcripts": [("segments", "TEXT NOT NULL DEFAULT '[]'")],
     "decisions": [("status", "TEXT NOT NULL DEFAULT 'active'")],

@@ -125,13 +125,14 @@ function MeetingCard({ m, selected, onSelect, progress }) {
 }
 
 export default function MeetingList({ onCollapse, children }) {
-  const { meetings, selectedId, selectMeeting, progress, upcoming, startRecording, recording } =
+  const { meetings, selectedId, selectMeeting, progress, upcoming, startRecording, recording, workspace } =
     useStore();
-  const [tab, setTab] = useState("all"); // all | recent | open
+  const [tab, setTab] = useState("all"); // all | recent | open | team
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
   const [askResults, setAskResults] = useState(null); // semantic search
   const [asking, setAsking] = useState(false);
+  const [teamMeetings, setTeamMeetings] = useState([]);
 
   const ask = () => {
     const q = query.trim();
@@ -160,7 +161,14 @@ export default function MeetingList({ onCollapse, children }) {
     return () => clearTimeout(t);
   }, [query]);
 
+  useEffect(() => {
+    if (tab === "team") {
+      api.get("/api/workspace/meetings").then(setTeamMeetings).catch(() => setTeamMeetings([]));
+    }
+  }, [tab]);
+
   const visible = useMemo(() => {
+    if (tab === "team") return teamMeetings;
     let list = searchResults ?? meetings;
     if (tab === "recent") {
       const cutoff = Date.now() - 7 * 24 * 3600 * 1000;
@@ -169,7 +177,7 @@ export default function MeetingList({ onCollapse, children }) {
       list = list.filter((m) => (m.open_actions ?? 0) > 0);
     }
     return list;
-  }, [meetings, searchResults, tab]);
+  }, [meetings, searchResults, tab, teamMeetings]);
 
   const upcomingVisible = upcoming.filter((e) => !e.recorded_meeting_id).slice(0, 4);
 
@@ -212,6 +220,14 @@ export default function MeetingList({ onCollapse, children }) {
               {t === "all" ? "All" : t === "recent" ? "Recent" : "Open"}
             </button>
           ))}
+          {workspace?.workspace && (
+            <button
+              className={tab === "team" ? "active" : ""}
+              onClick={() => setTab("team")}
+            >
+              Team
+            </button>
+          )}
         </div>
       </div>
 

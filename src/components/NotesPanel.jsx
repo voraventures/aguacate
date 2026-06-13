@@ -196,6 +196,53 @@ function CoachRecap({ coach }) {
   );
 }
 
+function SpeakerBadge({ speaker }) {
+  const n = parseInt(speaker?.replace("Speaker ", ""), 10) || 1;
+  const colors = ["var(--accent)", "var(--muted)", "#7b68ee", "#e8923c", "#2fb88b"];
+  return (
+    <span
+      className="speaker-badge"
+      style={{ background: colors[(n - 1) % colors.length] }}
+    >
+      S{n}
+    </span>
+  );
+}
+
+function TranscriptView({ segments }) {
+  if (!segments || segments.length === 0) {
+    return <p style={{ color: "var(--muted)", fontSize: 12 }}>No transcript available.</p>;
+  }
+  const hasSpeakers = segments.some((s) => s.speaker);
+  if (!hasSpeakers) {
+    return (
+      <p style={{ fontSize: 12.5, lineHeight: 1.65 }}>
+        {segments.map((s) => s.text).join(" ")}
+      </p>
+    );
+  }
+  // Group consecutive segments by speaker
+  const groups = [];
+  for (const seg of segments) {
+    const last = groups[groups.length - 1];
+    if (last && last.speaker === seg.speaker) {
+      last.texts.push(seg.text);
+    } else {
+      groups.push({ speaker: seg.speaker || "Speaker 1", texts: [seg.text] });
+    }
+  }
+  return (
+    <div className="diarized-transcript">
+      {groups.map((g, i) => (
+        <div key={i} className="diarized-turn">
+          <SpeakerBadge speaker={g.speaker} />
+          <span className="diarized-text">{g.texts.join(" ")}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function NotesPanel() {
   const {
     selectedId,
@@ -218,6 +265,7 @@ export default function NotesPanel() {
   const [followUpOpen, setFollowUpOpen] = useState(false);
   const [coachVisible, setCoachVisible] = useState(false);
   const [shareModal, setShareModal] = useState(null); // { url }
+  const [notesTab, setNotesTab] = useState("notes"); // notes | transcript
   const [onboarded, setOnboarded] = useState(
     () => localStorage.getItem("aguacate_onboarded") === "true"
   );
@@ -231,6 +279,7 @@ export default function NotesPanel() {
     setMoreOpen(false);
     setFollowUpOpen(false);
     setCoachVisible(false);
+    setNotesTab("notes");
   }, [meetingDetail?.id]);
 
   // Close the overflow menu when clicking outside it.
@@ -466,6 +515,18 @@ export default function NotesPanel() {
                 <button className="menu-item" onClick={shareMeeting}>
                   Share meeting
                 </button>
+                <button
+                  className="menu-item"
+                  onClick={() => {
+                    setMoreOpen(false);
+                    api
+                      .post(`/api/meetings/${m.id}/share-to-workspace`)
+                      .then(() => showToast("Shared to team workspace"))
+                      .catch((e) => showToast(e.message, "error"));
+                  }}
+                >
+                  Share to team
+                </button>
                 <button className="delete-menu-item" onClick={deleteFromNotes}>
                   Delete meeting
                 </button>
@@ -500,6 +561,36 @@ export default function NotesPanel() {
           </div>
         ) : (
           <>
+            {/* Tab switcher: Notes | Transcript */}
+            {m.transcript && (
+              <div className="notes-tab-bar">
+                <button
+                  className={`notes-tab-btn${notesTab === "notes" ? " active" : ""}`}
+                  onClick={() => setNotesTab("notes")}
+                >
+                  Notes
+                </button>
+                <button
+                  className={`notes-tab-btn${notesTab === "transcript" ? " active" : ""}`}
+                  onClick={() => setNotesTab("transcript")}
+                >
+                  Transcript
+                </button>
+                {m.workspace_id && (
+                  <span className="workspace-shared-badge">Shared</span>
+                )}
+              </div>
+            )}
+
+            {notesTab === "transcript" && m.transcript ? (
+              <div className="section-card">
+                <div className="section-label">Full Transcript</div>
+                <div className="section-body transcript-body">
+                  <TranscriptView segments={m.transcript._segments} />
+                </div>
+              </div>
+            ) : (
+            <>
             {showMetaBar && (
               <div className="ai-meta-bar">
                 <span className="ai-meta-item">
@@ -659,6 +750,8 @@ export default function NotesPanel() {
                 )}
               </div>
             </div>
+            </>
+            )}
           </>
         )}
       </div>

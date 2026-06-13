@@ -52,6 +52,8 @@ export default function Sidebar() {
     templates,
     selectedTemplate,
     setSelectedTemplate,
+    activeCall,
+    dismissActiveCall,
   } = useStore();
 
   const isDarkish = theme === "dark";
@@ -115,6 +117,31 @@ export default function Sidebar() {
               : "No upcoming meetings detected"}
           </span>
         </div>
+
+        {activeCall && !recording.active && (
+          <div className="call-detection-banner">
+            <span className="call-detection-text">
+              {activeCall.app} detected — record this call?
+            </span>
+            <div className="call-detection-actions">
+              <button
+                className="call-detection-btn primary"
+                onClick={() => {
+                  dismissActiveCall(activeCall.app);
+                  startRecording({ title: `${activeCall.app} call` });
+                }}
+              >
+                Record now
+              </button>
+              <button
+                className="call-detection-btn"
+                onClick={() => dismissActiveCall(activeCall.app)}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {license && free && (

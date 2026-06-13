@@ -116,12 +116,20 @@ def get_meeting(meeting_id: str):
         else None
     )
     transcript = db.execute(
-        "SELECT text, language, duration_sec FROM transcripts WHERE meeting_id=?",
+        "SELECT text, language, duration_sec, segments FROM transcripts WHERE meeting_id=?",
         (meeting_id,),
     ).fetchone()
     meeting["transcript"] = dict(transcript) if transcript else None
     if meeting["transcript"]:
-        meeting["transcript"].pop("segments", None)  # heavy; not needed by UI
+        # Parse segments JSON for the diarized transcript view in the UI
+        raw_segs = meeting["transcript"].pop("segments", None)
+        if raw_segs:
+            try:
+                meeting["transcript"]["_segments"] = json.loads(raw_segs)
+            except (json.JSONDecodeError, TypeError):
+                meeting["transcript"]["_segments"] = []
+        else:
+            meeting["transcript"]["_segments"] = []
     meeting["intelligence"] = intelligence.meeting_intelligence(meeting_id)
     meeting["coach"] = json.loads(meeting["coach"]) if meeting.get("coach") else None
     try:
@@ -203,6 +211,17 @@ def compose_followup(meeting_id: str, body: FollowupBody):
     ).fetchone()
     attendees = json.loads(row["attendees"]) if row else []
     return {**draft, "attendees": attendees}
+
+
+@router.post("/{meeting_id}/share-to-workspace")
+def share_to_workspace(meeting_id: str):
+    """Share a meeting to the team workspace."""
+    from .workspace import share_meeting_to_workspace
+
+    try:
+        return share_meeting_to_workspace(meeting_id)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.post("/{meeting_id}/followup/sent")

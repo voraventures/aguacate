@@ -7,15 +7,11 @@ function fmtElapsed(totalSec) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-// Live recording panel shown in the notes area while the selected meeting is
-// actively recording. Elapsed time and the audio-level meter are real
-// (recording_level RMS over the existing WebSocket). Word-by-word transcript is
-// not streamed by the backend — Whisper transcribes the full audio on-device
-// after you stop — so we surface that truthfully instead of inventing text.
 export default function LiveTranscript({ startedAt }) {
-  const { recordingLevel } = useStore();
+  const { recordingLevel, liveTranscriptChunks } = useStore();
   const [seconds, setSeconds] = useState(0);
   const baseRef = useRef(startedAt ? new Date(startedAt).getTime() : Date.now());
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const tick = () =>
@@ -25,7 +21,15 @@ export default function LiveTranscript({ startedAt }) {
     return () => clearInterval(id);
   }, []);
 
+  // Auto-scroll to bottom as new text arrives
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [liveTranscriptChunks]);
+
   const level = Math.min(1, Math.max(0, recordingLevel || 0));
+  const hasChunks = liveTranscriptChunks && liveTranscriptChunks.length > 0;
 
   return (
     <div className="live-transcript">
@@ -37,11 +41,30 @@ export default function LiveTranscript({ startedAt }) {
       <div className="live-meter" aria-hidden="true">
         <div className="live-meter-fill" style={{ width: `${Math.round(level * 100)}%` }} />
       </div>
-      <div className="live-transcript-body">
-        <p>
-          Capturing audio locally. Live transcription runs 100% on this Mac after you
-          stop recording — your audio never leaves the device.
-        </p>
+      <div className="live-transcript-body" ref={scrollRef}>
+        {hasChunks ? (
+          <div className="live-chunks">
+            {liveTranscriptChunks.map((chunk, i) => {
+              const isLast = i === liveTranscriptChunks.length - 1;
+              return (
+                <span
+                  key={i}
+                  className="live-chunk"
+                  style={{ opacity: isLast ? 0.7 : 1 }}
+                >
+                  {chunk}
+                  {isLast && <span className="live-cursor" aria-hidden="true">▌</span>}
+                  {" "}
+                </span>
+              );
+            })}
+          </div>
+        ) : (
+          <p>
+            Capturing audio locally. Transcription preview will appear here — your
+            audio never leaves the device.
+          </p>
+        )}
       </div>
     </div>
   );

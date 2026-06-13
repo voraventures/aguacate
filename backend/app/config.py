@@ -24,6 +24,7 @@ ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "app://aguacate",
+    "aguacate-ios://app",  # Mobile companion app
 ]
 # Host headers we accept (DNS-rebinding defense). Port is appended at startup.
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}

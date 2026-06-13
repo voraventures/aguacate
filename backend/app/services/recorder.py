@@ -200,6 +200,7 @@ class Recorder:
         self._captures: list[_DeviceCapture] = []
         self._meeting_id: str | None = None
         self._level_thread: threading.Thread | None = None
+        self._live_transcript_thread: threading.Thread | None = None
         self._stop_levels = threading.Event()
         self._started_at: float | None = None
         self.muted = False           # privacy mute zone: capture writes silence
@@ -279,6 +280,10 @@ class Recorder:
             self._stop_levels.clear()
             self._level_thread = threading.Thread(target=self._emit_levels, daemon=True)
             self._level_thread.start()
+            self._live_transcript_thread = threading.Thread(
+                target=self._emit_live_transcript, daemon=True
+            )
+            self._live_transcript_thread.start()
             hub.emit("recording_started", {"meeting_id": meeting_id})
 
     def _emit_levels(self):
@@ -292,6 +297,32 @@ class Recorder:
                     hub.emit("recording_level", {"rms": min(1.0, rms * 8)})
             except Exception:
                 pass
+
+    def _emit_live_transcript(self):
+        """Every 10s take the last 15s of audio and run tiny-model transcription.
+        Emits transcript_chunk events for the live preview display."""
+        from . import transcriber as transcriber_svc
+        INTERVAL = 10.0
+        WINDOW_SEC = 15
+        while not self._stop_levels.wait(INTERVAL):
+            try:
+                cap = self._captures[0] if self._captures else None
+                if cap is None or not cap.chunks:
+                    continue
+                # Take last 15 seconds of audio at capture samplerate
+                frames_needed = int(WINDOW_SEC * cap.samplerate)
+                all_audio = np.concatenate(cap.chunks, axis=0)
+                if all_audio.ndim > 1:
+                    all_audio = all_audio.mean(axis=1)
+                window = all_audio[-frames_needed:]
+                if len(window) < cap.samplerate:  # less than 1 second
+                    continue
+                resampled = _resample(window, cap.samplerate, TARGET_SR)
+                text = transcriber_svc.transcribe_chunk(resampled)
+                if text:
+                    hub.emit("transcript_chunk", {"text": text, "is_partial": True})
+            except Exception as exc:
+                log.debug("Live transcript emit failed: %s", exc)
 
     def stop(self) -> Path:
         with self._lock:

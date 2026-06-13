@@ -406,6 +406,8 @@ export default function Settings() {
     templates,
     refreshTemplates,
     setSelectedTemplate,
+    workspace,
+    refreshWorkspace,
   } = useStore();
   const [tab, setTab] = useState("appearance");
   const [tplDetailId, setTplDetailId] = useState(null);
@@ -420,6 +422,13 @@ export default function Settings() {
   const [tabFade, setTabFade] = useState({ left: false, right: false });
   const [openIntegration, setOpenIntegration] = useState(null);
   const [setupModal, setSetupModal] = useState(null); // "google" | "microsoft" | null
+  // Workspace state
+  const [wsName, setWsName] = useState("");
+  const [wsDisplayName, setWsDisplayName] = useState("");
+  const [wsInviteCode, setWsInviteCode] = useState("");
+  const [wsSharePath, setWsSharePath] = useState("");
+  // Mobile state
+  const [mobileSessions, setMobileSessions] = useState([]);
   const tabsRef = useRef(null);
   const isWin = (window.aguacate?.platform || "darwin") === "win32";
 
@@ -451,15 +460,23 @@ export default function Settings() {
   const loadSecrets = () =>
     api.get("/api/integrations/status").then((r) => setSecrets(r.secrets)).catch(() => {});
 
+  const loadMobileSessions = () =>
+    api.get("/api/mobile/sessions").then(setMobileSessions).catch(() => {});
+
   useEffect(() => {
     if (settingsOpen) {
       loadSecrets();
       api.get("/api/recording/devices").then(setDevices).catch(() => {});
       refreshCalendar();
+      loadMobileSessions();
       window.aguacate
         ?.getAutoLaunch?.()
         .then((r) => setAutoLaunch(!!r?.enabled))
         .catch(() => {});
+      // Populate share path from current workspace state
+      if (workspace?.workspace?.share_path) {
+        setWsSharePath(workspace.workspace.share_path);
+      }
     }
   }, [settingsOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -527,6 +544,7 @@ export default function Settings() {
     ["integrations", "Integrations"],
     ["privacy", "Privacy"],
     ["export", "Export"],
+    ["workspace", "Workspace"],
     ["license", "License"],
   ];
 
@@ -1276,6 +1294,63 @@ export default function Settings() {
                 </div>
               </div>
 
+              <div className="set-section-label">Mobile</div>
+              <div className="set-card stack">
+                <div className="set-card-main">
+                  <div className="set-card-name">Aguacate for iOS — coming soon</div>
+                  <div className="set-card-desc">
+                    The mobile companion app lets you review notes, complete actions, and search meetings on your iPhone.
+                    Connected devices are listed below and can be revoked at any time.
+                  </div>
+                </div>
+                <div className="set-card-control">
+                  <button
+                    className="btn secondary"
+                    onClick={() => {
+                      api
+                        .post("/api/mobile/auth", { device_id: "manual-qr-" + Date.now(), device_name: "QR Setup Token" })
+                        .then((r) => {
+                          showToast("Mobile token: " + r.mobile_token.slice(0, 12) + "…  (copy from logs)");
+                          loadMobileSessions();
+                        })
+                        .catch((e) => showToast(e.message, "error"));
+                    }}
+                  >
+                    Connect mobile app
+                  </button>
+                </div>
+              </div>
+              {mobileSessions.length > 0 && (
+                <div className="set-card stack">
+                  <div className="set-card-main">
+                    <div className="set-card-name">Connected devices</div>
+                  </div>
+                  <div className="set-card-control" style={{ flexDirection: "column", gap: 6, width: "100%" }}>
+                    {mobileSessions.map((s) => (
+                      <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5 }}>
+                        <span style={{ flex: 1 }}>{s.device_name || s.device_id}</span>
+                        <span style={{ color: "var(--muted)", fontSize: 11 }}>{s.created_at?.slice(0, 10)}</span>
+                        {!s.revoked && (
+                          <button
+                            className="btn secondary"
+                            style={{ padding: "2px 8px", fontSize: 11 }}
+                            onClick={() =>
+                              api
+                                .post(`/api/mobile/sessions/${s.id}/revoke`)
+                                .then(() => { loadMobileSessions(); showToast("Device revoked"); })
+                                .catch((e) => showToast(e.message, "error"))
+                            }
+                          >
+                            Revoke
+                          </button>
+                        )}
+                        {s.revoked && <span style={{ color: "var(--muted)", fontSize: 11 }}>Revoked</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="set-section-label">Backup</div>
               <div className="set-card stack">
                 <div className="set-card-icon"><LockIcon size={14} /></div>
@@ -1316,6 +1391,165 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
+            </>
+          )}
+
+          {tab === "workspace" && (
+            <>
+              <div className="set-section-label first">Team Workspace</div>
+              {!workspace?.workspace ? (
+                <>
+                  <div className="set-card stack">
+                    <div className="set-card-main">
+                      <div className="set-card-name">Create a workspace</div>
+                      <div className="set-card-desc">Start a team space to share meetings with teammates.</div>
+                    </div>
+                    <div className="set-card-control" style={{ flexDirection: "column", gap: 6 }}>
+                      <input
+                        className="text-input"
+                        placeholder="Workspace name"
+                        value={wsName}
+                        onChange={(e) => setWsName(e.target.value)}
+                      />
+                      <input
+                        className="text-input"
+                        placeholder="Your display name"
+                        value={wsDisplayName}
+                        onChange={(e) => setWsDisplayName(e.target.value)}
+                      />
+                      <button
+                        className="btn"
+                        disabled={!wsName.trim() || busy}
+                        onClick={() => {
+                          setBusy(true);
+                          api
+                            .post("/api/workspace/create", { name: wsName.trim(), display_name: wsDisplayName.trim() })
+                            .then(() => {
+                              refreshWorkspace();
+                              setWsName("");
+                              showToast("Workspace created");
+                            })
+                            .catch((e) => showToast(e.message, "error"))
+                            .finally(() => setBusy(false));
+                        }}
+                      >
+                        Create workspace
+                      </button>
+                    </div>
+                  </div>
+                  <div className="set-card stack">
+                    <div className="set-card-main">
+                      <div className="set-card-name">Join a workspace</div>
+                      <div className="set-card-desc">Enter an invite code from a teammate.</div>
+                    </div>
+                    <div className="set-card-control" style={{ flexDirection: "column", gap: 6 }}>
+                      <input
+                        className="text-input"
+                        placeholder="Invite code (e.g. AB12CD34)"
+                        value={wsInviteCode}
+                        onChange={(e) => setWsInviteCode(e.target.value.toUpperCase())}
+                      />
+                      <input
+                        className="text-input"
+                        placeholder="Your display name"
+                        value={wsDisplayName}
+                        onChange={(e) => setWsDisplayName(e.target.value)}
+                      />
+                      <button
+                        className="btn"
+                        disabled={wsInviteCode.length < 6 || busy}
+                        onClick={() => {
+                          setBusy(true);
+                          api
+                            .post("/api/workspace/join", { invite_code: wsInviteCode, display_name: wsDisplayName.trim() })
+                            .then(() => {
+                              refreshWorkspace();
+                              setWsInviteCode("");
+                              showToast("Joined workspace");
+                            })
+                            .catch((e) => showToast(e.message, "error"))
+                            .finally(() => setBusy(false));
+                        }}
+                      >
+                        Join workspace
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="set-card">
+                    <div className="set-card-main">
+                      <div className="set-card-name">{workspace.workspace.name}</div>
+                      <div className="set-card-desc">
+                        Invite code: <strong>{workspace.workspace.invite_code}</strong>
+                        {" · "}
+                        {workspace.members?.length ?? 0} member{workspace.members?.length !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                    <div className="set-card-control">
+                      <button
+                        className="btn secondary"
+                        onClick={() => {
+                          setBusy(true);
+                          api
+                            .post("/api/workspace/leave")
+                            .then(() => { refreshWorkspace(); showToast("Left workspace"); })
+                            .catch((e) => showToast(e.message, "error"))
+                            .finally(() => setBusy(false));
+                        }}
+                      >
+                        Leave
+                      </button>
+                    </div>
+                  </div>
+                  {workspace.members && workspace.members.length > 0 && (
+                    <div className="set-card stack">
+                      <div className="set-card-main">
+                        <div className="set-card-name">Members</div>
+                      </div>
+                      <div className="set-card-control" style={{ flexDirection: "column", gap: 4 }}>
+                        {workspace.members.map((m, i) => (
+                          <div key={i} style={{ fontSize: 12.5 }}>
+                            {m.display_name || "Member"}{" "}
+                            <span style={{ color: "var(--muted)", fontSize: 11 }}>joined {m.joined_at?.slice(0, 10)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="set-section-label">Sync folder</div>
+                  <div className="set-card stack">
+                    <div className="set-card-main">
+                      <div className="set-card-name">Shared folder path</div>
+                      <div className="set-card-desc">
+                        Point to a shared network drive or Dropbox folder that all members can access.
+                        Aguacate writes meeting JSON files here when you share to team.
+                      </div>
+                    </div>
+                    <div className="set-card-control" style={{ flexDirection: "column", gap: 6 }}>
+                      <input
+                        className="text-input"
+                        placeholder="/Volumes/SharedDrive  or  ~/Dropbox/team"
+                        value={wsSharePath}
+                        onChange={(e) => setWsSharePath(e.target.value)}
+                      />
+                      <button
+                        className="btn"
+                        disabled={!wsSharePath.trim()}
+                        onClick={() => {
+                          api
+                            .post("/api/workspace/share-path", { path: wsSharePath.trim() })
+                            .then(() => { refreshWorkspace(); showToast("Sync path saved"); })
+                            .catch((e) => showToast(e.message, "error"));
+                        }}
+                      >
+                        Save path
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
 
