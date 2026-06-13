@@ -1,0 +1,318 @@
+"""License, export, integrations, settings, secrets."""
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
+from ..config import is_safe_managed_path
+from ..db import get_db, get_setting, set_setting
+from ..services import exporter, license as license_svc, notes as notes_svc
+from ..services.integrations import SENDERS
+from ..services.keychain import KNOWN_SECRETS, delete_secret, secret_status, set_secret
+from ..services.recorder import AUDIO_AVAILABLE
+from ..services.transcriber import is_available as whisper_available
+
+router = APIRouter(prefix="/api", tags=["misc"])
+
+
+class LicenseKeyBody(BaseModel):
+    license_key: str = Field(min_length=8, max_length=200)
+
+
+class SecretBody(BaseModel):
+    name: str = Field(max_length=60)
+    value: str = Field(min_length=1, max_length=4000)
+
+
+class SettingBody(BaseModel):
+    key: str = Field(max_length=60)
+    value: object = None
+
+
+# Per-key validators (C6: never trust renderer input shape)
+def _is_device(v):
+    # 0-255: PortAudio device indices; 1000+: synthetic WASAPI loopback indices
+    return v is None or (isinstance(v, int) and 0 <= v < 2048)
+
+
+def _is_word_list(v):
+    return (
+        isinstance(v, list)
+        and len(v) <= 100
+        and all(isinstance(w, str) and 0 < len(w) <= 60 for w in v)
+    )
+
+
+SETTING_VALIDATORS = {
+    "theme": lambda v: v in ("default", "dark", "purple", "navy", "warm", "neon"),
+    "recording_mode": lambda v: v in ("all", "confirm_30s", "manual", "off"),
+    "mic_device": _is_device,
+    "system_device": _is_device,
+    "whisper_model": lambda v: v in ("tiny", "base", "small", "medium", "large-v3"),
+    "claude_model": lambda v: isinstance(v, str) and v.startswith("claude-") and len(v) < 60,
+    "apple_calendar_enabled": lambda v: isinstance(v, bool),
+    "auto_launch": lambda v: isinstance(v, bool),
+    "list_panel_width": lambda v: isinstance(v, (int, float)) and 240 <= v <= 480,
+    "coach_enabled": lambda v: isinstance(v, bool),
+    "redact_words": _is_word_list,
+    "exclude_patterns": _is_word_list,
+    "retention_days": lambda v: isinstance(v, int) and 0 <= v <= 3650,
+    "default_template": lambda v: isinstance(v, str) and len(v) <= 64,
+    "font_size": lambda v: v in ("small", "medium", "large"),
+    "reduce_motion": lambda v: isinstance(v, bool),
+}
+
+
+# ---------- license ----------
+@router.get("/license/status")
+def license_status():
+    return license_svc.status()
+
+
+@router.post("/license/activate")
+def license_activate(body: LicenseKeyBody):
+    try:
+        return license_svc.activate(body.license_key)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@router.post("/license/refresh")
+def license_refresh():
+    return license_svc.refresh()
+
+
+# ---------- integrations ----------
+@router.get("/integrations/status")
+def integrations_status():
+    return {"providers": list(SENDERS.keys()), "secrets": secret_status()}
+
+
+@router.post("/integrations/{provider}/send/{meeting_id}")
+def send_to_integration(provider: str, meeting_id: str):
+    sender = SENDERS.get(provider)
+    if not sender:
+        raise HTTPException(status_code=422, detail="Unknown integration")
+    db = get_db()
+    meeting = db.execute(
+        "SELECT title FROM meetings WHERE id=?", (meeting_id,)
+    ).fetchone()
+    note = db.execute(
+        "SELECT content FROM notes WHERE meeting_id=?", (meeting_id,)
+    ).fetchone()
+    if not meeting or not note:
+        raise HTTPException(status_code=404, detail="Meeting notes not found")
+    try:
+        result = sender(meeting["title"], note["content"])
+        return {"ok": True, "message": result}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception:
+        # Never leak third-party exception detail (C8)
+        raise HTTPException(status_code=502, detail=f"{provider} request failed")
+
+
+# ---------- secrets (write-only; values never readable back) ----------
+@router.post("/secrets")
+def save_secret(body: SecretBody):
+    if body.name not in KNOWN_SECRETS:
+        raise HTTPException(status_code=422, detail="Unknown secret name")
+    try:
+        set_secret(body.name, body.value)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"ok": True}
+
+
+@router.delete("/secrets/{name}")
+def remove_secret(name: str):
+    if name not in KNOWN_SECRETS:
+        raise HTTPException(status_code=422, detail="Unknown secret name")
+    delete_secret(name)
+    return {"ok": True}
+
+
+# ---------- settings ----------
+@router.get("/settings")
+def get_settings():
+    return {
+        "theme": get_setting("theme", "default"),
+        "recording_mode": get_setting("recording_mode", "confirm_30s"),
+        "mic_device": get_setting("mic_device"),
+        "system_device": get_setting("system_device"),
+        "whisper_model": get_setting("whisper_model", "base"),
+        "claude_model": get_setting("claude_model", "claude-sonnet-4-6"),
+        "apple_calendar_enabled": get_setting("apple_calendar_enabled", False),
+        "auto_launch": get_setting("auto_launch", False),
+        "list_panel_width": get_setting("list_panel_width", 308),
+        "coach_enabled": get_setting("coach_enabled", True),
+        "redact_words": get_setting("redact_words", []),
+        "exclude_patterns": get_setting("exclude_patterns", []),
+        "retention_days": get_setting("retention_days", 0),
+        "default_template": get_setting("default_template", "builtin-default"),
+        "font_size": get_setting("font_size", "medium"),
+        "reduce_motion": get_setting("reduce_motion", False),
+    }
+
+
+@router.post("/settings")
+def save_setting(body: SettingBody):
+    validator = SETTING_VALIDATORS.get(body.key)
+    if validator is None:
+        raise HTTPException(status_code=422, detail="Unknown setting")
+    if not validator(body.value):
+        raise HTTPException(status_code=422, detail="Invalid value for setting")
+    set_setting(body.key, body.value)
+    return {"ok": True}
+
+
+# ---------- templates ----------
+class TemplateBody(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    description: str = Field(default="", max_length=300)
+    body: str = Field(min_length=10, max_length=8000)
+
+
+@router.get("/templates")
+def list_templates_route():
+    from ..services.templates import list_templates
+
+    return list_templates()
+
+
+@router.post("/templates")
+def create_template_route(body: TemplateBody):
+    from ..services.templates import create_template
+
+    return create_template(body.name.strip(), body.description.strip(), body.body)
+
+
+@router.patch("/templates/{template_id}")
+def update_template_route(template_id: str, body: TemplateBody):
+    from ..services.templates import update_template
+
+    if not update_template(template_id, body.name.strip(), body.description.strip(), body.body):
+        raise HTTPException(status_code=404, detail="Template not found or built-in")
+    return {"ok": True}
+
+
+@router.delete("/templates/{template_id}")
+def delete_template_route(template_id: str):
+    from ..services.templates import delete_template
+
+    if not delete_template(template_id):
+        raise HTTPException(status_code=404, detail="Template not found or built-in")
+    return {"ok": True}
+
+
+# ---------- semantic knowledge search ----------
+class AskBody(BaseModel):
+    query: str = Field(min_length=3, max_length=300)
+
+
+@router.post("/search/ask")
+def search_ask(body: AskBody):
+    from ..services.ai import semantic_search
+
+    try:
+        return {"results": semantic_search(body.query.strip())}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+# ---------- export pack ----------
+@router.post("/export/pack/actions_csv")
+def export_pack_actions():
+    return {"path": str(exporter.export_actions_csv())}
+
+
+@router.post("/export/pack/timeline_pdf")
+def export_pack_timeline():
+    return {"path": str(exporter.export_timeline_pdf())}
+
+
+@router.get("/export/{meeting_id}/slack")
+def export_slack(meeting_id: str):
+    import json as _json
+
+    db = get_db()
+    meeting = db.execute(
+        "SELECT title FROM meetings WHERE id=?", (meeting_id,)
+    ).fetchone()
+    note = db.execute(
+        "SELECT sections FROM notes WHERE meeting_id=?", (meeting_id,)
+    ).fetchone()
+    if not meeting or not note:
+        raise HTTPException(status_code=404, detail="Meeting notes not found")
+    sections = _json.loads(note["sections"] or "{}")
+    return {"text": exporter.slack_digest(meeting["title"], sections)}
+
+
+# ---------- export ----------
+@router.post("/export/{meeting_id}/{fmt}")
+def export(meeting_id: str, fmt: str):
+    if fmt not in exporter.EXPORTERS:
+        raise HTTPException(status_code=422, detail="Format must be pdf, markdown, or text")
+    db = get_db()
+    meeting = db.execute(
+        "SELECT title FROM meetings WHERE id=?", (meeting_id,)
+    ).fetchone()
+    note = db.execute(
+        "SELECT content FROM notes WHERE meeting_id=?", (meeting_id,)
+    ).fetchone()
+    if not meeting or not note:
+        raise HTTPException(status_code=404, detail="Meeting notes not found")
+    path = exporter.EXPORTERS[fmt](meeting["title"], note["content"])
+    return {"path": str(path)}
+
+
+
+# ---------- encrypted vault ----------
+class VaultExportBody(BaseModel):
+    password: str = Field(min_length=8, max_length=200)
+    include_audio: bool = False
+
+
+class VaultImportBody(BaseModel):
+    path: str = Field(min_length=1, max_length=1024)
+    password: str = Field(min_length=8, max_length=200)
+
+
+@router.post("/vault/export")
+def vault_export(body: VaultExportBody):
+    from ..services.vault import export_vault
+
+    try:
+        return {"path": export_vault(body.password, body.include_audio)}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.post("/vault/import")
+def vault_import(body: VaultImportBody):
+    from ..config import is_safe_managed_path
+    from ..services.vault import import_vault
+
+    # only vaults inside our own data dir (e.g. exports/) may be restored,
+    # keeping the path surface sandboxed (C6)
+    if not is_safe_managed_path(body.path) or not body.path.endswith(".aguavault"):
+        raise HTTPException(
+            status_code=422,
+            detail="Vault file must be an .aguavault inside the Aguacate data folder",
+        )
+    try:
+        count = import_vault(body.path, body.password)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Vault file not found")
+    return {"ok": True, "restored": count, "restart_recommended": True}
+
+
+# ---------- health ----------
+@router.get("/health")
+def health():
+    return {
+        "ok": True,
+        "audio": AUDIO_AVAILABLE,
+        "whisper": whisper_available(),
+        "claude_configured": notes_svc.is_configured(),
+    }

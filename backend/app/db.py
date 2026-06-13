@@ -1,0 +1,183 @@
+"""SQLite persistence. DB file is chmod 600 on creation (C5)."""
+import json
+import sqlite3
+import threading
+import uuid
+from datetime import datetime, timezone
+
+from .config import DB_PATH, secure_file, touch_secure
+
+_local = threading.local()
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS meetings (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL DEFAULT 'Untitled meeting',
+    started_at TEXT NOT NULL,
+    ended_at TEXT,
+    status TEXT NOT NULL DEFAULT 'recording', -- recording|transcribing|generating|ready|error
+    audio_path TEXT,
+    transcript_path TEXT,
+    notes_path TEXT,
+    attendees TEXT NOT NULL DEFAULT '[]',     -- JSON array of names
+    calendar_event_id TEXT,
+    error TEXT
+);
+CREATE TABLE IF NOT EXISTS transcripts (
+    meeting_id TEXT PRIMARY KEY REFERENCES meetings(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    language TEXT,
+    duration_sec REAL
+);
+CREATE TABLE IF NOT EXISTS notes (
+    meeting_id TEXT PRIMARY KEY REFERENCES meetings(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,                    -- full markdown
+    sections TEXT NOT NULL DEFAULT '{}',      -- JSON {section_key: markdown}
+    generated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS action_items (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
+    owner TEXT NOT NULL DEFAULT 'TBD',
+    action TEXT NOT NULL,
+    due TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'open'       -- open|done
+);
+CREATE TABLE IF NOT EXISTS decisions (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    decided_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS topics (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
+    name TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS calendar_events (
+    id TEXT PRIMARY KEY,                      -- dedup key: norm_title|start
+    provider TEXT NOT NULL,                   -- google|microsoft|apple
+    provider_ids TEXT NOT NULL DEFAULT '[]',  -- JSON list of provider event ids merged in
+    title TEXT NOT NULL,
+    start TEXT NOT NULL,
+    end TEXT,
+    attendees TEXT NOT NULL DEFAULT '[]',
+    cancelled INTEGER NOT NULL DEFAULT 0,
+    recorded_meeting_id TEXT,
+    prompted INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS templates (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL,                       -- the template-specific sections spec
+    created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS conflicts (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
+    new_decision TEXT NOT NULL,
+    old_decision TEXT NOT NULL,
+    old_meeting_id TEXT,
+    old_meeting_title TEXT,
+    old_date TEXT,
+    explanation TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'open',      -- open|superseded|reviewed
+    created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS shares (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_actions_meeting ON action_items(meeting_id);
+CREATE INDEX IF NOT EXISTS idx_topics_meeting ON topics(meeting_id);
+CREATE INDEX IF NOT EXISTS idx_topics_name ON topics(name);
+CREATE INDEX IF NOT EXISTS idx_shares_token ON shares(token);
+"""
+
+# Idempotent column additions for existing databases.
+_MIGRATIONS = {
+    "meetings": [
+        ("template_id", "TEXT"),
+        ("followup_sent", "INTEGER NOT NULL DEFAULT 0"),
+        ("coach", "TEXT"),                    # JSON coaching summary
+        ("markers", "TEXT NOT NULL DEFAULT '[]'"),  # JSON [seconds,...]
+    ],
+    "transcripts": [("segments", "TEXT NOT NULL DEFAULT '[]'")],
+    "decisions": [("status", "TEXT NOT NULL DEFAULT 'active'")],
+    "calendar_events": [("briefed", "INTEGER NOT NULL DEFAULT 0")],
+    "action_items": [("completed_at", "TEXT")],
+}
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    for table, columns in _MIGRATIONS.items():
+        existing = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+        for name, ddl in columns:
+            if name not in existing:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}")
+    conn.commit()
+
+
+def get_db() -> sqlite3.Connection:
+    conn = getattr(_local, "conn", None)
+    if conn is None:
+        existed = DB_PATH.exists()
+        if not existed:
+            touch_secure(DB_PATH)  # 0600 before sqlite ever opens it (C5)
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.executescript(SCHEMA)
+        conn.commit()
+        _migrate(conn)
+        if not existed:
+            secure_file(DB_PATH)
+        _local.conn = conn
+    return conn
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def new_id() -> str:
+    return uuid.uuid4().hex
+
+
+def row_to_dict(row: sqlite3.Row) -> dict:
+    d = dict(row)
+    for key in ("attendees", "provider_ids"):
+        if key in d and isinstance(d[key], str):
+            try:
+                d[key] = json.loads(d[key])
+            except json.JSONDecodeError:
+                d[key] = []
+    return d
+
+
+def get_setting(key: str, default=None):
+    row = get_db().execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()
+    if row is None:
+        return default
+    try:
+        return json.loads(row["value"])
+    except json.JSONDecodeError:
+        return default
+
+
+def set_setting(key: str, value) -> None:
+    db = get_db()
+    db.execute(
+        "INSERT INTO settings(key,value) VALUES(?,?) "
+        "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+        (key, json.dumps(value)),
+    )
+    db.commit()
