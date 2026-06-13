@@ -35,7 +35,7 @@ LICENSE_SERVER_URL = os.environ.get(
     "AGUACATE_LICENSE_SERVER", "https://vora-aguacate-license-qdv9b2adr-venturesvora-7648s-projects.vercel.app/api"
 )
 STRIPE_CHECKOUT_URL = os.environ.get(
-    "AGUACATE_CHECKOUT_URL", "https://buy.stripe.com/aguacate-pro"
+    "AGUACATE_CHECKOUT_URL", "https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04"
 )
 FREE_TIER_LIMIT = 5
 
