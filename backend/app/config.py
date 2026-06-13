@@ -32,7 +32,7 @@ ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-sonnet-4-6")
 WHISPER_MODEL = os.environ.get("AGUACATE_WHISPER_MODEL", "base")
 LICENSE_SERVER_URL = os.environ.get(
-    "AGUACATE_LICENSE_SERVER", "https://license.aguacate.app/api/v1"
+    "AGUACATE_LICENSE_SERVER", "https://vora-aguacate-license-qdv9b2adr-venturesvora-7648s-projects.vercel.app/api"
 )
 STRIPE_CHECKOUT_URL = os.environ.get(
     "AGUACATE_CHECKOUT_URL", "https://buy.stripe.com/aguacate-pro"

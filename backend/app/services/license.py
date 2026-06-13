@@ -114,12 +114,11 @@ def refresh() -> dict:
         set_setting("license_status", {"valid": True, "dev": True, "checked_at": time.time()})
         return status()
     try:
-        resp = httpx.post(
-            f"{LICENSE_SERVER_URL}/validate",
-            json={"license_key": key, "product": "aguacate-pro"},
+        resp = httpx.get(
+            f"{LICENSE_SERVER_URL}/license/{key}",
             timeout=10,
         )
-        valid = resp.status_code == 200 and resp.json().get("valid") is True
+        valid = resp.status_code == 200 and not resp.json().get("error")
         set_setting("license_status", {"valid": valid, "checked_at": time.time()})
     except httpx.HTTPError as exc:
         log.warning("License server unreachable: %s", exc)
