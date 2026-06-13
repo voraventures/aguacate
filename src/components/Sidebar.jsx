@@ -156,7 +156,7 @@ export default function Sidebar() {
           </ul>
           <button
             className="upgrade-cta"
-            onClick={() => openExternal("https://aguacatenotes.com/pricing")}
+            onClick={() => window.aguacate.openExternal("https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04")}
           >
             Upgrade to Pro — $20/mo
           </button>

@@ -1602,7 +1602,7 @@ export default function Settings() {
                   <button className="btn secondary" onClick={() => api.post("/api/license/refresh").then(refreshLicense)}>
                     Re-validate
                   </button>
-                  <button className="btn" onClick={() => openExternal("https://aguacatenotes.com/pricing")}>
+                  <button className="btn" onClick={() => openExternal("https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04")}>
                     Get Pro — $20/mo
                   </button>
                 </div>
