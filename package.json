@@ -39,9 +39,13 @@
       "category": "public.app-category.productivity",
       "target": "dmg",
       "hardenedRuntime": true,
-      "entitlements": "electron/entitlements.plist",
-      "entitlementsInherit": "electron/entitlements.plist",
-      "notarize": false,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Aguacate needs microphone access to record your meetings.",
+        "NSAppleEventsUsageDescription": "Aguacate uses Apple Events to detect active calls."
+      },
       "icon": "electron/assets/icon.icns"
     },
     "win": {
