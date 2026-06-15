@@ -46,7 +46,8 @@
         "NSMicrophoneUsageDescription": "Aguacate needs microphone access to record your meetings.",
         "NSAppleEventsUsageDescription": "Aguacate uses Apple Events to detect active calls."
       },
-      "icon": "electron/assets/icon.icns"
+      "icon": "electron/assets/icon.icns",
+      "artifactName": "Aguacate-${version}-mac.${ext}"
     },
     "win": {
       "target": [
@@ -61,7 +62,8 @@
       "signtoolOptions": {
         "publisherName": "Vora Ventures"
       },
-      "icon": "electron/assets/icon.ico"
+      "icon": "electron/assets/icon.ico",
+      "artifactName": "Aguacate-${version}-Setup.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -90,6 +92,7 @@
       "icon": "electron/assets/icon.png",
       "category": "Office",
       "target": "AppImage"
-    }
+    },
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
   }
 }
