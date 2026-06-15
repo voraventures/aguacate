@@ -83,11 +83,16 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
+      "backend/dist/aguacate-backend",
       "!**/credentials*.json",
-      "!**/.env*",
-      "!backend/.venv/**/*"
+      "!**/.env*"
     ],
-    "extraResources": [],
+    "extraResources": [
+      {
+        "from": "backend/dist/aguacate-backend",
+        "to": "backend/dist/aguacate-backend"
+      }
+    ],
     "linux": {
       "icon": "electron/assets/icon.png",
       "category": "Office",

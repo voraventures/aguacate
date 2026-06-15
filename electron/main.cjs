@@ -47,20 +47,24 @@ app.on("second-instance", (_event, argv) => {
 });
 
 // ---------- backend lifecycle ----------
-function resolvePython() {
-  const candidates = IS_WIN
-    ? [path.join(PROJECT_ROOT, "backend", ".venv", "Scripts", "python.exe")]
-    : [path.join(PROJECT_ROOT, "backend", ".venv", "bin", "python")];
-  for (const c of candidates) {
-    if (fs.existsSync(c)) return c;
+function resolveBackend() {
+  if (app.isPackaged) {
+    const bundled = path.join(process.resourcesPath, "backend", "dist", "aguacate-backend");
+    if (fs.existsSync(bundled)) return { exe: bundled, useExe: true };
   }
-  return IS_WIN ? "python" : "python3";
+  // Dev fallback: use .venv python
+  const venvPython = IS_WIN
+    ? path.join(PROJECT_ROOT, "backend", ".venv", "Scripts", "python.exe")
+    : path.join(PROJECT_ROOT, "backend", ".venv", "bin", "python");
+  return { exe: venvPython, useExe: false };
 }
 
 function startBackend() {
-  const python = resolvePython();
-  backendProc = spawn(python, ["run.py"], {
-    cwd: path.join(PROJECT_ROOT, "backend"),
+  const { exe, useExe } = resolveBackend();
+  backendProc = spawn(exe, useExe ? [] : ["run.py"], {
+    // Bundled exe is self-contained; its own dir always exists on disk. In dev
+    // the interpreter needs the backend/ source dir so run.py resolves imports.
+    cwd: useExe ? path.dirname(exe) : path.join(PROJECT_ROOT, "backend"),
     // DEV ONLY: signal dev mode to the backend so it can register
     // developer-testing endpoints (never set true in packaged builds).
     env: { ...process.env, PYTHONUNBUFFERED: "1", AGUACATE_DEV: IS_DEV ? "1" : "0" },
@@ -89,6 +93,15 @@ function startBackend() {
   });
   backendProc.stderr.on("data", (chunk) => {
     if (IS_DEV) process.stderr.write(`[backend] ${chunk}`);
+  });
+  backendProc.on("error", (err) => {
+    backendProc = null;
+    if (!isQuitting) {
+      dialog.showErrorBox(
+        "Aguacate backend failed to start",
+        `The local engine could not be launched (${err.code || err.message}).`
+      );
+    }
   });
   backendProc.on("exit", (code) => {
     backendProc = null;
