@@ -51,7 +51,7 @@ app.on("second-instance", (_event, argv) => {
 // ---------- backend lifecycle ----------
 function resolveBackend() {
   if (app.isPackaged) {
-    const bundled = path.join(process.resourcesPath, "backend", "dist", "aguacate-backend");
+    const bundled = path.join(process.resourcesPath, "backend", "dist", "aguacate-backend", "aguacate-backend");
     if (fs.existsSync(bundled)) return { exe: bundled, useExe: true };
   }
   // Dev fallback: use .venv python

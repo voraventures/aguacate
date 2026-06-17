@@ -1,8 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 """PyInstaller spec for the Aguacate FastAPI backend.
 
-Produces a single self-contained executable (backend/dist/aguacate-backend)
-so the app runs on any Mac without a Python install.
+Produces a self-contained onedir bundle (backend/dist/aguacate-backend/, with the
+executable at backend/dist/aguacate-backend/aguacate-backend) so the app runs on
+any Mac without a Python install and launches instantly (no --onefile self-extract).
 """
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
@@ -57,9 +58,8 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name="aguacate-backend",
     debug=False,
     bootloader_ignore_signals=False,
@@ -73,4 +73,14 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name="aguacate-backend",
 )
