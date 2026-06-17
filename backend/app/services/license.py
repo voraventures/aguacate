@@ -1,5 +1,6 @@
 """Free tier (5 lifetime meetings) + Pro license validated against remote server."""
 import logging
+import os
 import time
 
 import httpx
@@ -15,7 +16,7 @@ OFFLINE_GRACE_SEC = 72 * 3600
 
 # DEV ONLY: local development license — activates Pro indefinitely without
 # ever contacting the license server. Never publish this key.
-DEV_LICENSE_KEY = "AGUA-DEV-LOCAL-2026"
+DEV_LICENSE_KEY = os.environ.get("AGUACATE_DEV_KEY", "")
 
 
 try:

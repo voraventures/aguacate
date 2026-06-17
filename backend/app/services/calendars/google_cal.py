@@ -101,7 +101,6 @@ def build_auth_url(redirect_uri: str) -> str:
         "code_challenge_method": "S256",
         "access_type": "offline",
         "prompt": "consent",
-        "login_hint": "venturesvora@gmail.com",
     }
     return f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
 
