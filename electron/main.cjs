@@ -14,6 +14,7 @@ const {
   globalShortcut,
   nativeImage,
   net,
+  session,
 } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
@@ -21,6 +22,7 @@ const fs = require("fs");
 const { pathToFileURL } = require("url");
 
 const IS_DEV = !app.isPackaged;
+protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
 const IS_WIN = process.platform === "win32";
 const PROJECT_ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(app.getPath("appData"), "Aguacate");
@@ -182,7 +184,9 @@ function showWindow() {
 // Serve the built renderer over app:// in production so the backend CORS
 // allowlist never needs file:// (C3). Electron ≥36 API: protocol.handle.
 function registerAppProtocol() {
-  const base = path.join(PROJECT_ROOT, "dist");
+  const base = app.isPackaged
+    ? path.join(app.getAppPath(), "dist")
+    : path.join(PROJECT_ROOT, "dist");
   protocol.handle("app", (request) => {
     try {
       const url = new URL(request.url);
@@ -195,6 +199,25 @@ function registerAppProtocol() {
     } catch {
       return new Response("Bad request", { status: 400 });
     }
+  });
+}
+
+// Apply the Content-Security-Policy via response headers. NOTE: index.html also
+// ships a <meta> CSP; browsers enforce the intersection of header + meta, so the
+// effective policy stays as restrictive as the stricter of the two.
+function applyContentSecurityPolicy() {
+  const csp =
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' app:; " +
+    "style-src 'self' 'unsafe-inline' app:; " +
+    "connect-src 'self' app: http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* https://api.anthropic.com";
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        "Content-Security-Policy": [csp],
+      },
+    });
   });
 }
 
@@ -423,6 +446,7 @@ app.whenReady().then(() => {
     } catch { /* dev nicety only */ }
   }
   if (!IS_DEV) registerAppProtocol();
+  applyContentSecurityPolicy();
   startBackend();
   createWindow();
   createTray();
