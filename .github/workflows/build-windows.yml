@@ -24,6 +24,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create backend virtualenv
+        run: python -m venv backend/.venv
+
+      - name: Install backend requirements
+        run: backend/.venv/Scripts/pip install -r backend/requirements.txt
+
+      - name: Install PyInstaller
+        run: backend/.venv/Scripts/pip install pyinstaller
+
+      - name: Build backend with PyInstaller
+        run: backend/.venv/Scripts/pyinstaller backend/backend.spec --clean --distpath backend/dist --workpath backend/build
+
+      - name: Verify backend executable exists
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "backend/dist/aguacate-backend/aguacate-backend.exe")) {
+            Write-Error "Backend executable not found at backend/dist/aguacate-backend/aguacate-backend.exe"
+            exit 1
+          }
+          Write-Host "Backend executable verified."
+
       - name: Build Windows installer
         run: npm run dist:win
         env:
