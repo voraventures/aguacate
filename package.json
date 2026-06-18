@@ -1,7 +1,7 @@
 {
   "name": "aguacate",
   "productName": "Aguacate",
-  "version": "2.0.0",
+  "version": "2.3.3",
   "description": "AI meeting notes. No bot. No cloud.",
   "private": true,
   "main": "electron/main.cjs",
