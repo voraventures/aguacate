@@ -46,8 +46,8 @@
 
   <!-- container: flat warm off-white squircle, 25% corner radius,
        with a baked drop shadow for visible elevation in the dock -->
-  <rect x="32" y="28" width="960" height="960" rx="240" fill="#F7F5F0" filter="url(#elevation)"/>
-  <rect x="32" y="28" width="960" height="960" rx="240" fill="#F7F5F0"/>
+  <rect x="32" y="28" width="960" height="960" rx="240" fill="#7CB87A" filter="url(#elevation)"/>
+  <rect x="32" y="28" width="960" height="960" rx="240" fill="#7CB87A"/>
 
   <!-- subtle top-surface light: soft white glow at the top center -->
   <g clip-path="url(#squircleClip)">
