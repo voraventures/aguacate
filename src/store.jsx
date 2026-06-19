@@ -274,7 +274,15 @@ export function StoreProvider({ children }) {
         selectMeeting(result.meeting_id);
         return result;
       } catch (err) {
-        showToast(err.message, "error");
+        const raw = err.message || "Recording failed";
+        if (/portaudio|input.?stream|undefined error.*-50|audio.*unavailable|unavailable.*audio/i.test(raw)) {
+          showToast(
+            "Microphone access denied — open System Settings → Privacy & Security → Microphone",
+            "error"
+          );
+        } else {
+          showToast(raw, "error");
+        }
         throw err;
       }
     },

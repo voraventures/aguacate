@@ -15,6 +15,7 @@ const {
   nativeImage,
   net,
   session,
+  systemPreferences,
 } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
@@ -444,6 +445,12 @@ app.whenReady().then(() => {
     try {
       app.dock.setIcon(path.join(__dirname, "assets", "icon-1024.png"));
     } catch { /* dev nicety only */ }
+  }
+  // Trigger the macOS microphone permission dialog on first launch via the
+  // Electron process (which holds the app bundle identity and entitlements).
+  // The Python subprocess cannot reliably trigger TCC dialogs on its own.
+  if (process.platform === "darwin") {
+    systemPreferences.askForMediaAccess("microphone").catch(() => {});
   }
   if (!IS_DEV) registerAppProtocol();
   applyContentSecurityPolicy();
