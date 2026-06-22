@@ -1,7 +1,6 @@
 import React from "react";
 import { openExternal } from "../api.js";
-import { useStore } from "../store.jsx";
-import logoUrl from "../assets/aguacate_icon.png";
+import { useStore, useLogo } from "../store.jsx";
 import {
   CalendarIcon,
   CheckIcon,
@@ -55,6 +54,7 @@ export default function Sidebar() {
     activeCall,
     dismissActiveCall,
   } = useStore();
+  const logoUrl = useLogo();
 
   const isDarkish = theme === "dark";
   const nextEvent = upcoming.find((e) => !e.cancelled && !e.recorded_meeting_id);
@@ -72,6 +72,7 @@ export default function Sidebar() {
         </div>
       </div>
 
+      <div className="sidebar-scroll">
       <div className="status-box">
         <div className="status-row">
           <span className="status-label">
@@ -235,6 +236,7 @@ export default function Sidebar() {
             <GearIcon size={15} />
           </button>
         </div>
+      </div>
       </div>
     </aside>
   );

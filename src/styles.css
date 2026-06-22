@@ -274,24 +274,40 @@ h3 {
   border-right: 1px solid var(--border);
   padding: 16px 16px 12px;
   gap: 16px;
-  overflow-y: auto;
+  /* static parent: holds the brand header + the scroll region; it never scrolls
+     itself, so the noise/gradient background no longer repaints on scroll */
+  overflow: hidden;
   -webkit-app-region: drag;
 }
 .sidebar > * {
   -webkit-app-region: no-drag;
 }
-/* scroll without a visible rail — the sidebar is a surface, not a document */
-.sidebar {
-  scrollbar-width: none;
-}
-.sidebar::-webkit-scrollbar {
-  display: none;
-}
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* brand title area — lives outside the scroll region, so it is always
+     visible and no content can scroll above or behind it */
   padding: 32px 4px 0;
+}
+/* the only vertical scroll region in the sidebar */
+.sidebar-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* GPU-composite the scroller so scrolling stays smooth */
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+/* scroll without a visible rail — the sidebar is a surface, not a document */
+.sidebar-scroll {
+  scrollbar-width: none;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
 }
 .logo {
   display: flex;
@@ -335,11 +351,14 @@ h3 {
 /* status box */
 .status-box {
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
   border-radius: 16px;
   padding: 16px;
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(14px);
+  /* cache the blurred card on its own layer so the backdrop-filter is not
+     re-evaluated against scrolling content every frame */
+  transform: translateZ(0);
 }
 .status-row {
   display: flex;
@@ -823,6 +842,15 @@ h3 {
 }
 .list-header {
   padding: 48px 16px 8px;
+  /* make the panel header a window-drag area (covers Meetings + Intelligence);
+     interactive controls inside are exempted below */
+  -webkit-app-region: drag;
+}
+.list-header button,
+.list-header input,
+.list-header .search-bar,
+.list-header .segmented {
+  -webkit-app-region: no-drag;
 }
 .list-title {
   font-family: var(--font-display);

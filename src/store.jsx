@@ -8,10 +8,16 @@ import React, {
   useState,
 } from "react";
 import { api, connectWebSocket, initBackend } from "./api.js";
+import logoPrimary from "./assets/logo-primary.svg?no-inline";
+import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
 
 const StoreContext = createContext(null);
 
 export const THEMES = ["default", "dark", "purple", "navy", "warm", "neon"];
+
+// Themes with a dark --bg; the in-app logo uses white waveform bars on these
+// (green seed outline stays identical across every theme).
+export const DARK_THEMES = new Set(["dark", "navy", "neon"]);
 
 export function StoreProvider({ children }) {
   const [ready, setReady] = useState(false);
@@ -47,6 +53,9 @@ export function StoreProvider({ children }) {
   const [workspace, setWorkspace] = useState(null);
   const selectedIdRef = useRef(null);
   selectedIdRef.current = selectedId;
+  const proPollRef = useRef(null);
+  const licenseRef = useRef(null);
+  licenseRef.current = license;
 
   const notify = useCallback((title, body) => {
     window.aguacate?.notify?.(title, body || "");
@@ -348,6 +357,59 @@ export function StoreProvider({ children }) {
     setActiveCall(null);
   }, []);
 
+  // After the user opens the Stripe checkout URL, poll the license server (via
+  // the local backend's /api/license/refresh) every 10s for up to 10 minutes,
+  // stopping as soon as the license upgrades to Pro.
+  const startProUpgradePolling = useCallback(() => {
+    if (proPollRef.current) clearInterval(proPollRef.current);
+    const deadline = Date.now() + 10 * 60 * 1000;
+    const stop = () => {
+      if (proPollRef.current) {
+        clearInterval(proPollRef.current);
+        proPollRef.current = null;
+      }
+    };
+    proPollRef.current = setInterval(async () => {
+      if (Date.now() > deadline) {
+        stop();
+        return;
+      }
+      try {
+        const status = await api.post("/api/license/refresh");
+        if (status?.tier === "pro") {
+          stop();
+          refreshLicense();
+        }
+      } catch {
+        // ignore transient errors; keep polling until the deadline
+      }
+    }, 10000);
+  }, [refreshLicense]);
+
+  useEffect(
+    () => () => {
+      if (proPollRef.current) clearInterval(proPollRef.current);
+    },
+    []
+  );
+
+  // Passive background license poll: every 5 minutes, re-validate against the
+  // license server so a Pro upgrade is reflected even without any user action.
+  useEffect(() => {
+    if (!ready) return;
+    const id = setInterval(async () => {
+      try {
+        const status = await api.post("/api/license/refresh");
+        if (status?.tier === "pro" && licenseRef.current?.tier !== "pro") {
+          refreshLicense();
+        }
+      } catch {
+        // swallow — background poll must never surface errors
+      }
+    }, 5 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [ready, refreshLicense]);
+
   // Feature 4: load workspace on boot
   const refreshWorkspace = useCallback(
     () => api.get("/api/workspace").then((r) => setWorkspace(r)).catch(() => {}),
@@ -393,6 +455,7 @@ export function StoreProvider({ children }) {
     deleteMeeting,
     license,
     refreshLicense,
+    startProUpgradePolling,
     myWork,
     refreshMyWork,
     recording,
@@ -436,4 +499,11 @@ export function StoreProvider({ children }) {
 
 export function useStore() {
   return useContext(StoreContext);
+}
+
+// Theme-aware in-app logo: green seed outline is identical everywhere; only the
+// waveform bars switch (dark on light themes, white on dark themes).
+export function useLogo() {
+  const { theme } = useStore();
+  return DARK_THEMES.has(theme) ? logoPrimaryDark : logoPrimary;
 }

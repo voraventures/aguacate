@@ -54,7 +54,22 @@ def meetings_used() -> int:
     return max(db_count, _keychain_counter())
 
 
+def _sync_install_id_key() -> None:
+    """The Stripe webhook keys the issued license to the install_id, so the
+    install_id IS the license key — users never enter one manually. Keep the
+    keychain license_key in sync with the install_id, but never clobber a dev key."""
+    from ..routes.workspace import _install_id
+
+    current = get_secret("license_key")
+    if DEV_LICENSE_KEY and current == DEV_LICENSE_KEY:
+        return
+    iid = _install_id()
+    if current != iid:
+        set_secret("license_key", iid)
+
+
 def status() -> dict:
+    _sync_install_id_key()  # on app start: ensure license_key == install_id
     used = meetings_used()
     cached = get_setting("license_status", {})
     is_dev = bool(cached.get("dev"))  # DEV ONLY: no expiry, no grace window
@@ -107,6 +122,7 @@ def set_tier(tier: str) -> dict:  # DEV ONLY
 
 def refresh() -> dict:
     """Validate the stored license key against the license server."""
+    _sync_install_id_key()  # after checkout: ensure we validate the install_id
     key = get_secret("license_key")
     if not key:
         set_setting("license_status", {"valid": False, "checked_at": time.time()})

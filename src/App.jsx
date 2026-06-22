@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useStore } from "./store.jsx";
+import { useStore, useLogo } from "./store.jsx";
 import BriefPanel from "./components/BriefPanel.jsx";
 import CoachPanel from "./components/CoachPanel.jsx";
 import IntelligenceView from "./components/IntelligenceView.jsx";
@@ -10,7 +10,6 @@ import RecordPrompt from "./components/RecordPrompt.jsx";
 import Settings from "./components/Settings.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Titlebar from "./components/Titlebar.jsx";
-import logoUrl from "./assets/aguacate_icon.png";
 
 const platform = window.aguacate?.platform || "darwin";
 const MIN_LIST = 240;
@@ -18,6 +17,7 @@ const MAX_LIST = 480;
 
 export default function App() {
   const { ready, connectionFailed, nav, toast } = useStore();
+  const logoUrl = useLogo();
   const [listWidth, setListWidth] = useState(() => {
     const saved = Number(localStorage.getItem("aguacate_list_width"));
     return saved >= MIN_LIST && saved <= MAX_LIST ? saved : 308;

@@ -80,6 +80,13 @@ def license_refresh():
     return license_svc.refresh()
 
 
+@router.get("/install-id")
+def install_id():
+    from .workspace import _install_id
+
+    return {"install_id": _install_id()}
+
+
 # ---------- integrations ----------
 @router.get("/integrations/status")
 def integrations_status():

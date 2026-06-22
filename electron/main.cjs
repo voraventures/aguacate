@@ -224,23 +224,12 @@ function applyContentSecurityPolicy() {
 
 // ---------- tray ----------
 function buildTrayIcon() {
-  // 16x16 avocado-green rounded dot, generated in-process (no asset pipeline).
-  const size = 16;
-  const buf = Buffer.alloc(size * size * 4);
-  const cx = 7.5;
-  const cy = 7.5;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const d = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
-      const alpha = d <= 5.6 ? 255 : d <= 6.8 ? Math.round(255 * (6.8 - d) / 1.2) : 0;
-      const i = (y * size + x) * 4; // BGRA
-      buf[i] = 69; // B
-      buf[i + 1] = 139; // G
-      buf[i + 2] = 63; // R
-      buf[i + 3] = alpha;
-    }
-  }
-  return nativeImage.createFromBitmap(buf, { width: size, height: size });
+  // Load the bundled icon, size it for the menu bar, and flag it as a template
+  // image so macOS recolors it correctly in both light and dark mode.
+  const img = nativeImage.createFromPath(path.join(__dirname, "assets", "tray-icon.png"));
+  const resized = img.resize({ width: 16, height: 16 });
+  resized.setTemplateImage(true);
+  return resized;
 }
 
 function createTray() {
@@ -298,21 +287,12 @@ let pulseTimer = null;
 let pulsePhase = false;
 const ICON_IDLE = () => buildTrayIcon();
 function buildRecordingIcon(dim) {
-  const size = 16;
-  const buf = Buffer.alloc(size * size * 4);
-  const alphaScale = dim ? 0.45 : 1;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const d = Math.sqrt((x - 7.5) ** 2 + (y - 7.5) ** 2);
-      const alpha = d <= 5.6 ? 255 : d <= 6.8 ? Math.round(255 * (6.8 - d) / 1.2) : 0;
-      const i = (y * size + x) * 4; // BGRA — red recording dot
-      buf[i] = 64;
-      buf[i + 1] = 74;
-      buf[i + 2] = 208;
-      buf[i + 3] = Math.round(alpha * alphaScale);
-    }
-  }
-  return nativeImage.createFromBitmap(buf, { width: size, height: size });
+  // Use the same template image as the idle tray (no programmatic dot); macOS
+  // handles light/dark rendering. `dim` is retained for the caller's signature.
+  const img = nativeImage.createFromPath(path.join(__dirname, "assets", "tray-icon.png"));
+  const resized = img.resize({ width: 16, height: 16 });
+  resized.setTemplateImage(true);
+  return resized;
 }
 
 function setTrayRecording(recording) {
@@ -443,7 +423,7 @@ app.on("open-url", (event, url) => {
 app.whenReady().then(() => {
   if (IS_DEV && process.platform === "darwin") {
     try {
-      app.dock.setIcon(path.join(__dirname, "assets", "icon-1024.png"));
+      app.dock.setIcon(path.join(__dirname, "assets", "icon.png"));
     } catch { /* dev nicety only */ }
   }
   // Trigger the macOS microphone permission dialog on first launch via the

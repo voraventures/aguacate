@@ -402,6 +402,7 @@ export default function Settings() {
     refreshCalendar,
     license,
     refreshLicense,
+    startProUpgradePolling,
     showToast,
     templates,
     refreshTemplates,
@@ -414,7 +415,7 @@ export default function Settings() {
   const [secrets, setSecrets] = useState({});
   const [devices, setDevices] = useState({ devices: [] });
   const [msFlow, setMsFlow] = useState(null);
-  const [licenseKey, setLicenseKey] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [autoLaunch, setAutoLaunch] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null); // {id?,name,description,body}
   const [vaultPassword, setVaultPassword] = useState("");
@@ -511,15 +512,25 @@ export default function Settings() {
       .catch((e) => showToast(e.message, "error"));
   };
 
-  const activateLicense = () => {
-    api
-      .post("/api/license/activate", { license_key: licenseKey.trim() })
-      .then(() => {
-        setLicenseKey("");
-        refreshLicense();
-        showToast("License saved");
-      })
-      .catch((e) => showToast(e.message, "error"));
+  const startProCheckout = async () => {
+    setCheckoutLoading(true);
+    try {
+      const { install_id } = await api.get("/api/install-id");
+      const resp = await fetch("https://license.aguacatenotes.com/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ install_id }),
+      });
+      if (!resp.ok) throw new Error(`Checkout failed (${resp.status})`);
+      const data = await resp.json();
+      if (!data?.url) throw new Error("No checkout URL returned");
+      openExternal(data.url);
+      startProUpgradePolling();
+    } catch (e) {
+      showToast(e.message || "Could not start checkout", "error");
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   // DEV ONLY: flip the local license tier for testing; the sidebar re-reads
@@ -1572,26 +1583,6 @@ export default function Settings() {
                   </span>
                 </div>
               </div>
-              <div className="set-card stack">
-                <div className="set-card-icon"><KeyIcon size={14} /></div>
-                <div className="set-card-main">
-                  <div className="set-card-name">License key</div>
-                  <div className="set-card-desc">Paste your Aguacate Pro key to activate.</div>
-                </div>
-                <div className="set-card-control">
-                  <div style={{ display: "flex", gap: 7, width: "100%" }}>
-                    <input
-                      className="text-input"
-                      placeholder={license?.license_key_set ? "•••••••• (saved)" : "AGUA-XXXX-XXXX-XXXX"}
-                      value={licenseKey}
-                      onChange={(e) => setLicenseKey(e.target.value)}
-                    />
-                    <button className="btn" disabled={licenseKey.trim().length < 8} onClick={activateLicense}>
-                      Activate
-                    </button>
-                  </div>
-                </div>
-              </div>
               <div className="set-card">
                 <div className="set-card-icon"><RefreshIcon size={14} /></div>
                 <div className="set-card-main">
@@ -1602,8 +1593,8 @@ export default function Settings() {
                   <button className="btn secondary" onClick={() => api.post("/api/license/refresh").then(refreshLicense)}>
                     Re-validate
                   </button>
-                  <button className="btn" onClick={() => openExternal("https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04")}>
-                    Get Pro — $20/mo
+                  <button className="btn" disabled={checkoutLoading} onClick={startProCheckout}>
+                    {checkoutLoading ? "Starting…" : "Get Pro — $20/mo"}
                   </button>
                 </div>
               </div>
