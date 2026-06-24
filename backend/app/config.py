@@ -52,6 +52,10 @@ DEV_MODE = (
 # OAuth client config is user-supplied (never bundled). See credentials.example.json.
 CREDENTIALS_PATH = DATA_DIR / "credentials.json"
 
+# Default public OAuth client_id (PKCE flow — no secret). Used when credentials.json
+# does not supply one; credentials.json still overrides this for backward compatibility.
+GOOGLE_CLIENT_ID = "316282714383-nheoav7hcoj4sd00ooge7s0k2onblv8e.apps.googleusercontent.com"
+
 
 def _secure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)

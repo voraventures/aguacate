@@ -54,6 +54,50 @@ def is_available() -> bool:
     return True  # macOS always has osascript; permission is requested on first use
 
 
+# JXA probe: request EventKit access and report only whether it was granted.
+_JXA_PROBE = """
+ObjC.import('EventKit');
+function run() {
+  const store = $.EKEventStore.alloc.init;
+  let granted = false;
+  const sema = $.dispatch_semaphore_create(0);
+  store.requestFullAccessToEventsWithCompletion(function(ok, err) {
+    granted = ok; $.dispatch_semaphore_signal(sema);
+  });
+  $.dispatch_semaphore_wait(sema, $.dispatch_time($.DISPATCH_TIME_NOW, 10 * 1e9));
+  return JSON.stringify({granted: granted});
+}
+"""
+
+
+def probe_access() -> str | None:
+    """Return "access_denied" if EventKit denies calendar access, else None.
+
+    Transient failures (missing osascript, timeout, malformed output) are not
+    treated as a definitive denial — they return None so the caller doesn't
+    surface a false "access denied" on a flaky probe.
+    """
+    try:
+        proc = subprocess.run(
+            ["osascript", "-l", "JavaScript", "-e", _JXA_PROBE],
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+        if proc.returncode != 0:
+            log.warning("Apple Calendar access probe failed: %s", proc.stderr.strip()[:200])
+            return None
+        payload = json.loads(proc.stdout.strip() or "{}")
+        if payload.get("granted") is True:
+            return None
+        if payload.get("granted") is False:
+            return "access_denied"
+        return None
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError) as exc:
+        log.warning("Apple Calendar access probe error: %s", exc)
+        return None
+
+
 def fetch_events(hours_ahead: int = 18) -> list[dict]:
     try:
         proc = subprocess.run(

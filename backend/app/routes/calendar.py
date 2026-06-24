@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from ..db import get_setting, set_setting
-from ..services.calendars import google_cal, ms_cal, sync
+from ..services.calendars import apple_cal, google_cal, ms_cal, sync
 
 router = APIRouter(prefix="/api/calendar", tags=["calendar"])
 oauth_router = APIRouter(tags=["oauth"])  # mounted without auth dependency
@@ -102,6 +102,8 @@ def ms_disconnect():
 @router.post("/apple/toggle")
 def apple_toggle(body: AppleToggle):
     set_setting("apple_calendar_enabled", body.enabled)
+    if body.enabled and apple_cal.probe_access() == "access_denied":
+        return {"ok": False, "error": "access_denied"}
     return {"ok": True, "enabled": body.enabled}
 
 

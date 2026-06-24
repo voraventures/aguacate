@@ -939,7 +939,23 @@ export default function Settings() {
                       onClick={() =>
                         api
                           .post("/api/calendar/apple/toggle", { enabled: !calendarStatus.apple })
-                          .then(refreshCalendar)
+                          .then((resp) => {
+                            if (resp?.error === "access_denied") {
+                              showToast(
+                                "Calendar access denied. Grant access in System Settings → Privacy & Security → Calendars.",
+                                "error"
+                              );
+                            }
+                            refreshCalendar();
+                          })
+                          .catch((e) => {
+                            if (String(e?.message || "").includes("access_denied")) {
+                              showToast(
+                                "Calendar access denied. Grant access in System Settings → Privacy & Security → Calendars.",
+                                "error"
+                              );
+                            }
+                          })
                       }
                     >
                       {calendarStatus.apple ? "Disable" : "Enable"}

@@ -13,13 +13,16 @@ import urllib.parse
 
 import httpx
 
-from ...config import load_oauth_credentials
+from ...config import GOOGLE_CLIENT_ID, load_oauth_credentials
 
 log = logging.getLogger("aguacate.google")
 
 SCOPES = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/drive.file"
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
+# Desktop-app OAuth client secret (non-confidential for installed apps; Google
+# requires it in the token exchange even with PKCE for Desktop client types).
+GOOGLE_CLIENT_SECRET = "REMOVED-LEAKED-CLIENT-SECRET"
 
 # CSRF state tokens with TTL (C9)
 _pending: dict[str, dict] = {}
@@ -65,7 +68,7 @@ def _cleanup_states() -> None:
 
 def client_id() -> str | None:
     creds = load_oauth_credentials()
-    return creds.get("google", {}).get("client_id")
+    return creds.get("google", {}).get("client_id") or GOOGLE_CLIENT_ID
 
 
 def is_connected() -> bool:
@@ -114,6 +117,7 @@ def exchange_code(state: str, code: str) -> None:
         TOKEN_URL,
         data={
             "client_id": client_id(),
+            "client_secret": GOOGLE_CLIENT_SECRET,
             "code": code,
             "code_verifier": pending["verifier"],
             "grant_type": "authorization_code",
@@ -141,6 +145,7 @@ def get_access_token() -> str | None:
             TOKEN_URL,
             data={
                 "client_id": client_id(),
+                "client_secret": GOOGLE_CLIENT_SECRET,
                 "refresh_token": refresh,
                 "grant_type": "refresh_token",
             },
