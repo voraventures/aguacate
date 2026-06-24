@@ -45,7 +45,8 @@
       "entitlementsInherit": "build/entitlements.mac.inherit.plist",
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Aguacate needs microphone access to record your meetings.",
-        "NSAppleEventsUsageDescription": "Aguacate uses Apple Events to detect active calls."
+        "NSAppleEventsUsageDescription": "Aguacate uses Apple Events to detect active calls.",
+        "NSCalendarsUsageDescription": "Aguacate needs calendar access to detect upcoming meetings."
       },
       "icon": "electron/assets/icon.icns",
       "artifactName": "Aguacate-${version}-mac.${ext}"
