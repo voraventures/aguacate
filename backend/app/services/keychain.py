@@ -8,6 +8,8 @@ SERVICE = "Aguacate"
 
 KNOWN_SECRETS = [
     "anthropic_api_key",
+    "openai_api_key",
+    "google_api_key",
     "license_key",
     "hubspot_token",
     "salesforce_token",

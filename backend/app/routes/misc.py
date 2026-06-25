@@ -2,7 +2,12 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from ..config import is_safe_managed_path
+from ..config import (
+    DEFAULT_AI_PROVIDER,
+    DEFAULT_GEMINI_MODEL,
+    DEFAULT_OPENAI_MODEL,
+    is_safe_managed_path,
+)
 from ..db import get_db, get_setting, set_setting
 from ..services import exporter, license as license_svc, notes as notes_svc
 from ..services.integrations import SENDERS
@@ -48,6 +53,9 @@ SETTING_VALIDATORS = {
     "system_device": _is_device,
     "whisper_model": lambda v: v in ("tiny", "base", "small", "medium", "large-v3"),
     "claude_model": lambda v: isinstance(v, str) and v.startswith("claude-") and len(v) < 60,
+    "ai_provider": lambda v: v in ("anthropic", "openai", "google"),
+    "openai_model": lambda v: isinstance(v, str) and len(v) < 60,
+    "gemini_model": lambda v: isinstance(v, str) and len(v) < 60,
     "apple_calendar_enabled": lambda v: isinstance(v, bool),
     "auto_launch": lambda v: isinstance(v, bool),
     "list_panel_width": lambda v: isinstance(v, (int, float)) and 240 <= v <= 480,
@@ -147,6 +155,9 @@ def get_settings():
         "system_device": get_setting("system_device"),
         "whisper_model": get_setting("whisper_model", "base"),
         "claude_model": get_setting("claude_model", "claude-sonnet-4-6"),
+        "ai_provider": get_setting("ai_provider", DEFAULT_AI_PROVIDER),
+        "openai_model": get_setting("openai_model", DEFAULT_OPENAI_MODEL),
+        "gemini_model": get_setting("gemini_model", DEFAULT_GEMINI_MODEL),
         "apple_calendar_enabled": get_setting("apple_calendar_enabled", False),
         "auto_launch": get_setting("auto_launch", False),
         "list_panel_width": get_setting("list_panel_width", 308),
@@ -157,6 +168,27 @@ def get_settings():
         "default_template": get_setting("default_template", "builtin-default"),
         "font_size": get_setting("font_size", "medium"),
         "reduce_motion": get_setting("reduce_motion", False),
+    }
+
+
+@router.get("/models")
+def list_models():
+    return {
+        "anthropic": [
+            {"id": "claude-opus-4-8", "name": "Claude Opus 4.8", "default": False},
+            {"id": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "default": True},
+            {"id": "claude-haiku-4-5-20251001", "name": "Claude Haiku 4.5", "default": False},
+        ],
+        "openai": [
+            {"id": "gpt-4o", "name": "GPT-4o", "default": True},
+            {"id": "gpt-4o-mini", "name": "GPT-4o mini", "default": False},
+            {"id": "o3-mini", "name": "o3 mini", "default": False},
+        ],
+        "google": [
+            {"id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash", "default": True},
+            {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "default": False},
+            {"id": "gemini-1.5-pro", "name": "Gemini 1.5 Pro", "default": False},
+        ],
     }
 
 

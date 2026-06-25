@@ -1,15 +1,32 @@
 """Structured AI meeting notes via the Claude API."""
 import logging
 
-from ..config import CLAUDE_MODEL, NOTES_DIR, write_secure_text
+from ..config import (
+    CLAUDE_MODEL,
+    DEFAULT_AI_PROVIDER,
+    DEFAULT_GEMINI_MODEL,
+    DEFAULT_OPENAI_MODEL,
+    NOTES_DIR,
+    write_secure_text,
+)
 from ..db import get_setting
 from ..events import hub
 from .keychain import get_secret
 
 log = logging.getLogger("aguacate.notes")
 
-def is_configured() -> bool:
-    return bool(get_secret("anthropic_api_key"))
+_PROVIDER_KEYS = {
+    "anthropic": "anthropic_api_key",
+    "openai": "openai_api_key",
+    "google": "google_api_key",
+}
+
+
+def is_configured(provider: str | None = None) -> bool:
+    """True if the API key for the given provider (or the active provider) is set."""
+    if provider is None:
+        provider = get_setting("ai_provider", DEFAULT_AI_PROVIDER)
+    return bool(get_secret(_PROVIDER_KEYS.get(provider, "anthropic_api_key")))
 
 
 def get_client():
@@ -21,7 +38,40 @@ def get_client():
     return anthropic.Anthropic(api_key=api_key)
 
 
+def get_openai_client():
+    api_key = get_secret("openai_api_key")
+    if not api_key:
+        raise RuntimeError("OpenAI API key not configured. Add it in Settings → AI.")
+    try:
+        import openai
+    except ImportError:
+        raise RuntimeError("The 'openai' package is not installed on the backend.")
+    return openai.OpenAI(api_key=api_key)
+
+
+def get_gemini_client():
+    api_key = get_secret("google_api_key")
+    if not api_key:
+        raise RuntimeError("Google API key not configured. Add it in Settings → AI.")
+    try:
+        import google.generativeai as genai
+    except ImportError:
+        raise RuntimeError("The 'google-generativeai' package is not installed on the backend.")
+    genai.configure(api_key=api_key)
+    return genai
+
+
 def current_model() -> str:
+    # Anthropic model only — shared by ai.py / conflicts.py, which call the Anthropic
+    # client. Per-provider note generation resolves its model via _model_for().
+    return get_setting("claude_model", CLAUDE_MODEL)
+
+
+def _model_for(provider: str) -> str:
+    if provider == "openai":
+        return get_setting("openai_model", DEFAULT_OPENAI_MODEL)
+    if provider == "google":
+        return get_setting("gemini_model", DEFAULT_GEMINI_MODEL)
     return get_setting("claude_model", CLAUDE_MODEL)
 
 
@@ -35,13 +85,12 @@ def generate_notes(
     """Call Claude with the meeting's template and persist the markdown."""
     from . import templates as templates_svc
 
-    client = get_client()
     template = templates_svc.get_template(template_id)
     hub.emit("notes_started", {"meeting_id": meeting_id, "template": template["name"]})
 
     attendee_line = f"Attendees: {', '.join(attendees)}\n" if attendees else ""
 
-    # Detect if transcript contains speaker labels so Claude can attribute decisions
+    # Detect if transcript contains speaker labels so the model can attribute decisions
     has_speakers = bool(transcript and "Speaker " in transcript[:500])
     speaker_note = (
         "\n\nNote: The transcript uses 'Speaker N:' labels. When attributing action items "
@@ -56,21 +105,46 @@ def generate_notes(
         if user_name else ""
     )
 
-    message = client.messages.create(
-        model=current_model(),
-        max_tokens=2400,
-        system=templates_svc.compose_system_prompt(template) + speaker_note + user_note,
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Meeting title: {title}\n{attendee_line}\n"
-                    f"Transcript:\n\n{transcript[:120000]}"
-                ),
-            }
-        ],
+    # Shared prompt for every provider — only the SDK call differs below.
+    system = templates_svc.compose_system_prompt(template) + speaker_note + user_note
+    user_content = (
+        f"Meeting title: {title}\n{attendee_line}\n"
+        f"Transcript:\n\n{transcript[:120000]}"
     )
-    content = "".join(b.text for b in message.content if b.type == "text").strip()
+
+    provider = get_setting("ai_provider", DEFAULT_AI_PROVIDER)
+    model = _model_for(provider)
+
+    if provider == "anthropic":
+        client = get_client()
+        message = client.messages.create(
+            model=model,
+            max_tokens=2400,
+            system=system,
+            messages=[{"role": "user", "content": user_content}],
+        )
+        content = "".join(b.text for b in message.content if b.type == "text").strip()
+    elif provider == "openai":
+        client = get_openai_client()
+        resp = client.chat.completions.create(
+            model=model,
+            max_completion_tokens=2400,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
+        )
+        content = (resp.choices[0].message.content or "").strip()
+    elif provider == "google":
+        genai = get_gemini_client()
+        gmodel = genai.GenerativeModel(model, system_instruction=system)
+        resp = gmodel.generate_content(
+            user_content,
+            generation_config={"max_output_tokens": 2400},
+        )
+        content = (resp.text or "").strip()
+    else:
+        raise RuntimeError(f"Unknown AI provider: {provider}")
 
     path = NOTES_DIR / f"{meeting_id}.md"
     write_secure_text(path, content)
