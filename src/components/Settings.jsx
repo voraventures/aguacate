@@ -418,6 +418,7 @@ export default function Settings() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [autoLaunch, setAutoLaunch] = useState(false);
   const [userName, setUserName] = useState("");
+  const [models, setModels] = useState({});
   const [editingTemplate, setEditingTemplate] = useState(null); // {id?,name,description,body}
   const [vaultPassword, setVaultPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -470,6 +471,7 @@ export default function Settings() {
       loadSecrets();
       api.get("/api/recording/devices").then(setDevices).catch(() => {});
       api.get("/api/settings/user-name").then((r) => setUserName(r.user_name || "")).catch(() => {});
+      api.get("/api/models").then(setModels).catch(() => {});
       refreshCalendar();
       loadMobileSessions();
       window.aguacate
@@ -851,38 +853,83 @@ export default function Settings() {
             </>
           )}
 
-          {tab === "ai" && (
-            <>
-              <div className="set-section-label first">Model access</div>
-              {SECRET_FIELDS.filter((f) => f.tab === "ai").map((f) => (
-                <div className="set-card stack" key={f.name}>
-                  <div className="set-card-icon"><KeyIcon size={14} /></div>
-                  <SecretField {...f} isSet={secrets[f.name]} onSaved={loadSecrets} />
-                </div>
-              ))}
-              <div className="set-card stack">
-                <div className="set-card-icon"><StarIcon size={14} /></div>
-                <div className="set-card-main">
-                  <div className="set-card-name">Claude model</div>
-                  <div className="set-card-desc">
-                    Only the transcript text is sent to Claude to write your notes. Audio never leaves
-                    this Mac. Your key is stored in the macOS Keychain.
+          {tab === "ai" && (() => {
+            const PROVIDERS = [
+              { id: "anthropic", name: "Anthropic", keyName: "anthropic_api_key", keyLabel: "Anthropic API key", modelKey: "claude_model", link: "https://console.anthropic.com/" },
+              { id: "openai", name: "OpenAI", keyName: "openai_api_key", keyLabel: "OpenAI API key", modelKey: "openai_model", link: "https://platform.openai.com/api-keys" },
+              { id: "google", name: "Google", keyName: "google_api_key", keyLabel: "Google API key", modelKey: "gemini_model", link: "https://aistudio.google.com/apikey" },
+            ];
+            const provider = settings.ai_provider || "anthropic";
+            const active = PROVIDERS.find((p) => p.id === provider) || PROVIDERS[0];
+            const providerModels = models[provider] || [];
+            const defaultModelId = providerModels.find((m) => m.default)?.id || "";
+            const selectedModel = settings[active.modelKey] || defaultModelId;
+            return (
+              <>
+                <div className="set-section-label first">AI provider</div>
+                <div className="set-card stack">
+                  <div className="set-card-main">
+                    <div className="set-card-name">Provider</div>
+                    <div className="set-card-desc">
+                      Only the transcript text is sent to {active.name} to write your notes. Audio never
+                      leaves this Mac.
+                    </div>
+                  </div>
+                  <div className="set-card-control">
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {PROVIDERS.map((p) => (
+                        <button
+                          key={p.id}
+                          className={`btn${provider === p.id ? "" : " secondary"}`}
+                          onClick={() => saveSetting("ai_provider", p.id)}
+                        >
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="set-card-control">
-                  <select
-                    className="select-input"
-                    value={settings.claude_model || "claude-sonnet-4-6"}
-                    onChange={(e) => saveSetting("claude_model", e.target.value)}
-                  >
-                    <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (recommended)</option>
-                    <option value="claude-opus-4-8">Claude Opus 4.8 (highest quality)</option>
-                    <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (fastest)</option>
-                  </select>
+
+                <div className="set-card stack">
+                  <div className="set-card-icon"><KeyIcon size={14} /></div>
+                  <SecretField
+                    name={active.keyName}
+                    label={active.keyLabel}
+                    isSet={secrets[active.keyName]}
+                    onSaved={loadSecrets}
+                  />
                 </div>
-              </div>
-            </>
-          )}
+                <div className="field-help" style={{ marginTop: -4 }}>
+                  <button
+                    onClick={() => openExternal(active.link)}
+                    style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", fontSize: 11, padding: 0 }}
+                  >
+                    Get your {active.name} API key →
+                  </button>
+                </div>
+
+                <div className="set-card stack">
+                  <div className="set-card-icon"><StarIcon size={14} /></div>
+                  <div className="set-card-main">
+                    <div className="set-card-name">Model</div>
+                    <div className="set-card-desc">Choose the {active.name} model used to write your notes.</div>
+                  </div>
+                  <div className="set-card-control">
+                    <select
+                      className="select-input"
+                      value={selectedModel}
+                      onChange={(e) => saveSetting(active.modelKey, e.target.value)}
+                    >
+                      {providerModels.length === 0 && <option value="">Loading…</option>}
+                      {providerModels.map((m) => (
+                        <option key={m.id} value={m.id}>{m.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
 
           {tab === "calendars" && (
             <>

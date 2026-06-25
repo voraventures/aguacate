@@ -30,6 +30,9 @@ ALLOWED_ORIGINS = [
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 
 CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-sonnet-4-6")
+DEFAULT_AI_PROVIDER = os.environ.get("AGUACATE_AI_PROVIDER", "anthropic")
+DEFAULT_OPENAI_MODEL = os.environ.get("AGUACATE_OPENAI_MODEL", "gpt-4o")
+DEFAULT_GEMINI_MODEL = os.environ.get("AGUACATE_GEMINI_MODEL", "gemini-2.0-flash")
 WHISPER_MODEL = os.environ.get("AGUACATE_WHISPER_MODEL", "base")
 LICENSE_SERVER_URL = os.environ.get(
     "AGUACATE_LICENSE_SERVER", "https://license.aguacatenotes.com/api"

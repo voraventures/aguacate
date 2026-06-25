@@ -19,11 +19,23 @@ datas += [(os.path.join(SPECPATH, "..", "electron", "assets", "icon.png"), "asse
 
 # Native-library-heavy packages: pull in their binaries, data files, and
 # submodules wholesale so faster-whisper / ctranslate2 / torch load at runtime.
-for pkg in ("faster_whisper", "ctranslate2", "torch", "torchaudio"):
-    pkg_datas, pkg_binaries, pkg_hidden = collect_all(pkg)
-    datas += pkg_datas
-    binaries += pkg_binaries
-    hiddenimports += pkg_hidden
+for pkg in (
+    "faster_whisper",
+    "ctranslate2",
+    "torch",
+    "torchaudio",
+    "openai",
+    "google.generativeai",
+    "google.ai.generativelanguage",
+):
+    try:
+        pkg_datas, pkg_binaries, pkg_hidden = collect_all(pkg)
+        datas += pkg_datas
+        binaries += pkg_binaries
+        hiddenimports += pkg_hidden
+    except Exception:
+        # Optional/secondary providers — skip if not present at build time.
+        pass
 
 # The application package and all of its submodules (routes/, services/, ...).
 hiddenimports += collect_submodules("app")
@@ -37,6 +49,8 @@ hiddenimports += [
     "ctranslate2",
     "sounddevice",
     "anthropic",
+    "openai",
+    "google.generativeai",
     "sqlite3",
 ]
 for mod in ("uvicorn", "fastapi", "whisper", "anthropic"):
