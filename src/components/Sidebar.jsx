@@ -170,7 +170,7 @@ export default function Sidebar() {
                 >
                   <CalendarIcon size={12} /> Next meeting
                 </div>
-                <div style={{ fontWeight: 500, marginTop: 4, lineHeight: 1.3 }}>
+                <div style={{ fontWeight: 500, marginTop: 2, lineHeight: 1.3 }}>
                   {nextEvent.title}
                 </div>
                 {d && (
@@ -180,12 +180,12 @@ export default function Sidebar() {
                       alignItems: "center",
                       justifyContent: "space-between",
                       gap: 8,
-                      marginTop: 8,
+                      marginTop: 6,
                       paddingLeft: 8,
                       borderLeft: "3px solid #3F8B45",
                     }}
                   >
-                    <span style={{ fontSize: 12, color: "#767b72" }}>
+                    <span style={{ fontSize: 11, color: "#767b72", whiteSpace: "nowrap" }}>
                       {_dayLabel(d, now)} · {_timeLabel(d)}
                     </span>
                     <span
