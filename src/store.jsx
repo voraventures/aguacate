@@ -410,6 +410,16 @@ export function StoreProvider({ children }) {
     return () => clearInterval(id);
   }, [ready, refreshLicense]);
 
+  // Safety net: re-fetch upcoming meetings every 2 minutes in case a
+  // calendar_synced WebSocket push was missed (e.g. a dropped socket).
+  useEffect(() => {
+    if (!ready) return;
+    const id = setInterval(() => {
+      api.get("/api/calendar/upcoming").then(setUpcoming).catch(() => {});
+    }, 2 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [ready]);
+
   // Feature 4: load workspace on boot
   const refreshWorkspace = useCallback(
     () => api.get("/api/workspace").then((r) => setWorkspace(r)).catch(() => {}),
