@@ -266,6 +266,8 @@ export default function NotesPanel() {
   const [coachVisible, setCoachVisible] = useState(false);
   const [shareModal, setShareModal] = useState(null); // { url }
   const [notesTab, setNotesTab] = useState("notes"); // notes | transcript
+  const [myItemsOnly, setMyItemsOnly] = useState(false);
+  const [userName, setUserName] = useState("");
   const [onboarded, setOnboarded] = useState(
     () => localStorage.getItem("aguacate_onboarded") === "true"
   );
@@ -281,6 +283,10 @@ export default function NotesPanel() {
     setCoachVisible(false);
     setNotesTab("notes");
   }, [meetingDetail?.id]);
+
+  useEffect(() => {
+    api.get("/api/settings/user-name").then((r) => setUserName(r.user_name || "")).catch(() => {});
+  }, []);
 
   // Close the overflow menu when clicking outside it.
   useEffect(() => {
@@ -431,6 +437,16 @@ export default function NotesPanel() {
       .then(({ text }) =>
         navigator.clipboard.writeText(text).then(() => showToast("Slack digest copied"))
       )
+      .catch((e) => showToast(e.message, "error"));
+  };
+
+  const downloadMyActions = () => {
+    api
+      .post(`/api/export/${m.id}/my-actions`)
+      .then(({ path }) => {
+        showToast("Exported your action items");
+        showInFolder(path);
+      })
       .catch((e) => showToast(e.message, "error"));
   };
 
@@ -656,12 +672,53 @@ export default function NotesPanel() {
                     {card}
                     {actions.length > 0 && (
                       <div className="section-card stagger" data-tour="action-items" style={{ animationDelay: "60ms" }}>
-                        <div className="section-label">
-                          <CheckIcon size={13} /> Action Items
+                        <div className="section-label" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span><CheckIcon size={13} /> Action Items</span>
+                          <span style={{ display: "flex", gap: 6 }}>
+                            <button
+                              className={`toolbar-btn${myItemsOnly ? " primary" : ""}`}
+                              onClick={() => {
+                                setMyItemsOnly((v) => !v);
+                                api
+                                  .get("/api/settings/user-name")
+                                  .then((r) => setUserName(r.user_name || ""))
+                                  .catch(() => {});
+                              }}
+                            >
+                              My items
+                            </button>
+                            {myItemsOnly && userName && (
+                              <button className="toolbar-btn" onClick={downloadMyActions}>
+                                <ExportIcon size={13} /> Download
+                              </button>
+                            )}
+                          </span>
                         </div>
-                        {actions.map((a) => (
-                          <ActionRow key={a.id} item={a} onAssign={assign} onComplete={completeAction} />
-                        ))}
+                        {myItemsOnly && !userName ? (
+                          <div style={{ color: "#767b72", padding: "4px 2px", fontSize: 13 }}>
+                            Set your name in Settings → General to filter your items
+                          </div>
+                        ) : (
+                          (() => {
+                            const list = myItemsOnly
+                              ? actions.filter(
+                                  (a) =>
+                                    (a.owner || "").trim().toLowerCase() ===
+                                    userName.trim().toLowerCase()
+                                )
+                              : actions;
+                            if (myItemsOnly && list.length === 0) {
+                              return (
+                                <div style={{ color: "#767b72", padding: "4px 2px", fontSize: 13 }}>
+                                  No action items assigned to you in this meeting.
+                                </div>
+                              );
+                            }
+                            return list.map((a) => (
+                              <ActionRow key={a.id} item={a} onAssign={assign} onComplete={completeAction} />
+                            ));
+                          })()
+                        )}
                       </div>
                     )}
                     {decisions.length > 0 && (
