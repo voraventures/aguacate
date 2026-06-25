@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { openExternal } from "../api.js";
 import { useStore, useLogo } from "../store.jsx";
 import {
@@ -33,6 +33,33 @@ function Waveform() {
   );
 }
 
+// Parse a calendar event start (ISO datetime, or date-only for all-day) to a Date.
+function _meetingDate(start) {
+  if (!start) return null;
+  const d = start.length === 10 ? new Date(start + "T00:00:00") : new Date(start);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function _dayLabel(d, now) {
+  const startOfDay = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((startOfDay(d) - startOfDay(new Date(now))) / 86400000);
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+}
+
+function _timeLabel(d) {
+  return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+
+function _countdown(d, now) {
+  const mins = Math.round((d.getTime() - now) / 60000);
+  if (mins <= 0) return "now";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `in ${h}h ${m}m` : `in ${m}m`;
+}
+
 export default function Sidebar() {
   const {
     theme,
@@ -55,6 +82,12 @@ export default function Sidebar() {
     dismissActiveCall,
   } = useStore();
   const logoUrl = useLogo();
+
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   const isDarkish = theme === "dark";
   const nextEvent = upcoming.find((e) => !e.cancelled && !e.recorded_meeting_id);
@@ -110,14 +143,75 @@ export default function Sidebar() {
             )}
           </>
         )}
-        <div className="calendar-hint">
-          <CalendarIcon size={12} />
-          <span className="hint-text">
-            {nextEvent
-              ? `Next: ${nextEvent.title}`
-              : "No upcoming meetings detected"}
-          </span>
-        </div>
+        {nextEvent ? (
+          (() => {
+            const d = _meetingDate(nextEvent.start);
+            return (
+              <div
+                className="next-meeting-card"
+                style={{
+                  border: "1px solid rgba(63, 139, 69, 0.25)",
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                  background: "rgba(63, 139, 69, 0.04)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    color: "#3F8B45",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  <CalendarIcon size={12} /> Next meeting
+                </div>
+                <div style={{ fontWeight: 500, marginTop: 4, lineHeight: 1.3 }}>
+                  {nextEvent.title}
+                </div>
+                {d && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 8,
+                      marginTop: 8,
+                      paddingLeft: 8,
+                      borderLeft: "3px solid #3F8B45",
+                    }}
+                  >
+                    <span style={{ fontSize: 12, color: "#767b72" }}>
+                      {_dayLabel(d, now)} · {_timeLabel(d)}
+                    </span>
+                    <span
+                      style={{
+                        background: "#3F8B45",
+                        color: "#fff",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        padding: "2px 8px",
+                        borderRadius: 999,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {_countdown(d, now)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })()
+        ) : (
+          <div className="calendar-hint">
+            <CalendarIcon size={12} />
+            <span className="hint-text">No upcoming meetings detected</span>
+          </div>
+        )}
 
         {activeCall && !recording.active && (
           <div className="call-detection-banner">
