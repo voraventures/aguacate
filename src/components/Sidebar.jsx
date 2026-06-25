@@ -185,7 +185,7 @@ export default function Sidebar() {
                       borderLeft: "3px solid #3F8B45",
                     }}
                   >
-                    <span style={{ fontSize: 11, color: "#767b72", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 11, color: "#767b72", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
                       {_dayLabel(d, now)} · {_timeLabel(d)}
                     </span>
                     <span
@@ -197,6 +197,7 @@ export default function Sidebar() {
                         padding: "2px 8px",
                         borderRadius: 999,
                         whiteSpace: "nowrap",
+                        flexShrink: 0,
                       }}
                     >
                       {_countdown(d, now)}
