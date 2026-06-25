@@ -50,7 +50,7 @@
         "NSScreenCaptureUsageDescription": "Aguacate needs screen recording permission to capture system audio from your meetings."
       },
       "icon": "electron/assets/icon.icns",
-      "artifactName": "Aguacate-${version}-mac.${ext}"
+      "artifactName": "Aguacate.dmg"
     },
     "win": {
       "target": [
