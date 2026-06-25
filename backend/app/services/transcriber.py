@@ -119,7 +119,15 @@ def transcribe(meeting_id: str, audio_path: Path) -> dict:
         )
     model = _load_model()
     with transcribe_lock:
-        segments, info = model.transcribe(str(audio_path), vad_filter=True)
+        segments, info = model.transcribe(
+            str(audio_path),
+            vad_filter=True,
+            vad_parameters={
+                "min_speech_duration_ms": 100,
+                "min_silence_duration_ms": 300,
+                "speech_pad_ms": 200,
+            },
+        )
 
         parts = []
         seg_data = []

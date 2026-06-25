@@ -46,7 +46,8 @@
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Aguacate needs microphone access to record your meetings.",
         "NSAppleEventsUsageDescription": "Aguacate uses Apple Events to detect active calls.",
-        "NSCalendarsUsageDescription": "Aguacate needs calendar access to detect upcoming meetings."
+        "NSCalendarsUsageDescription": "Aguacate needs calendar access to detect upcoming meetings.",
+        "NSScreenCaptureUsageDescription": "Aguacate needs screen recording permission to capture system audio from your meetings."
       },
       "icon": "electron/assets/icon.icns",
       "artifactName": "Aguacate-${version}-mac.${ext}"

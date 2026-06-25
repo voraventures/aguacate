@@ -420,6 +420,39 @@ app.on("open-url", (event, url) => {
   }
 });
 
+// macOS only: system audio capture needs Screen Recording permission. Nudge the
+// user toward the right pane if it hasn't been granted yet.
+function checkScreenRecordingPermission() {
+  if (process.platform !== "darwin") return;
+  let status;
+  try {
+    status = systemPreferences.getMediaAccessStatus("screen");
+  } catch {
+    return;
+  }
+  if (status === "granted") return;
+  dialog
+    .showMessageBox(mainWindow, {
+      type: "info",
+      title: "Screen Recording Permission Required",
+      message: "Aguacate needs Screen Recording permission to capture system audio from your meetings.",
+      detail:
+        "Without it, audio from other participants (system audio) will not be recorded. " +
+        "Grant access in System Settings → Privacy & Security → Screen Recording, then restart Aguacate.",
+      buttons: ["Open System Settings", "Later"],
+      defaultId: 0,
+      cancelId: 1,
+    })
+    .then(({ response }) => {
+      if (response === 0) {
+        shell.openExternal(
+          "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
+        );
+      }
+    })
+    .catch(() => {});
+}
+
 app.whenReady().then(() => {
   if (IS_DEV && process.platform === "darwin") {
     try {
@@ -436,6 +469,7 @@ app.whenReady().then(() => {
   applyContentSecurityPolicy();
   startBackend();
   createWindow();
+  checkScreenRecordingPermission();
   createTray();
   registerShortcuts();
   app.on("activate", () => showWindow());
