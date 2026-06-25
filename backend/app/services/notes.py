@@ -49,10 +49,17 @@ def generate_notes(
         if has_speakers else ""
     )
 
+    user_name = get_setting("user_name", "")
+    user_note = (
+        f"\n\nThe user's name is {user_name}. When assigning action items, "
+        "use their exact name as the owner."
+        if user_name else ""
+    )
+
     message = client.messages.create(
         model=current_model(),
         max_tokens=2400,
-        system=templates_svc.compose_system_prompt(template) + speaker_note,
+        system=templates_svc.compose_system_prompt(template) + speaker_note + user_note,
         messages=[
             {
                 "role": "user",

@@ -11,6 +11,12 @@ datas = []
 binaries = []
 hiddenimports = []
 
+# Bundle the app logo so the Python backend can embed it in PDF exports.
+# Resolved relative to the spec dir; lands at <bundle>/assets/icon.png and is
+# read at runtime via sys._MEIPASS (see services/exporter.py).
+import os
+datas += [(os.path.join(SPECPATH, "..", "electron", "assets", "icon.png"), "assets")]
+
 # Native-library-heavy packages: pull in their binaries, data files, and
 # submodules wholesale so faster-whisper / ctranslate2 / torch load at runtime.
 for pkg in ("faster_whisper", "ctranslate2", "torch", "torchaudio"):

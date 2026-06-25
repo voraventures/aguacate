@@ -171,6 +171,24 @@ def save_setting(body: SettingBody):
     return {"ok": True}
 
 
+class UserNameBody(BaseModel):
+    name: str = Field(max_length=100)
+
+
+@router.get("/settings/user-name")
+def get_user_name():
+    return {"user_name": get_setting("user_name", "")}
+
+
+@router.post("/settings/user-name")
+def set_user_name(body: UserNameBody):
+    name = body.name.strip()
+    if not (1 <= len(name) <= 100):
+        raise HTTPException(status_code=422, detail="Name must be 1-100 characters")
+    set_setting("user_name", name)
+    return {"ok": True, "user_name": name}
+
+
 # ---------- templates ----------
 class TemplateBody(BaseModel):
     name: str = Field(min_length=1, max_length=80)
@@ -251,6 +269,15 @@ def export_slack(meeting_id: str):
         raise HTTPException(status_code=404, detail="Meeting notes not found")
     sections = _json.loads(note["sections"] or "{}")
     return {"text": exporter.slack_digest(meeting["title"], sections)}
+
+
+# Declared before the generic /{fmt} route so "my-actions" matches here first.
+@router.post("/export/{meeting_id}/my-actions")
+def export_my_actions(meeting_id: str):
+    user_name = get_setting("user_name", "")
+    if not user_name:
+        raise HTTPException(status_code=400, detail="Set your name in Settings first")
+    return {"path": str(exporter.export_my_actions_pdf(meeting_id, user_name))}
 
 
 # ---------- export ----------

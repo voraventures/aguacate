@@ -1,5 +1,7 @@
 """Export notes as PDF (fpdf2), Markdown, or plain text. Files land in EXPORTS_DIR."""
 import re
+import sys
+from datetime import datetime
 from pathlib import Path
 
 from ..config import EXPORTS_DIR, secure_file, touch_secure, write_secure_text
@@ -11,6 +13,52 @@ _MD_HEADER = re.compile(r"^(#{1,3})\s+(.*)$")
 def _safe_name(title: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9 _-]", "", title).strip() or "meeting"
     return cleaned[:60].replace(" ", "_")
+
+
+def _logo_path() -> Path | None:
+    """Locate the Aguacate logo: PyInstaller bundle first (sys._MEIPASS/assets),
+    then the dev project tree. Returns None if unavailable so PDFs render
+    text-only rather than crashing."""
+    candidates = []
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        candidates.append(Path(sys._MEIPASS) / "assets" / "icon.png")
+    candidates.append(
+        Path(__file__).resolve().parents[3] / "electron" / "assets" / "icon.png"
+    )
+    for c in candidates:
+        try:
+            if c.exists():
+                return c
+        except OSError:
+            continue
+    return None
+
+
+def _logo_header(pdf, subtitle: str | None = None) -> None:
+    """Draw the Aguacate logo (16x16mm) + wordmark top-left, optional subtitle below.
+    Falls back to wordmark-only if the logo asset can't be found/read."""
+    logo = _logo_path()
+    x = pdf.l_margin
+    top = pdf.get_y()
+    text_x = x
+    if logo is not None:
+        try:
+            pdf.image(str(logo), x=x, y=top, w=16, h=16)
+            text_x = x + 19
+        except Exception:
+            text_x = x
+    pdf.set_xy(text_x, top + 3)
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_text_color(63, 139, 69)
+    pdf.cell(0, 9, "Aguacate", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_y(max(pdf.get_y(), top + 16) + 2)
+    if subtitle:
+        pdf.set_x(pdf.l_margin)
+        pdf.set_font("Helvetica", "B", 14)
+        pdf.set_text_color(30, 40, 29)
+        safe = subtitle.encode("latin-1", "replace").decode("latin-1")
+        pdf.multi_cell(0, 7, safe, new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
 
 
 def export_markdown(title: str, markdown: str) -> Path:
@@ -50,6 +98,7 @@ def export_pdf(title: str, markdown: str) -> Path:
         pdf.set_x(pdf.l_margin)
         pdf.multi_cell(0, spacing, safe, new_x="LMARGIN", new_y="NEXT")
 
+    _logo_header(pdf)
     w(title, size=20, style="B", color=(63, 139, 69), spacing=9)
     pdf.ln(3)
 
@@ -132,6 +181,7 @@ def export_timeline_pdf() -> Path:
             new_x="LMARGIN", new_y="NEXT",
         )
 
+    _logo_header(pdf)
     w("Aguacate — Decision Timeline", size=20, style="B", color=(63, 139, 69), spacing=9)
     pdf.ln(4)
     current_date = None
@@ -150,6 +200,80 @@ def export_timeline_pdf() -> Path:
         w(f"      from: {r['title']}", size=9, color=(118, 123, 114), spacing=4.5)
 
     path = EXPORTS_DIR / "aguacate-decision-timeline.pdf"
+    touch_secure(path)
+    pdf.output(str(path))
+    secure_file(path)
+    return path
+
+
+def export_my_actions_pdf(meeting_id: str, user_name: str) -> Path:
+    """One meeting's action items owned by user_name, as a branded PDF checklist."""
+    from fpdf import FPDF
+
+    from ..db import get_db
+
+    db = get_db()
+    meeting = db.execute("SELECT title FROM meetings WHERE id=?", (meeting_id,)).fetchone()
+    title = meeting["title"] if meeting else "Meeting"
+    rows = db.execute(
+        "SELECT action, due, status FROM action_items "
+        "WHERE meeting_id=? AND LOWER(owner)=LOWER(?) ORDER BY status, due",
+        (meeting_id, user_name),
+    ).fetchall()
+
+    def _l1(text: str) -> str:
+        return (text or "").encode("latin-1", "replace").decode("latin-1")
+
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=18)
+    pdf.add_page()
+    pdf.set_margins(18, 18, 18)
+
+    _logo_header(pdf, title)
+
+    pdf.set_x(pdf.l_margin)
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.set_text_color(63, 139, 69)
+    pdf.multi_cell(0, 8, _l1(f"Your action items - {user_name}"), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+
+    if not rows:
+        pdf.set_font("Helvetica", "", 11)
+        pdf.set_text_color(118, 123, 114)
+        pdf.multi_cell(
+            0, 6, _l1("No action items assigned to you in this meeting."),
+            new_x="LMARGIN", new_y="NEXT",
+        )
+    else:
+        box = 4.5
+        for r in rows:
+            done = r["status"] == "done"
+            y = pdf.get_y()
+            pdf.set_draw_color(63, 139, 69)
+            pdf.set_fill_color(63, 139, 69)
+            pdf.set_line_width(0.4)
+            pdf.rect(pdf.l_margin, y + 0.6, box, box, style="DF" if done else "D")
+            pdf.set_xy(pdf.l_margin + box + 3, y)
+            pdf.set_font("Helvetica", "", 11)
+            pdf.set_text_color(30, 40, 29)
+            due = f"  (due {r['due']})" if r["due"] else ""
+            badge = "DONE" if done else "OPEN"
+            pdf.multi_cell(
+                0, 6, _l1(f"{r['action']}{due}   [{badge}]"),
+                new_x="LMARGIN", new_y="NEXT",
+            )
+            pdf.ln(1.5)
+
+    pdf.ln(4)
+    pdf.set_x(pdf.l_margin)
+    pdf.set_font("Helvetica", "I", 8.5)
+    pdf.set_text_color(118, 123, 114)
+    pdf.multi_cell(
+        0, 5, _l1(f"Generated by Aguacate - {datetime.now().strftime('%Y-%m-%d')}"),
+        new_x="LMARGIN", new_y="NEXT",
+    )
+
+    path = EXPORTS_DIR / f"{_safe_name(title)}-my-actions.pdf"
     touch_secure(path)
     pdf.output(str(path))
     secure_file(path)

@@ -410,13 +410,14 @@ export default function Settings() {
     workspace,
     refreshWorkspace,
   } = useStore();
-  const [tab, setTab] = useState("appearance");
+  const [tab, setTab] = useState("general");
   const [tplDetailId, setTplDetailId] = useState(null);
   const [secrets, setSecrets] = useState({});
   const [devices, setDevices] = useState({ devices: [] });
   const [msFlow, setMsFlow] = useState(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [autoLaunch, setAutoLaunch] = useState(false);
+  const [userName, setUserName] = useState("");
   const [editingTemplate, setEditingTemplate] = useState(null); // {id?,name,description,body}
   const [vaultPassword, setVaultPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -468,6 +469,7 @@ export default function Settings() {
     if (settingsOpen) {
       loadSecrets();
       api.get("/api/recording/devices").then(setDevices).catch(() => {});
+      api.get("/api/settings/user-name").then((r) => setUserName(r.user_name || "")).catch(() => {});
       refreshCalendar();
       loadMobileSessions();
       window.aguacate
@@ -547,6 +549,7 @@ export default function Settings() {
   };
 
   const TABS = [
+    ["general", "General"],
     ["appearance", "Appearance"],
     ["recording", "Recording"],
     ["templates", "Templates"],
@@ -593,6 +596,34 @@ export default function Settings() {
           )}
         </div>
         <div className="modal-body">
+          {tab === "general" && (
+            <>
+              <div className="set-section-label first">General</div>
+              <div className="set-card stack">
+                <div className="set-card-icon"><UsersIcon size={14} /></div>
+                <div className="set-card-main">
+                  <div className="set-card-name">Your name</div>
+                  <div className="set-card-desc">Used to identify your action items in meetings</div>
+                </div>
+                <div className="set-card-control">
+                  <input
+                    className="text-input"
+                    value={userName}
+                    placeholder="e.g. Luis Coomer"
+                    onChange={(e) => setUserName(e.target.value)}
+                    onBlur={() => {
+                      const v = userName.trim();
+                      if (v)
+                        api
+                          .post("/api/settings/user-name", { name: v })
+                          .then(() => showToast("Name saved"))
+                          .catch((e) => showToast(e.message, "error"));
+                    }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
           {tab === "appearance" && (
             <>
               <div className="set-section-label first">Appearance</div>
