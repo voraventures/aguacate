@@ -1707,12 +1707,16 @@ export default function Settings() {
                       {portalLoading ? "Opening…" : "Manage subscription"}
                     </button>
                   )}
-                  <button className="btn secondary" onClick={() => api.post("/api/license/refresh").then(refreshLicense)}>
-                    Re-validate
-                  </button>
-                  <button className="btn" disabled={checkoutLoading} onClick={startProCheckout}>
-                    {checkoutLoading ? "Starting…" : "Get Pro — $20/mo"}
-                  </button>
+                  {license?.tier !== "pro" && (
+                    <button className="btn secondary" onClick={() => api.post("/api/license/refresh").then(refreshLicense)}>
+                      Re-validate
+                    </button>
+                  )}
+                  {license?.tier !== "pro" && (
+                    <button className="btn" disabled={checkoutLoading} onClick={startProCheckout}>
+                      {checkoutLoading ? "Starting…" : "Get Pro — $20/mo"}
+                    </button>
+                  )}
                 </div>
               </div>
               {/* DEV ONLY: tier switching for local testing (hidden in production builds) */}
