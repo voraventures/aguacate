@@ -1,4 +1,5 @@
 """License, export, integrations, settings, secrets."""
+import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -93,6 +94,29 @@ def install_id():
     from .workspace import _install_id
 
     return {"install_id": _install_id()}
+
+
+@router.get("/license/portal-url")
+def license_portal_url():
+    from .workspace import _install_id
+
+    try:
+        resp = httpx.post(
+            "https://license.aguacatenotes.com/api/portal",
+            json={"install_id": _install_id()},
+            timeout=10,
+        )
+    except httpx.HTTPError:
+        return {"url": None, "error": "unavailable"}
+
+    if resp.status_code == 404:
+        return {"url": None, "error": "no_subscription"}
+    if resp.status_code == 200:
+        try:
+            return {"url": resp.json().get("url")}
+        except ValueError:
+            return {"url": None, "error": "unavailable"}
+    return {"url": None, "error": "unavailable"}
 
 
 # ---------- integrations ----------

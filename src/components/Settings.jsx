@@ -416,6 +416,7 @@ export default function Settings() {
   const [devices, setDevices] = useState({ devices: [] });
   const [msFlow, setMsFlow] = useState(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [autoLaunch, setAutoLaunch] = useState(false);
   const [userName, setUserName] = useState("");
   const [models, setModels] = useState({});
@@ -535,6 +536,23 @@ export default function Settings() {
     } finally {
       setCheckoutLoading(false);
     }
+  };
+
+  const openPortal = () => {
+    setPortalLoading(true);
+    api
+      .get("/api/license/portal-url")
+      .then((r) => {
+        if (r?.url) {
+          openExternal(r.url);
+        } else if (r?.error === "no_subscription") {
+          showToast("No active subscription found", "error");
+        } else {
+          showToast("Unable to reach billing portal. Try again later.", "error");
+        }
+      })
+      .catch(() => showToast("Unable to reach billing portal. Try again later.", "error"))
+      .finally(() => setPortalLoading(false));
   };
 
   // DEV ONLY: flip the local license tier for testing; the sidebar re-reads
@@ -1684,6 +1702,11 @@ export default function Settings() {
                   <div className="set-card-desc">Re-check your license or upgrade to Pro.</div>
                 </div>
                 <div className="set-card-control">
+                  {license?.tier === "pro" && (
+                    <button className="btn secondary" disabled={portalLoading} onClick={openPortal}>
+                      {portalLoading ? "Opening…" : "Manage subscription"}
+                    </button>
+                  )}
                   <button className="btn secondary" onClick={() => api.post("/api/license/refresh").then(refreshLicense)}>
                     Re-validate
                   </button>
