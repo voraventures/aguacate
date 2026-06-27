@@ -34,6 +34,12 @@ def people():
     return intelligence.aggregate_people()
 
 
+@router.get("/conflicts")
+def conflicts():
+    """Open contradictions between decisions, as flat pairs."""
+    return intelligence.aggregate_conflicts()
+
+
 @router.get("/my-work")
 def my_work():
     return intelligence.my_work_summary()
