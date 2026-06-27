@@ -629,7 +629,7 @@ export default function Settings() {
                   <input
                     className="text-input"
                     value={userName}
-                    placeholder="e.g. Luis Coomer"
+                    placeholder="e.g. Sir David Attenborough"
                     onChange={(e) => setUserName(e.target.value)}
                     onBlur={() => {
                       const v = userName.trim();
@@ -741,7 +741,7 @@ export default function Settings() {
                     className={`btn${settings.reduce_motion ? "" : " secondary"}`}
                     onClick={() => saveSetting("reduce_motion", !settings.reduce_motion)}
                   >
-                    {settings.reduce_motion ? "On" : "Off"}
+                    {settings.reduce_motion ? "Enabled" : "Disabled"}
                   </button>
                 </div>
               </div>
@@ -884,7 +884,7 @@ export default function Settings() {
             const selectedModel = settings[active.modelKey] || defaultModelId;
             return (
               <>
-                <div className="set-section-label first">AI provider</div>
+                <div className="set-section-label first">AI Provider & Model</div>
                 <div className="set-card stack">
                   <div className="set-card-main">
                     <div className="set-card-name">Provider</div>
