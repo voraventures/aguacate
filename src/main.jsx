@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { StoreProvider } from "./store.jsx";
+import "./i18n.js";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(

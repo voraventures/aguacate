@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api, showInFolder } from "../api.js";
 import { useStore } from "../store.jsx";
 import FollowUp from "./FollowUp.jsx";
@@ -40,37 +41,40 @@ const SECTION_ICONS = {
 };
 
 function EmptyState() {
+  const { t } = useTranslation();
   return (
     <div className="empty-state" data-tour="notes-panel">
       <div className="empty-art">
         <EmptyNotes />
       </div>
-      <div className="empty-title">Select a meeting</div>
-      <div className="empty-sub">Choose a meeting from the list to view its notes</div>
+      <div className="empty-title">{t('notes.empty.selectMeeting')}</div>
+      <div className="empty-sub">{t('notes.empty.selectMeetingSub')}</div>
     </div>
   );
 }
 
 function ProcessingState({ stage, pct }) {
+  const { t } = useTranslation();
   const labels = {
-    recording: "Recording in progress…",
+    recording: t('notes.processing.recording'),
     transcribing: pct
-      ? `Transcribing locally — ${Math.round(pct * 100)}%`
-      : "Transcribing locally with Whisper…",
-    generating: "Claude is writing your notes…",
+      ? t('notes.processing.transcribingPct', { pct: Math.round(pct * 100) })
+      : t('notes.processing.transcribing'),
+    generating: t('notes.processing.writing'),
   };
   return (
     <div className="processing-state">
       <div className="processing-ring" />
       <div style={{ fontSize: 12 }}>
-        {labels[stage] || "Processing…"}
+        {labels[stage] || t('notes.processing.processing')}
       </div>
-      <div style={{ fontSize: 11.5 }}>Audio never leaves this Mac.</div>
+      <div style={{ fontSize: 11.5 }}>{t('notes.processing.audioLocal')}</div>
     </div>
   );
 }
 
 function ActionRow({ item, onAssign, onComplete }) {
+  const { t } = useTranslation();
   const [assigning, setAssigning] = useState(false);
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
@@ -97,7 +101,7 @@ function ActionRow({ item, onAssign, onComplete }) {
   return (
     <div className={`action-row${done ? " completed" : ""}`}>
       <span className={`owner-chip${isTbd ? " tbd" : ""}`}>
-        {isTbd ? "TBD" : item.owner}
+        {isTbd ? t('notes.action.tbd') : item.owner}
       </span>
       <span className={`action-text${done ? " done" : ""}`}>
         {item.action}
@@ -108,7 +112,7 @@ function ActionRow({ item, onAssign, onComplete }) {
           <input
             className="assign-input"
             autoFocus
-            placeholder="Owner"
+            placeholder={t('notes.action.owner')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -119,23 +123,23 @@ function ActionRow({ item, onAssign, onComplete }) {
           />
         ) : (
           <button className="tool-btn" onClick={() => setAssigning(true)}>
-            Assign
+            {t('notes.action.assign')}
           </button>
         )}
         <button className="tool-btn" onClick={copy}>
-          {copied ? "Copied" : "Copy"}
+          {copied ? t('notes.action.copied') : t('notes.action.copy')}
         </button>
         <button
           className={`tool-btn${done ? " done" : ""}`}
           onClick={() => onComplete(item)}
-          title={done ? "Mark incomplete" : "Mark complete"}
+          title={done ? t('notes.action.markIncomplete') : t('notes.action.markComplete')}
         >
           {done ? (
             <>
-              <CheckIcon size={12} /> Done
+              <CheckIcon size={12} /> {t('notes.action.done')}
             </>
           ) : (
-            "Complete"
+            t('notes.action.complete')
           )}
         </button>
       </span>
@@ -144,14 +148,15 @@ function ActionRow({ item, onAssign, onComplete }) {
 }
 
 function ConflictCard({ conflict, onResolve }) {
+  const { t } = useTranslation();
   return (
     <div className="conflict-card">
       <div className="section-label" style={{ color: "var(--danger)" }}>
-        <WarnIcon size={13} /> Conflict detected
+        <WarnIcon size={13} /> {t('notes.conflict.detected')}
       </div>
       <div className="conflict-pair">
         <div className="conflict-side new">
-          <span className="conflict-tag">NEW</span>
+          <span className="conflict-tag">{t('notes.conflict.new')}</span>
           <p>{conflict.new_decision}</p>
         </div>
         <div className="conflict-side old">
@@ -166,10 +171,10 @@ function ConflictCard({ conflict, onResolve }) {
       )}
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <button className="btn" style={{ padding: "6px 12px", fontSize: 12 }} onClick={() => onResolve(conflict.id, "superseded")}>
-          New decision supersedes
+          {t('notes.conflict.supersedes')}
         </button>
         <button className="btn secondary" style={{ padding: "6px 12px", fontSize: 12 }} onClick={() => onResolve(conflict.id, "reviewed")}>
-          Mark reviewed
+          {t('notes.conflict.markReviewed')}
         </button>
       </div>
     </div>
@@ -177,20 +182,21 @@ function ConflictCard({ conflict, onResolve }) {
 }
 
 function CoachRecap({ coach }) {
+  const { t } = useTranslation();
   if (!coach || !coach.elapsed_sec) return null;
   return (
     <div className="ai-meta-bar" style={{ marginTop: 12 }}>
       <span className="ai-meta-item">
-        <strong>{Math.round((coach.talk_density || 0) * 100)}%</strong> speaking density
+        <strong>{Math.round((coach.talk_density || 0) * 100)}%</strong> {t('notes.coach.speakingDensity')}
       </span>
       <span className="ai-meta-item">
-        <strong>{coach.questions}</strong> questions
+        <strong>{coach.questions}</strong> {t('notes.coach.questions')}
       </span>
       <span className="ai-meta-item">
-        <strong>{coach.fillers}</strong> fillers
+        <strong>{coach.fillers}</strong> {t('notes.coach.fillers')}
       </span>
       <span className="ai-meta-item">
-        <strong>{coach.long_silences}</strong> long silences
+        <strong>{coach.long_silences}</strong> {t('notes.coach.longSilences')}
       </span>
     </div>
   );
@@ -210,8 +216,9 @@ function SpeakerBadge({ speaker }) {
 }
 
 function TranscriptView({ segments }) {
+  const { t } = useTranslation();
   if (!segments || segments.length === 0) {
-    return <p style={{ color: "var(--muted)", fontSize: 12 }}>No transcript available.</p>;
+    return <p style={{ color: "var(--muted)", fontSize: 12 }}>{t('notes.transcript.none')}</p>;
   }
   const hasSpeakers = segments.some((s) => s.speaker);
   if (!hasSpeakers) {
@@ -244,6 +251,7 @@ function TranscriptView({ segments }) {
 }
 
 export default function NotesPanel() {
+  const { t } = useTranslation();
   const {
     selectedId,
     meetingDetail,
@@ -300,7 +308,7 @@ export default function NotesPanel() {
 
   const deleteFromNotes = () => {
     setMoreOpen(false);
-    if (window.confirm("Delete this meeting? This cannot be undone.")) {
+    if (window.confirm(t('notes.confirm.delete'))) {
       deleteMeeting(meetingDetail.id);
     }
   };
@@ -386,7 +394,7 @@ export default function NotesPanel() {
   const copyShareLink = () => {
     if (!shareModal) return;
     const text = shareModal.url;
-    const ok = () => showToast("Link copied");
+    const ok = () => showToast(t('notes.toast.linkCopied'));
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
     } else {
@@ -406,7 +414,7 @@ export default function NotesPanel() {
       document.execCommand("copy");
       cb();
     } catch {
-      showToast("Copy failed — select and copy manually", "error");
+      showToast(t('notes.toast.copyFailed'), "error");
     }
     document.body.removeChild(ta);
   }
@@ -416,7 +424,7 @@ export default function NotesPanel() {
       .patch(`/api/intelligence/conflicts/${conflictId}`, { resolution })
       .then(() => {
         refreshDetail();
-        showToast(resolution === "superseded" ? "Old decision superseded" : "Marked reviewed");
+        showToast(resolution === "superseded" ? t('notes.toast.oldSuperseded') : t('notes.toast.markedReviewed'));
       })
       .catch((e) => showToast(e.message, "error"));
   };
@@ -425,7 +433,7 @@ export default function NotesPanel() {
     api
       .post(`/api/export/${m.id}/${fmt}`)
       .then(({ path }) => {
-        showToast(`Exported ${fmt.toUpperCase()}`);
+        showToast(t('notes.toast.exported', { fmt: fmt.toUpperCase() }));
         showInFolder(path);
       })
       .catch((e) => showToast(e.message, "error"));
@@ -435,7 +443,7 @@ export default function NotesPanel() {
     api
       .get(`/api/export/${m.id}/slack`)
       .then(({ text }) =>
-        navigator.clipboard.writeText(text).then(() => showToast("Slack digest copied"))
+        navigator.clipboard.writeText(text).then(() => showToast(t('notes.toast.slackCopied')))
       )
       .catch((e) => showToast(e.message, "error"));
   };
@@ -444,7 +452,7 @@ export default function NotesPanel() {
     api
       .post(`/api/export/${m.id}/my-actions`)
       .then(({ path }) => {
-        showToast("Exported your action items");
+        showToast(t('notes.toast.exportedActions'));
         showInFolder(path);
       })
       .catch((e) => showToast(e.message, "error"));
@@ -452,7 +460,7 @@ export default function NotesPanel() {
 
   const sendTo = (provider) => {
     setSendOpen(false);
-    showToast(`Sending to ${INTEGRATION_LABELS[provider]}…`);
+    showToast(t('notes.toast.sendingTo', { label: INTEGRATION_LABELS[provider] }));
     api
       .post(`/api/integrations/${provider}/send/${m.id}`)
       .then((r) => showToast(r.message))
@@ -463,7 +471,7 @@ export default function NotesPanel() {
     setRegenOpen(false);
     api
       .post(`/api/meetings/${m.id}/regenerate`, { template_id: templateId })
-      .then(() => showToast("Regenerating notes…"))
+      .then(() => showToast(t('notes.toast.regenerating')))
       .catch((e) => showToast(e.message, "error"));
   };
 
@@ -492,7 +500,7 @@ export default function NotesPanel() {
         <div className="meta-pills">
           {m.audio_path && (
             <span className="pill rec">
-              <MicIcon size={11} /> Recorded
+              <MicIcon size={11} /> {t('notes.header.recorded')}
             </span>
           )}
           <span className="pill">
@@ -500,8 +508,7 @@ export default function NotesPanel() {
           </span>
           {participants.length > 0 && (
             <span className="pill">
-              <UsersIcon size={11} /> {participants.length} attendee
-              {participants.length !== 1 ? "s" : ""}
+              <UsersIcon size={11} /> {t('notes.header.attendee', { count: participants.length })}
             </span>
           )}
           {templateName && templateName !== "Default" && (
@@ -511,13 +518,13 @@ export default function NotesPanel() {
           )}
           {!!m.followup_sent && (
             <span className="pill rec">
-              <SendIcon size={11} /> Follow-up sent
+              <SendIcon size={11} /> {t('notes.header.followupSent')}
             </span>
           )}
           <div className="notes-header-menu" ref={moreRef}>
             <button
               className="notes-header-menu-btn"
-              aria-label="More options"
+              aria-label={t('notes.header.moreOptions')}
               onClick={() => setMoreOpen(!moreOpen)}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -529,7 +536,7 @@ export default function NotesPanel() {
             {moreOpen && (
               <div className="card-menu-dropdown" role="menu">
                 <button className="menu-item" onClick={shareMeeting}>
-                  Share meeting
+                  {t('notes.header.shareMeeting')}
                 </button>
                 <button
                   className="menu-item"
@@ -537,14 +544,14 @@ export default function NotesPanel() {
                     setMoreOpen(false);
                     api
                       .post(`/api/meetings/${m.id}/share-to-workspace`)
-                      .then(() => showToast("Shared to team workspace"))
+                      .then(() => showToast(t('notes.toast.sharedTeam')))
                       .catch((e) => showToast(e.message, "error"));
                   }}
                 >
-                  Share to team
+                  {t('notes.header.shareTeam')}
                 </button>
                 <button className="delete-menu-item" onClick={deleteFromNotes}>
-                  Delete meeting
+                  {t('notes.header.deleteMeeting')}
                 </button>
               </div>
             )}
@@ -558,22 +565,22 @@ export default function NotesPanel() {
         ) : live === "error" ? (
           <div className="section-card warning">
             <div className="section-label">
-              <WarnIcon size={13} /> Processing failed
+              <WarnIcon size={13} /> {t('notes.error.processingFailed')}
             </div>
             <div className="section-body">
-              <p>{m.error || "Something went wrong while processing this meeting."}</p>
+              <p>{m.error || t('notes.error.processingFailedSub')}</p>
             </div>
             <button
               className="toolbar-btn"
               style={{ marginTop: 12 }}
               onClick={() => regenerateWith(null)}
             >
-              <RefreshIcon size={13} /> Retry notes generation
+              <RefreshIcon size={13} /> {t('notes.error.retry')}
             </button>
           </div>
         ) : !m.notes ? (
           <div className="processing-state">
-            <div style={{ fontSize: 13 }}>No notes for this meeting yet.</div>
+            <div style={{ fontSize: 13 }}>{t('notes.error.noNotes')}</div>
           </div>
         ) : (
           <>
@@ -584,23 +591,23 @@ export default function NotesPanel() {
                   className={`notes-tab-btn${notesTab === "notes" ? " active" : ""}`}
                   onClick={() => setNotesTab("notes")}
                 >
-                  Notes
+                  {t('notes.tab.notes')}
                 </button>
                 <button
                   className={`notes-tab-btn${notesTab === "transcript" ? " active" : ""}`}
                   onClick={() => setNotesTab("transcript")}
                 >
-                  Transcript
+                  {t('notes.tab.transcript')}
                 </button>
                 {m.workspace_id && (
-                  <span className="workspace-shared-badge">Shared</span>
+                  <span className="workspace-shared-badge">{t('notes.tab.shared')}</span>
                 )}
               </div>
             )}
 
             {notesTab === "transcript" && m.transcript ? (
               <div className="section-card">
-                <div className="section-label">Full Transcript</div>
+                <div className="section-label">{t('notes.transcript.full')}</div>
                 <div className="section-body transcript-body">
                   <TranscriptView segments={m.transcript._segments} />
                 </div>
@@ -610,13 +617,13 @@ export default function NotesPanel() {
             {showMetaBar && (
               <div className="ai-meta-bar">
                 <span className="ai-meta-item">
-                  <strong>{actions.length}</strong> Actions
+                  <strong>{actions.length}</strong> {t('notes.bar.actions')}
                 </span>
                 <span className="ai-meta-item">
-                  <strong>{decisions.length}</strong> Decisions
+                  <strong>{decisions.length}</strong> {t('notes.bar.decisions')}
                 </span>
                 <span className="ai-meta-item">
-                  <strong>{participants.length}</strong> Participants
+                  <strong>{participants.length}</strong> {t('notes.bar.participants')}
                 </span>
                 {m.coach && (
                   <button
@@ -624,7 +631,7 @@ export default function NotesPanel() {
                     style={{ marginLeft: "auto" }}
                     onClick={() => setCoachVisible(!coachVisible)}
                   >
-                    Coach recap
+                    {t('notes.bar.coachRecap')}
                   </button>
                 )}
               </div>
@@ -638,7 +645,7 @@ export default function NotesPanel() {
             {headsUp.length > 0 && (
               <div className="section-card warning">
                 <div className="section-label">
-                  <WarnIcon size={13} /> Heads up
+                  <WarnIcon size={13} /> {t('notes.bar.headsUp')}
                 </div>
                 <div className="section-body">
                   <ul>
@@ -673,7 +680,7 @@ export default function NotesPanel() {
                     {actions.length > 0 && (
                       <div className="section-card stagger" data-tour="action-items" style={{ animationDelay: "60ms" }}>
                         <div className="section-label" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <span><CheckIcon size={13} /> Action Items</span>
+                          <span><CheckIcon size={13} /> {t('notes.section.actionItems')}</span>
                           <span style={{ display: "flex", gap: 6 }}>
                             <button
                               className={`toolbar-btn${myItemsOnly ? " primary" : ""}`}
@@ -685,18 +692,18 @@ export default function NotesPanel() {
                                   .catch(() => {});
                               }}
                             >
-                              My items
+                              {t('notes.action.myItems')}
                             </button>
                             {myItemsOnly && userName && (
                               <button className="toolbar-btn" onClick={downloadMyActions}>
-                                <ExportIcon size={13} /> Download
+                                <ExportIcon size={13} /> {t('notes.action.download')}
                               </button>
                             )}
                           </span>
                         </div>
                         {myItemsOnly && !userName ? (
                           <div style={{ color: "#767b72", padding: "4px 2px", fontSize: 13 }}>
-                            Set your name in Settings → General to filter your items
+                            {t('notes.action.setNameFilter')}
                           </div>
                         ) : (
                           (() => {
@@ -710,7 +717,7 @@ export default function NotesPanel() {
                             if (myItemsOnly && list.length === 0) {
                               return (
                                 <div style={{ color: "#767b72", padding: "4px 2px", fontSize: 13 }}>
-                                  No action items assigned to you in this meeting.
+                                  {t('notes.action.noneAssigned')}
                                 </div>
                               );
                             }
@@ -724,7 +731,7 @@ export default function NotesPanel() {
                     {decisions.length > 0 && (
                       <div className="section-card stagger" style={{ animationDelay: "120ms" }}>
                         <div className="section-label">
-                          <GavelIcon size={13} /> Key Decisions
+                          <GavelIcon size={13} /> {t('notes.section.keyDecisions')}
                         </div>
                         <div className="section-body">
                           <ul>
@@ -745,7 +752,7 @@ export default function NotesPanel() {
 
             {related.length > 0 && (
               <div className="section-card stagger">
-                <div className="section-label">Related Meetings</div>
+                <div className="section-label">{t('notes.section.relatedMeetings')}</div>
                 {related.map((r) => (
                   <button
                     key={r.meeting_id}
@@ -767,20 +774,20 @@ export default function NotesPanel() {
 
             <div className="notes-toolbar">
               <button className="toolbar-btn primary" onClick={() => setFollowUpOpen(true)}>
-                <SendIcon size={13} /> Follow-up
+                <SendIcon size={13} /> {t('notes.toolbar.followup')}
               </button>
               <button className="toolbar-btn" onClick={() => doExport("pdf")}>
-                <ExportIcon size={13} /> PDF
+                <ExportIcon size={13} /> {t('notes.toolbar.pdf')}
               </button>
               <button className="toolbar-btn" onClick={() => doExport("markdown")}>
-                <ExportIcon size={13} /> MD
+                <ExportIcon size={13} /> {t('notes.toolbar.md')}
               </button>
               <button className="toolbar-btn" onClick={copySlackDigest}>
-                <ExportIcon size={13} /> Slack digest
+                <ExportIcon size={13} /> {t('notes.toolbar.slackDigest')}
               </button>
               <div style={{ position: "relative" }}>
                 <button className="toolbar-btn" onClick={() => setSendOpen(!sendOpen)}>
-                  <SendIcon size={13} /> Send to…
+                  <SendIcon size={13} /> {t('notes.toolbar.sendTo')}
                 </button>
                 {sendOpen && (
                   <div className="popover-menu">
@@ -794,7 +801,7 @@ export default function NotesPanel() {
               </div>
               <div style={{ position: "relative" }}>
                 <button className="toolbar-btn" onClick={() => setRegenOpen(!regenOpen)}>
-                  <RefreshIcon size={13} /> Regenerate
+                  <RefreshIcon size={13} /> {t('notes.toolbar.regenerate')}
                 </button>
                 {regenOpen && (
                   <div className="popover-menu">
@@ -821,8 +828,8 @@ export default function NotesPanel() {
         >
           <div className="modal" style={{ width: 440 }}>
             <div className="modal-header">
-              <div className="modal-title">Meeting link created</div>
-              <button className="icon-btn" onClick={() => setShareModal(null)} aria-label="Close">
+              <div className="modal-title">{t('notes.share.created')}</div>
+              <button className="icon-btn" onClick={() => setShareModal(null)} aria-label={t('notes.share.close')}>
                 ✕
               </button>
             </div>
@@ -830,16 +837,15 @@ export default function NotesPanel() {
               <div style={{ display: "flex", gap: 7 }}>
                 <input className="text-input" readOnly value={shareModal.url} onFocus={(e) => e.target.select()} />
                 <button className="btn" onClick={copyShareLink}>
-                  Copy link
+                  {t('notes.share.copyLink')}
                 </button>
               </div>
               <div className="field-help" style={{ marginTop: 8 }}>
-                Link expires in 30 days. Anyone with this link can view a read-only summary
-                of this meeting.
+                {t('notes.share.expires')}
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
                 <button className="btn secondary" onClick={() => setShareModal(null)}>
-                  Close
+                  {t('notes.share.close')}
                 </button>
               </div>
             </div>

@@ -1,0 +1,613 @@
+{
+  "sidebar": {
+    "nav": {
+      "meetings": "회의",
+      "actions": "할 일",
+      "decisions": "결정 사항",
+      "topics": "주제",
+      "people": "사람",
+      "series": "시리즈",
+      "conflicts": "충돌"
+    },
+    "status": {
+      "recording": "녹음 중",
+      "ready": "준비됨",
+      "online": "온라인",
+      "starting": "시작 중"
+    },
+    "time": {
+      "today": "오늘",
+      "tomorrow": "내일",
+      "now": "지금",
+      "inHM": "{{h}}시간 {{m}}분 후",
+      "inM": "{{m}}분 후"
+    },
+    "brand": {
+      "pro": "Pro"
+    },
+    "templateSelectTitle": "다음 녹음에 사용할 노트 템플릿",
+    "record": "녹음",
+    "stop": "정지",
+    "meetingCard": {
+      "next": "다음 회의",
+      "none": "예정된 회의가 감지되지 않았습니다"
+    },
+    "call": {
+      "prompt": "{{app}} 감지됨 — 이 통화를 녹음할까요?",
+      "title": "{{app}} 통화",
+      "record": "지금 녹음",
+      "dismiss": "닫기"
+    },
+    "free": {
+      "planLabel": "무료 플랜",
+      "usage": "무료 회의 {{limit}}개 중 {{used}}개 사용",
+      "unlock": "Pro로 잠금 해제:",
+      "unlimited": "무제한 회의",
+      "crossMeeting": "회의 간 인텔리전스",
+      "allIntegrations": "모든 통합",
+      "upgrade": "Pro로 업그레이드 — $20/mo"
+    },
+    "myWork": {
+      "title": "내 작업",
+      "refresh": "개수 새로 고침",
+      "openActions": "미완료 할 일",
+      "decisionsWeek": "이번 주 결정 사항",
+      "meetingsProcessed": "처리된 회의"
+    },
+    "navigate": "탐색",
+    "toggleTheme": "라이트/다크 전환",
+    "settings": "설정"
+  },
+  "app": {
+    "error": {
+      "title": "문제가 발생했습니다.",
+      "restartHint": "앱을 다시 시작해 주세요.",
+      "restart": "다시 시작"
+    },
+    "engine": {
+      "unreachable": "로컬 엔진에 연결할 수 없습니다 — 앱을 다시 시작하세요",
+      "starting": "로컬 엔진 시작 중…"
+    },
+    "dragResize": "드래그하여 크기 조절",
+    "expandList": "목록 펼치기",
+    "expandMeetingList": "회의 목록 펼치기"
+  },
+  "intel": {
+    "title": {
+      "actions": "할 일",
+      "decisions": "결정 사항",
+      "topics": "주제",
+      "people": "사람",
+      "series": "시리즈",
+      "conflicts": "충돌"
+    },
+    "empty": {
+      "actions": {
+        "head": "미완료 할 일 없음",
+        "sub": "회의에서 나온 할 일이 여기에 표시됩니다"
+      },
+      "decisions": {
+        "head": "기록된 결정 사항 없음",
+        "sub": "회의에서 포착된 결정 사항이 여기에 표시됩니다"
+      },
+      "topics": {
+        "head": "아직 주제 없음",
+        "sub": "회의를 더 녹음할수록 주제가 나타납니다"
+      },
+      "people": {
+        "head": "아직 참여자 없음",
+        "sub": "회의에 참여한 사람이 여기에 표시됩니다"
+      },
+      "series": {
+        "head": "아직 반복 회의 없음",
+        "sub": "같은 회의가 두 번 열리면 Aguacate가 시리즈 추적을 시작합니다"
+      },
+      "conflicts": {
+        "head": "감지된 충돌 없음",
+        "sub": "새로운 결정이 이전 결정과 모순되면 여기에 표시됩니다"
+      }
+    },
+    "searchPlaceholder": "{{section}} 검색…",
+    "range": {
+      "all": "전체 기간",
+      "d7": "최근 7일",
+      "d30": "최근 30일",
+      "d90": "최근 90일"
+    },
+    "filter": {
+      "all": "전체",
+      "open": "미완료",
+      "completed": "완료됨",
+      "mine": "내 것",
+      "mineHint": "이 필터를 사용하려면 설정 → 일반에서 이름을 설정하세요"
+    },
+    "list": {
+      "tbd": "미정",
+      "due": "마감 {{due}}",
+      "superseded": "대체됨",
+      "staleDays": "지연됨 · {{days}}일",
+      "meetingCount_one": "회의 {{count}}개",
+      "meetingCount_other": "회의 {{count}}개",
+      "occurrenceCount_one": "{{count}}회 발생",
+      "occurrenceCount_other": "{{count}}회 발생",
+      "cadence": "약 {{cadence}}일마다",
+      "actionCount_one": "할 일 {{count}}개",
+      "actionCount_other": "할 일 {{count}}개",
+      "openCount": "미완료 {{count}}개",
+      "contradicts": "이전 결정과 모순 · {{date}}",
+      "noCompleted": "완료된 할 일 없음",
+      "goToMeetings": "회의로 이동"
+    },
+    "detail": {
+      "kicker": {
+        "actions": "할 일 항목",
+        "decisions": "결정 사항",
+        "topics": "주제",
+        "series": "회의 시리즈",
+        "conflicts": "충돌",
+        "people": "사람"
+      },
+      "selectPrompt": "목록에서 항목을 선택하면 세부 정보가 표시됩니다",
+      "select": {
+        "actions": "할 일 선택",
+        "decisions": "결정 사항 선택",
+        "topics": "주제 선택",
+        "people": "사람 선택",
+        "series": "시리즈 선택",
+        "conflicts": "충돌 선택"
+      },
+      "owner": "담당자: {{owner}}",
+      "ownerTbd": "담당자: 미정",
+      "due": "마감 {{due}}",
+      "done": "완료",
+      "open": "미완료",
+      "reopen": "다시 열기",
+      "markDone": "완료로 표시",
+      "discussedIn": "논의된 회의",
+      "relatedDecisions": "관련 결정 사항",
+      "mentionCount_one": "{{count}}회 언급",
+      "mentionCount_other": "{{count}}회 언급",
+      "contradicting": "모순되는 결정 사항",
+      "newDecision": "새 결정",
+      "priorDecision": "이전 결정",
+      "recentActions": "최근 할 일",
+      "view": "보기",
+      "meetings": "회의",
+      "actionCount_one": "할 일 {{count}}개",
+      "actionCount_other": "할 일 {{count}}개",
+      "openCount": "미완료 {{count}}개",
+      "meetingCount_one": "회의 {{count}}개",
+      "meetingCount_other": "회의 {{count}}개",
+      "series": {
+        "cadenceDays": "약 {{cadence}}일마다",
+        "completion": "할 일 {{pct}}% 완료",
+        "nextExpected": "다음 예상: {{date}}",
+        "openActions_one": "미완료 할 일 {{count}}개",
+        "openActions_other": "미완료 할 일 {{count}}개",
+        "completedCount": "{{count}}개 완료",
+        "carryOver": "이월된 할 일",
+        "noCarryOver": "이월된 할 일 없음",
+        "stillOpen": "회의 {{count}}개에 걸쳐 여전히 미완료",
+        "recurringTopics": "반복되는 주제",
+        "cameUpIn": "전체 {{total}}개 중 {{count}}개 회의에서 다뤄짐",
+        "noResolution": "결론 없이 안건에서 사라짐",
+        "inSeries": "이 시리즈에서"
+      }
+    },
+    "trend": {
+      "rising": "증가 중",
+      "recurring": "반복됨",
+      "fading": "감소 중"
+    }
+  },
+  "settings": {
+    "title": "설정",
+    "scrollLeft": "탭 왼쪽으로 스크롤",
+    "scrollRight": "탭 오른쪽으로 스크롤",
+    "tabs": {
+      "general": "일반",
+      "appearance": "화면",
+      "recording": "녹음",
+      "templates": "템플릿",
+      "ai": "AI",
+      "calendars": "캘린더",
+      "integrations": "통합",
+      "privacy": "개인정보 보호",
+      "export": "내보내기",
+      "workspace": "작업 공간",
+      "license": "라이선스"
+    },
+    "general": {
+      "label": "일반",
+      "yourName": "이름",
+      "yourNameDesc": "회의에서 내 할 일 항목을 식별하는 데 사용됩니다",
+      "namePlaceholder": "예: 홍길동",
+      "nameSaved": "이름 저장됨",
+      "language": "언어"
+    },
+    "appearance": {
+      "label": "화면",
+      "theme": "테마",
+      "themeDesc": "앱 전체의 색상 팔레트를 설정합니다.",
+      "themes": {
+        "default": "기본",
+        "dark": "다크",
+        "purple": "퍼플",
+        "navy": "네이비",
+        "warm": "웜",
+        "neon": "네온"
+      },
+      "fontSize": "글자 크기",
+      "fontSizeDesc": "앱 전체의 텍스트 크기를 조정합니다. 보통이 기본값입니다.",
+      "small": "작게",
+      "medium": "보통",
+      "large": "크게",
+      "reduceMotion": "동작 줄이기",
+      "reduceMotionDesc": "애니메이션과 전환 효과를 비활성화합니다.",
+      "enabled": "켜짐",
+      "disabled": "꺼짐"
+    },
+    "recording": {
+      "startup": "시작",
+      "launchLogin": "로그인 시 Aguacate 실행",
+      "launchLoginDesc": "자동 녹음되는 회의를 놓치지 마세요.",
+      "on": "켜짐",
+      "off": "꺼짐",
+      "globalShortcut": "전역 단축키",
+      "globalShortcutDesc": "어디서나 녹음을 시작하거나 중지하세요 — Aguacate가 트레이에 있을 때도요.",
+      "capture": "캡처",
+      "autoMode": "자동 녹음 모드",
+      "autoModeDesc": "Aguacate가 언제 녹음을 시작할지 결정하는 방식입니다.",
+      "modeAll": "모든 회의 자동 녹음",
+      "mode30": "각 회의 30초 전에 물어보기",
+      "modeManual": "수동 전용 (캘린더만 표시, 묻지 않음)",
+      "modeOff": "꺼짐",
+      "microphone": "마이크",
+      "micDesc": "음성 입력 장치입니다.",
+      "systemDefault": "시스템 기본값",
+      "systemAudio": "시스템 오디오 장치",
+      "winHint": "Windows: 스피커와 일치하는 \"(loopback)\" 항목을 선택하세요 — Aguacate는 드라이버 없이 WASAPI를 통해 시스템 오디오를 가져옵니다.",
+      "macHint": "macOS: BlackHole(무료)을 설치하고 여기서 선택하면 Zoom/Meet의 회의 오디오를 캡처합니다. Aguacate가 로컬에서 마이크와 혼합합니다.",
+      "none": "없음",
+      "loopbackSuffix": "  ← loopback",
+      "transcription": "전사",
+      "whisperModel": "Whisper 모델",
+      "whisperDesc": "전사는 100% 이 Mac에서 실행됩니다. 모델은 처음 사용할 때 한 번 다운로드됩니다.",
+      "modelTiny": "tiny — 가장 빠름",
+      "modelBase": "base — 균형",
+      "modelSmall": "small — 더 나은 정확도",
+      "modelMedium": "medium — 높은 정확도, 느림"
+    },
+    "ai": {
+      "title": "AI 제공자 및 모델",
+      "provider": "제공자",
+      "privacyNote": "노트를 작성하기 위해 전사 텍스트만 {{name}}에 전송됩니다. 오디오는 이 Mac을 떠나지 않습니다.",
+      "getKey": "{{name}} API 키 받기 →",
+      "model": "모델",
+      "modelDesc": "노트 작성에 사용할 {{name}} 모델을 선택하세요.",
+      "loading": "불러오는 중…",
+      "keyLabel": {
+        "anthropic": "Anthropic API 키",
+        "openai": "OpenAI API 키",
+        "google": "Google API 키"
+      }
+    },
+    "calendars": {
+      "connected": "연결된 캘린더",
+      "google": "Google Calendar",
+      "connectedDot": "연결됨.",
+      "googleVia": "Google OAuth를 통해 연결합니다.",
+      "disconnect": "연결 해제",
+      "connect": "연결",
+      "microsoft": "Microsoft Calendar",
+      "msVia": "Microsoft OAuth를 통해 연결합니다.",
+      "enterCode": "{{uri}}에서 코드 {{code}}를 입력하세요",
+      "apple": "Apple Calendar",
+      "appleEnabled": "사용 설정됨 (로컬).",
+      "appleClick": "클릭하여 사용 설정.",
+      "accessDenied": "캘린더 접근이 거부되었습니다. 시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 접근을 허용하세요.",
+      "disable": "사용 안 함",
+      "enable": "사용",
+      "pollNote": "Aguacate는 30초마다 연결된 캘린더를 확인하고 캘린더 간 중복 일정을 자동으로 병합합니다. Apple Calendar를 처음 사용 설정하면 macOS가 캘린더 권한을 요청합니다."
+    },
+    "integrations": {
+      "connected": "연결됨",
+      "notConfigured": "구성되지 않음",
+      "googleNote": "Google 계정을 통해 연결되었습니다. 캘린더 탭에서 관리하세요.",
+      "connectGoogle": "캘린더에서 Google 연결 →",
+      "desc": {
+        "slack": "수신 웹훅을 통해 형식이 지정된 회의 요약을 채널에 게시합니다.",
+        "notion": "전체 노트가 담긴 페이지를 원하는 Notion 데이터베이스에 생성합니다.",
+        "linear": "회의 노트를 팀의 Linear 이슈로 등록합니다.",
+        "jira": "전체 노트를 담은 Jira 작업을 생성합니다.",
+        "hubspot": "회의를 HubSpot CRM 타임라인의 노트로 기록합니다.",
+        "salesforce": "노트를 Salesforce Note 객체로 저장합니다.",
+        "googleDrive": "노트를 Markdown으로 업로드합니다. Google Calendar 연결을 사용하므로 추가 키가 필요 없습니다.",
+        "zapier": "제목 + 노트 JSON을 catch-hook 웹훅을 통해 모든 Zap에 전송합니다."
+      },
+      "fields": {
+        "anthropicKey": "Anthropic API 키",
+        "slackWebhook": "Slack 웹훅 URL",
+        "notionToken": "Notion 통합 토큰",
+        "notionDb": "Notion 데이터베이스 ID",
+        "linearKey": "Linear API 키",
+        "jiraBase": "Jira 기본 URL",
+        "jiraEmail": "Jira 계정 이메일",
+        "jiraToken": "Jira API 토큰",
+        "hubspotToken": "HubSpot 비공개 앱 토큰",
+        "salesforceUrl": "Salesforce 인스턴스 URL",
+        "salesforceToken": "Salesforce 액세스 토큰",
+        "zapierWebhook": "Zapier 웹훅 URL"
+      }
+    },
+    "templates": {
+      "new": "새 템플릿",
+      "builtin": "기본 제공",
+      "custom": "사용자 지정",
+      "sectionsGenerated": "생성된 섹션",
+      "use": "이 템플릿 사용",
+      "edit": "편집",
+      "delete": "삭제",
+      "name": "이름",
+      "description": "설명",
+      "structure": "구조 (markdown ## 섹션)",
+      "structureHint": "표준 결정 사항 / 할 일 항목 / 다음 단계 블록이 들어갈 위치에 {{token}}를 작성하세요.",
+      "saved": "템플릿 저장됨",
+      "save": "템플릿 저장",
+      "cancel": "취소",
+      "setAsTemplate": "\"{{name}}\"이(가) 녹음 템플릿으로 설정되었습니다"
+    },
+    "privacy": {
+      "title": "개인정보 보호",
+      "coach": "회의 코치",
+      "coachDesc": "녹음 중 실시간 분석 — 100% 로컬.",
+      "redactedWords": "가려진 단어",
+      "autoRedacted": "자동 가림",
+      "appearsAs": "가려진 텍스트는 다음과 같이 표시됩니다:",
+      "redactNote": "(█████) 전사에서 — 따라서 노트, 검색, 모든 내보내기에서도 가려집니다.",
+      "redactPlaceholder": "acme corp, project nova, jane (쉼표로 구분)",
+      "neverRecord": "이 회의는 절대 녹음하지 않음",
+      "neverRecordDesc": "이 패턴과 일치하는 캘린더 일정은 안내, 브리핑, 자동 녹음되지 않습니다.",
+      "excludePlaceholder": "변호사와 1:1, 상담, 연봉 협상 (제목에 포함)",
+      "autoDelete": "다음 기간 후 회의 자동 삭제",
+      "autoDeleteDesc": "오래된 회의는 이 기간이 지나면 자동으로 삭제됩니다.",
+      "retentionNever": "안 함 (모두 보관)",
+      "d30": "30일",
+      "d90": "90일",
+      "d180": "180일",
+      "y1": "1년",
+      "muteNote": "녹음 중에는 코치 패널에서 **Mute zone**을 누를 수도 있습니다 — 음소거를 해제할 때까지 오디오 대신 무음이 기록됩니다."
+    },
+    "export": {
+      "title": "내보내기",
+      "actionsCsv": "할 일 항목 CSV",
+      "actionsCsvDesc": "모든 회의의 모든 할 일.",
+      "csvExported": "CSV 내보냄",
+      "export": "내보내기",
+      "timelinePdf": "결정 타임라인 PDF",
+      "timelinePdfDesc": "시간순 결정 기록.",
+      "timelineExported": "타임라인 내보냄",
+      "mobile": "모바일",
+      "iosSoon": "iOS용 Aguacate — 곧 출시",
+      "mobileBlurb": "모바일 동반 앱으로 iPhone에서 노트를 검토하고, 할 일을 완료하고, 회의를 검색할 수 있습니다. 연결된 기기는 아래에 표시되며 언제든지 해제할 수 있습니다.",
+      "qrToken": "QR 설정 토큰",
+      "connectMobile": "모바일 앱 연결",
+      "connectedDevices": "연결된 기기",
+      "deviceRevoked": "기기 해제됨",
+      "revoke": "해제",
+      "revoked": "해제됨",
+      "backup": "백업",
+      "vault": "암호화된 보관함",
+      "vaultBlurb": "전체 회의 자료 — 노트, 전사, 데이터베이스 — 를 하나의 비밀번호로 암호화된 휴대용 파일로. 로컬 우선 앱만이 제공할 수 있습니다.",
+      "vaultPlaceholder": "보관함 비밀번호 (최소 8자)",
+      "vaultExported": "보관함 내보냄",
+      "encrypting": "암호화 중…",
+      "exportVault": "보관함 내보내기"
+    },
+    "workspace": {
+      "title": "팀 작업 공간",
+      "create": "작업 공간 만들기",
+      "createDesc": "팀원과 회의를 공유할 팀 공간을 시작하세요.",
+      "namePlaceholder": "작업 공간 이름",
+      "displayNamePlaceholder": "표시 이름",
+      "created": "작업 공간 생성됨",
+      "createBtn": "작업 공간 만들기",
+      "join": "작업 공간 참여",
+      "joinDesc": "팀원에게 받은 초대 코드를 입력하세요.",
+      "invitePlaceholder": "초대 코드 (예: AB12CD34)",
+      "joined": "작업 공간 참여됨",
+      "joinBtn": "작업 공간 참여",
+      "inviteCode": "초대 코드:",
+      "memberCount_one": "멤버 {{count}}명",
+      "memberCount_other": "멤버 {{count}}명",
+      "left": "작업 공간 나감",
+      "leave": "나가기",
+      "members": "멤버",
+      "memberFallback": "멤버",
+      "joinedDate": "{{date}} 참여",
+      "syncFolder": "동기화 폴더",
+      "sharedPath": "공유 폴더 경로",
+      "syncNote": "모든 멤버가 접근할 수 있는 공유 네트워크 드라이브나 Dropbox 폴더를 지정하세요. 팀에 공유할 때 Aguacate가 여기에 회의 JSON 파일을 저장합니다.",
+      "syncPlaceholder": "/Volumes/SharedDrive  또는  ~/Dropbox/team",
+      "syncSaved": "동기화 경로 저장됨",
+      "savePath": "경로 저장"
+    },
+    "license": {
+      "title": "구독",
+      "currentPlan": "현재 플랜",
+      "remaining": "무료 회의 {{limit}}개 중 {{remaining}}개 남음.",
+      "manage": "구독 관리",
+      "manageDesc": "라이선스를 다시 확인하거나 Pro로 업그레이드하세요.",
+      "opening": "여는 중…",
+      "revalidate": "재검증",
+      "getPro": "Pro 구매 — $20/mo",
+      "starting": "시작 중…",
+      "devTesting": "개발자 테스트",
+      "switchFree": "Free로 전환",
+      "switchPro": "Pro로 전환",
+      "planPro": "Pro",
+      "planFree": "Free"
+    },
+    "toast": {
+      "noSubscription": "활성 구독을 찾을 수 없습니다",
+      "portalUnavailable": "결제 포털에 연결할 수 없습니다. 나중에 다시 시도하세요.",
+      "checkoutFailed": "결제를 시작할 수 없습니다",
+      "checkoutFailedStatus": "결제 실패 ({{status}})",
+      "noCheckoutUrl": "반환된 결제 URL이 없습니다",
+      "switched": "{{plan}}(으)로 전환됨",
+      "savedKeychain": "{{name}}이(가) 키체인에 저장됨",
+      "disconnected": "{{name}} 연결 해제됨"
+    },
+    "secret": {
+      "configured": "● 구성됨",
+      "savedKeychainPlaceholder": "••••••••  (macOS 키체인에 저장됨)",
+      "pasteValue": "값 붙여넣기",
+      "save": "저장",
+      "saving": "저장 중…",
+      "configuration": "구성",
+      "disconnect": "연결 해제"
+    },
+    "oauth": {
+      "connectCalendar": "{{provider}} Calendar 연결",
+      "explain": "Aguacate는 {{provider}}의 공식 로그인(OAuth)으로 캘린더에 연결합니다 — 브라우저에서 접근을 승인하며 비밀번호는 Aguacate와 공유되지 않습니다.",
+      "setupNote": "먼저 간단한 일회성 설정이 필요합니다: Aguacate가 캘린더 접근을 요청할 수 있도록 {{provider}} 계정에 앱으로 등록되어야 합니다. 아래 가이드가 약 2분 만에 안내해 드립니다 — 그런 다음 여기로 돌아와 다시 연결을 누르세요.",
+      "learnMore": "자세히 알아보기",
+      "close": "닫기"
+    }
+  },
+  "notes": {
+    "empty": {
+      "selectMeeting": "회의 선택",
+      "selectMeetingSub": "목록에서 회의를 선택하면 노트를 볼 수 있습니다"
+    },
+    "processing": {
+      "recording": "녹음 진행 중…",
+      "transcribingPct": "로컬에서 전사 중 — {{pct}}%",
+      "transcribing": "Whisper로 로컬에서 전사 중…",
+      "writing": "Claude가 노트를 작성하고 있습니다…",
+      "processing": "처리 중…",
+      "audioLocal": "오디오는 이 Mac을 떠나지 않습니다."
+    },
+    "action": {
+      "tbd": "미정",
+      "owner": "담당자",
+      "assign": "할당",
+      "copied": "복사됨",
+      "copy": "복사",
+      "markIncomplete": "미완료로 표시",
+      "markComplete": "완료로 표시",
+      "done": "완료",
+      "complete": "완료",
+      "myItems": "내 항목",
+      "download": "다운로드",
+      "setNameFilter": "설정 → 일반에서 이름을 설정하면 내 항목을 필터링할 수 있습니다",
+      "noneAssigned": "이 회의에서 나에게 할당된 할 일이 없습니다."
+    },
+    "conflict": {
+      "detected": "충돌 감지됨",
+      "new": "신규",
+      "supersedes": "새 결정이 대체함",
+      "markReviewed": "검토 완료로 표시"
+    },
+    "coach": {
+      "speakingDensity": "발화 밀도",
+      "questions": "질문",
+      "fillers": "군말",
+      "longSilences": "긴 침묵"
+    },
+    "transcript": {
+      "none": "사용 가능한 전사가 없습니다.",
+      "full": "전체 전사"
+    },
+    "confirm": {
+      "delete": "이 회의를 삭제할까요? 되돌릴 수 없습니다."
+    },
+    "toast": {
+      "linkCopied": "링크 복사됨",
+      "copyFailed": "복사 실패 — 직접 선택하여 복사하세요",
+      "oldSuperseded": "이전 결정이 대체됨",
+      "markedReviewed": "검토 완료로 표시됨",
+      "exported": "{{fmt}} 내보냄",
+      "slackCopied": "Slack 요약 복사됨",
+      "exportedActions": "할 일 항목을 내보냈습니다",
+      "sendingTo": "{{label}}(으)로 전송 중…",
+      "regenerating": "노트 재생성 중…",
+      "sharedTeam": "팀 작업 공간에 공유됨"
+    },
+    "header": {
+      "recorded": "녹음됨",
+      "attendee_one": "참석자 {{count}}명",
+      "attendee_other": "참석자 {{count}}명",
+      "followupSent": "후속 조치 전송됨",
+      "moreOptions": "추가 옵션",
+      "shareMeeting": "회의 공유",
+      "shareTeam": "팀에 공유",
+      "deleteMeeting": "회의 삭제"
+    },
+    "error": {
+      "processingFailed": "처리 실패",
+      "processingFailedSub": "이 회의를 처리하는 중 문제가 발생했습니다.",
+      "retry": "노트 생성 다시 시도",
+      "noNotes": "아직 이 회의에 대한 노트가 없습니다."
+    },
+    "tab": {
+      "notes": "노트",
+      "transcript": "전사",
+      "shared": "공유됨"
+    },
+    "bar": {
+      "actions": "할 일",
+      "decisions": "결정 사항",
+      "participants": "참석자",
+      "coachRecap": "코치 요약",
+      "headsUp": "주의 사항"
+    },
+    "section": {
+      "actionItems": "할 일 항목",
+      "keyDecisions": "주요 결정 사항",
+      "relatedMeetings": "관련 회의"
+    },
+    "toolbar": {
+      "followup": "후속 조치",
+      "pdf": "PDF",
+      "md": "MD",
+      "slackDigest": "Slack 요약",
+      "sendTo": "보내기…",
+      "regenerate": "재생성"
+    },
+    "share": {
+      "created": "회의 링크 생성됨",
+      "copyLink": "링크 복사",
+      "expires": "링크는 30일 후 만료됩니다. 이 링크가 있는 누구나 이 회의의 읽기 전용 요약을 볼 수 있습니다.",
+      "close": "닫기"
+    }
+  },
+  "store": {
+    "toast": {
+      "calendarConnected": "캘린더 연결됨",
+      "msFailed": "Microsoft 로그인 실패",
+      "momentFlagged": "순간 표시됨",
+      "micDenied": "마이크 접근이 거부되었습니다 — 시스템 설정 → 개인정보 보호 및 보안 → 마이크를 여세요",
+      "processingFailed": "처리 실패",
+      "recordingFailed": "녹음 실패"
+    },
+    "notify": {
+      "recordingStartedTitle": "녹음 시작됨",
+      "recordingStartedBody": "Aguacate가 이 회의를 로컬에서 캡처하고 있습니다.",
+      "briefReadyTitle": "회의 브리핑 준비됨",
+      "briefReadyBody": "{{title}}이(가) {{minutes}}분 후 시작됩니다 — 이 그룹과 이력이 있습니다.",
+      "pulseTitle": "할 일 알림",
+      "pulseBody_one": "지연된 할 일 {{count}}개에 주의가 필요합니다.",
+      "pulseBody_other": "지연된 할 일 {{count}}개에 주의가 필요합니다.",
+      "conflictTitle": "충돌 감지됨",
+      "conflictBody": "새로운 결정이 이전 결정과 모순됩니다.",
+      "transcriptionDoneTitle": "전사 완료",
+      "transcriptionDoneBody": "Claude가 지금 노트를 작성하고 있습니다.",
+      "notesReadyTitle": "노트 준비됨",
+      "notesReadyBody": "회의 노트와 할 일 항목을 검토할 준비가 되었습니다.",
+      "meetingDetectedTitle": "회의 감지됨",
+      "meetingDetectedBody": "{{title}}이(가) 곧 시작됩니다.",
+      "fallbackMeeting": "회의"
+    }
+  }
+}

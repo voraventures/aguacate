@@ -1,0 +1,17 @@
+{
+  "backendFailedTitle": "Aguacate backend failed to start",
+  "backendFailedMsg": "The local engine could not be launched ({{error}}).",
+  "backendStoppedTitle": "Aguacate backend stopped",
+  "backendStoppedMsg": "The local engine exited unexpectedly. Restart the app to continue.",
+  "trayTooltip": "Aguacate — AI meeting notes",
+  "trayShow": "Show Aguacate",
+  "trayHide": "Hide",
+  "trayToggleRecord": "Start / stop recording",
+  "trayQuit": "Quit Aguacate",
+  "trayRecordingAmbient": "Aguacate — recording (ambient)",
+  "screenRecTitle": "Screen Recording Permission Required",
+  "screenRecMsg": "Aguacate needs Screen Recording permission to capture system audio from your meetings.",
+  "screenRecDetail": "Without it, audio from other participants (system audio) will not be recorded. Grant access in System Settings → Privacy & Security → Screen Recording, then restart Aguacate.",
+  "openSettings": "Open System Settings",
+  "later": "Later"
+}

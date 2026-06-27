@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { api, connectWebSocket, initBackend } from "./api.js";
+import i18n from "./i18n.js";
 import logoPrimary from "./assets/logo-primary.svg?no-inline";
 import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
 
@@ -178,7 +179,10 @@ export function StoreProvider({ children }) {
             setMarkerCount(0);
             setLiveTranscriptChunks([]);
             refreshMeetings();
-            notify("Recording started", "Aguacate is capturing this meeting locally.");
+            notify(
+              i18n.t("store.notify.recordingStartedTitle"),
+              i18n.t("store.notify.recordingStartedBody")
+            );
             break;
           case "transcript_chunk":
             if (data.text) {
@@ -197,22 +201,31 @@ export function StoreProvider({ children }) {
           case "meeting_brief":
             setBrief(data);
             notify(
-              "Meeting brief ready",
-              `${data.title} starts in ${data.minutes_until} min — you have history with this group.`
+              i18n.t("store.notify.briefReadyTitle"),
+              i18n.t("store.notify.briefReadyBody", {
+                title: data.title,
+                minutes: data.minutes_until,
+              })
             );
             break;
           case "daily_pulse":
             notify(
-              "Action Pulse",
-              `${data.stale_count} stale action${data.stale_count === 1 ? "" : "s"} need attention.`
+              i18n.t("store.notify.pulseTitle"),
+              i18n.t("store.notify.pulseBody", { count: data.stale_count })
             );
             break;
           case "conflicts_found":
-            notify("Conflict detected", "A new decision contradicts an earlier one.");
+            notify(
+              i18n.t("store.notify.conflictTitle"),
+              i18n.t("store.notify.conflictBody")
+            );
             if (selectedIdRef.current === data.meeting_id) refreshDetail();
             break;
           case "transcription_done":
-            notify("Transcription complete", "Claude is writing your notes now.");
+            notify(
+              i18n.t("store.notify.transcriptionDoneTitle"),
+              i18n.t("store.notify.transcriptionDoneBody")
+            );
             break;
           case "recording_stopped":
             setRecording({ active: false, meetingId: null });
@@ -232,9 +245,12 @@ export function StoreProvider({ children }) {
               refreshMyWork();
               refreshLicense();
               if (selectedIdRef.current === data.meeting_id) refreshDetail();
-              if (data.status === "error") showToast(data.error || "Processing failed", "error");
+              if (data.status === "error") showToast(data.error || i18n.t("store.toast.processingFailed"), "error");
               if (data.status === "ready")
-                notify("Notes ready", "Your meeting notes and action items are ready to review.");
+                notify(
+                  i18n.t("store.notify.notesReadyTitle"),
+                  i18n.t("store.notify.notesReadyBody")
+                );
             }
             break;
           case "transcription_progress":
@@ -246,7 +262,12 @@ export function StoreProvider({ children }) {
           case "meeting_prompt":
           case "auto_record_starting":
             setPrompt({ ...data, auto: event === "auto_record_starting" });
-            notify("Meeting detected", `${data.title || "A meeting"} is about to start.`);
+            notify(
+              i18n.t("store.notify.meetingDetectedTitle"),
+              i18n.t("store.notify.meetingDetectedBody", {
+                title: data.title || i18n.t("store.notify.fallbackMeeting"),
+              })
+            );
             break;
           case "calendar_synced":
             api.get("/api/calendar/upcoming").then(setUpcoming).catch(() => {});
@@ -254,10 +275,10 @@ export function StoreProvider({ children }) {
           case "google_connected":
           case "ms_connected":
             refreshCalendar();
-            showToast("Calendar connected");
+            showToast(i18n.t("store.toast.calendarConnected"));
             break;
           case "ms_connect_failed":
-            showToast("Microsoft sign-in failed", "error");
+            showToast(i18n.t("store.toast.msFailed"), "error");
             break;
           default:
             break;
@@ -283,12 +304,9 @@ export function StoreProvider({ children }) {
         selectMeeting(result.meeting_id);
         return result;
       } catch (err) {
-        const raw = err.message || "Recording failed";
+        const raw = err.message || i18n.t("store.toast.recordingFailed");
         if (/portaudio|input.?stream|undefined error.*-50|audio.*unavailable|unavailable.*audio/i.test(raw)) {
-          showToast(
-            "Microphone access denied — open System Settings → Privacy & Security → Microphone",
-            "error"
-          );
+          showToast(i18n.t("store.toast.micDenied"), "error");
         } else {
           showToast(raw, "error");
         }
@@ -442,7 +460,7 @@ export function StoreProvider({ children }) {
   const dropMarker = useCallback(async () => {
     try {
       await api.post("/api/recording/marker");
-      showToast("Moment flagged");
+      showToast(i18n.t("store.toast.momentFlagged"));
     } catch (err) {
       showToast(err.message, "error");
     }

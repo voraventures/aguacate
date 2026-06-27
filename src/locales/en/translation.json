@@ -1,0 +1,613 @@
+{
+  "sidebar": {
+    "nav": {
+      "meetings": "Meetings",
+      "actions": "Actions",
+      "decisions": "Decisions",
+      "topics": "Topics",
+      "people": "People",
+      "series": "Series",
+      "conflicts": "Conflicts"
+    },
+    "status": {
+      "recording": "Recording",
+      "ready": "Ready",
+      "online": "Online",
+      "starting": "Starting"
+    },
+    "time": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "now": "now",
+      "inHM": "in {{h}}h {{m}}m",
+      "inM": "in {{m}}m"
+    },
+    "brand": {
+      "pro": "Pro"
+    },
+    "templateSelectTitle": "Notes template for the next recording",
+    "record": "Record",
+    "stop": "Stop",
+    "meetingCard": {
+      "next": "Next meeting",
+      "none": "No upcoming meetings detected"
+    },
+    "call": {
+      "prompt": "{{app}} detected — record this call?",
+      "title": "{{app}} call",
+      "record": "Record now",
+      "dismiss": "Dismiss"
+    },
+    "free": {
+      "planLabel": "FREE PLAN",
+      "usage": "{{used}} of {{limit}} free meetings used",
+      "unlock": "Unlock with Pro:",
+      "unlimited": "Unlimited meetings",
+      "crossMeeting": "Cross-meeting intelligence",
+      "allIntegrations": "All integrations",
+      "upgrade": "Upgrade to Pro — $20/mo"
+    },
+    "myWork": {
+      "title": "My Work",
+      "refresh": "Refresh counts",
+      "openActions": "Open actions",
+      "decisionsWeek": "Decisions this week",
+      "meetingsProcessed": "Meetings processed"
+    },
+    "navigate": "Navigate",
+    "toggleTheme": "Toggle light/dark",
+    "settings": "Settings"
+  },
+  "app": {
+    "error": {
+      "title": "Something went wrong.",
+      "restartHint": "Please restart the app.",
+      "restart": "Restart"
+    },
+    "engine": {
+      "unreachable": "COULDN'T REACH THE LOCAL ENGINE — RESTART THE APP",
+      "starting": "STARTING LOCAL ENGINE…"
+    },
+    "dragResize": "Drag to resize",
+    "expandList": "Expand list",
+    "expandMeetingList": "Expand meeting list"
+  },
+  "intel": {
+    "title": {
+      "actions": "Actions",
+      "decisions": "Decisions",
+      "topics": "Topics",
+      "people": "People",
+      "series": "Series",
+      "conflicts": "Conflicts"
+    },
+    "empty": {
+      "actions": {
+        "head": "No open actions",
+        "sub": "Action items from your meetings will appear here"
+      },
+      "decisions": {
+        "head": "No decisions recorded",
+        "sub": "Decisions captured in your meetings will appear here"
+      },
+      "topics": {
+        "head": "No topics yet",
+        "sub": "Topics will surface as you record more meetings"
+      },
+      "people": {
+        "head": "No contributors yet",
+        "sub": "People from your meetings will appear here"
+      },
+      "series": {
+        "head": "No recurring meetings yet",
+        "sub": "When the same meeting happens twice, Aguacate starts tracking the series"
+      },
+      "conflicts": {
+        "head": "No conflicts detected",
+        "sub": "When a new decision contradicts an earlier one, it shows up here"
+      }
+    },
+    "searchPlaceholder": "Search {{section}}…",
+    "range": {
+      "all": "All time",
+      "d7": "Last 7 days",
+      "d30": "Last 30 days",
+      "d90": "Last 90 days"
+    },
+    "filter": {
+      "all": "All",
+      "open": "Open",
+      "completed": "Completed",
+      "mine": "Mine",
+      "mineHint": "Set your name in Settings → General to use this filter"
+    },
+    "list": {
+      "tbd": "TBD",
+      "due": "Due {{due}}",
+      "superseded": "Superseded",
+      "staleDays": "stale · {{days}}d",
+      "meetingCount_one": "{{count}} meeting",
+      "meetingCount_other": "{{count}} meetings",
+      "occurrenceCount_one": "{{count}} occurrence",
+      "occurrenceCount_other": "{{count}} occurrences",
+      "cadence": "every ~{{cadence}}d",
+      "actionCount_one": "{{count}} action",
+      "actionCount_other": "{{count}} actions",
+      "openCount": "{{count}} open",
+      "contradicts": "contradicts an earlier decision · {{date}}",
+      "noCompleted": "No completed actions",
+      "goToMeetings": "Go to Meetings"
+    },
+    "detail": {
+      "kicker": {
+        "actions": "Action Item",
+        "decisions": "Decision",
+        "topics": "Topic",
+        "series": "Meeting Series",
+        "conflicts": "Conflict",
+        "people": "Person"
+      },
+      "selectPrompt": "Pick an item from the list to see its detail",
+      "select": {
+        "actions": "Select an action",
+        "decisions": "Select a decision",
+        "topics": "Select a topic",
+        "people": "Select a person",
+        "series": "Select a series",
+        "conflicts": "Select a conflict"
+      },
+      "owner": "Owner: {{owner}}",
+      "ownerTbd": "Owner: TBD",
+      "due": "Due {{due}}",
+      "done": "Done",
+      "open": "Open",
+      "reopen": "Reopen",
+      "markDone": "Mark done",
+      "discussedIn": "Discussed in",
+      "relatedDecisions": "Related decisions",
+      "mentionCount_one": "{{count}} mention",
+      "mentionCount_other": "{{count}} mentions",
+      "contradicting": "Contradicting decisions",
+      "newDecision": "New decision",
+      "priorDecision": "Prior decision",
+      "recentActions": "Recent actions",
+      "view": "View",
+      "meetings": "Meetings",
+      "actionCount_one": "{{count}} action",
+      "actionCount_other": "{{count}} actions",
+      "openCount": "{{count}} open",
+      "meetingCount_one": "{{count}} meeting",
+      "meetingCount_other": "{{count}} meetings",
+      "series": {
+        "cadenceDays": "every ~{{cadence}} days",
+        "completion": "{{pct}}% actions completed",
+        "nextExpected": "Next expected: {{date}}",
+        "openActions_one": "{{count}} open action",
+        "openActions_other": "{{count}} open actions",
+        "completedCount": "{{count}} completed",
+        "carryOver": "Carry-over actions",
+        "noCarryOver": "No carry-over actions",
+        "stillOpen": "still open across {{count}} meetings",
+        "recurringTopics": "Recurring topics",
+        "cameUpIn": "has come up in {{count}} of {{total}} meetings",
+        "noResolution": "without resolution dropping off the agenda",
+        "inSeries": "In this series"
+      }
+    },
+    "trend": {
+      "rising": "rising",
+      "recurring": "recurring",
+      "fading": "fading"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "scrollLeft": "Scroll tabs left",
+    "scrollRight": "Scroll tabs right",
+    "tabs": {
+      "general": "General",
+      "appearance": "Appearance",
+      "recording": "Recording",
+      "templates": "Templates",
+      "ai": "AI",
+      "calendars": "Calendars",
+      "integrations": "Integrations",
+      "privacy": "Privacy",
+      "export": "Export",
+      "workspace": "Workspace",
+      "license": "License"
+    },
+    "general": {
+      "label": "General",
+      "yourName": "Your name",
+      "yourNameDesc": "Used to identify your action items in meetings",
+      "namePlaceholder": "e.g. Sir David Attenborough",
+      "nameSaved": "Name saved",
+      "language": "Language"
+    },
+    "appearance": {
+      "label": "Appearance",
+      "theme": "Theme",
+      "themeDesc": "Sets the color palette across the whole app.",
+      "themes": {
+        "default": "Default",
+        "dark": "Dark",
+        "purple": "Purple",
+        "navy": "Navy",
+        "warm": "Warm",
+        "neon": "Neon"
+      },
+      "fontSize": "Font size",
+      "fontSizeDesc": "Adjusts text size across the whole app. Medium is the default.",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "reduceMotion": "Reduce motion",
+      "reduceMotionDesc": "Disables animations and transitions.",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "recording": {
+      "startup": "Startup",
+      "launchLogin": "Launch Aguacate at login",
+      "launchLoginDesc": "Never miss an auto-recorded meeting.",
+      "on": "On",
+      "off": "Off",
+      "globalShortcut": "Global shortcut",
+      "globalShortcutDesc": "Start or stop recording from anywhere — even when Aguacate is in the tray.",
+      "capture": "Capture",
+      "autoMode": "Auto-record mode",
+      "autoModeDesc": "How Aguacate decides when to start recording.",
+      "modeAll": "Record all meetings automatically",
+      "mode30": "Ask me 30 seconds before each meeting",
+      "modeManual": "Manual only (show calendar, never prompt)",
+      "modeOff": "Off",
+      "microphone": "Microphone",
+      "micDesc": "Input device for your voice.",
+      "systemDefault": "System default",
+      "systemAudio": "System audio device",
+      "winHint": "Windows: pick the \"(loopback)\" entry matching your speakers — Aguacate taps system audio via WASAPI, no driver needed.",
+      "macHint": "macOS: install BlackHole (free) and select it here to capture meeting audio from Zoom/Meet. Aguacate mixes it with your mic locally.",
+      "none": "None",
+      "loopbackSuffix": "  ← loopback",
+      "transcription": "Transcription",
+      "whisperModel": "Whisper model",
+      "whisperDesc": "Transcription runs 100% on this Mac. Models download once on first use.",
+      "modelTiny": "tiny — fastest",
+      "modelBase": "base — balanced",
+      "modelSmall": "small — better accuracy",
+      "modelMedium": "medium — high accuracy, slower"
+    },
+    "ai": {
+      "title": "AI Provider & Model",
+      "provider": "Provider",
+      "privacyNote": "Only the transcript text is sent to {{name}} to write your notes. Audio never leaves this Mac.",
+      "getKey": "Get your {{name}} API key →",
+      "model": "Model",
+      "modelDesc": "Choose the {{name}} model used to write your notes.",
+      "loading": "Loading…",
+      "keyLabel": {
+        "anthropic": "Anthropic API key",
+        "openai": "OpenAI API key",
+        "google": "Google API key"
+      }
+    },
+    "calendars": {
+      "connected": "Connected calendars",
+      "google": "Google Calendar",
+      "connectedDot": "Connected.",
+      "googleVia": "Connects via Google OAuth.",
+      "disconnect": "Disconnect",
+      "connect": "Connect",
+      "microsoft": "Microsoft Calendar",
+      "msVia": "Connects via Microsoft OAuth.",
+      "enterCode": "Enter code {{code}} at {{uri}}",
+      "apple": "Apple Calendar",
+      "appleEnabled": "Enabled (local).",
+      "appleClick": "Click to enable.",
+      "accessDenied": "Calendar access denied. Grant access in System Settings → Privacy & Security → Calendars.",
+      "disable": "Disable",
+      "enable": "Enable",
+      "pollNote": "Aguacate polls connected calendars every 30 seconds and merges duplicate events across calendars automatically. macOS will ask for Calendar permission the first time Apple Calendar is enabled."
+    },
+    "integrations": {
+      "connected": "CONNECTED",
+      "notConfigured": "NOT CONFIGURED",
+      "googleNote": "Connected through your Google account. Manage it in the Calendars tab.",
+      "connectGoogle": "Connect Google in Calendars →",
+      "desc": {
+        "slack": "Post a formatted meeting digest to a channel via incoming webhook.",
+        "notion": "Create a page with the full notes in any Notion database.",
+        "linear": "File the meeting notes as a Linear issue in your team.",
+        "jira": "Create a Jira task carrying the full notes.",
+        "hubspot": "Log the meeting as a note on your HubSpot CRM timeline.",
+        "salesforce": "Save the notes as a Salesforce Note object.",
+        "googleDrive": "Upload notes as Markdown. Uses your Google Calendar connection — no extra key.",
+        "zapier": "Send title + notes JSON to any Zap via catch-hook webhook."
+      },
+      "fields": {
+        "anthropicKey": "Anthropic API key",
+        "slackWebhook": "Slack webhook URL",
+        "notionToken": "Notion integration token",
+        "notionDb": "Notion database ID",
+        "linearKey": "Linear API key",
+        "jiraBase": "Jira base URL",
+        "jiraEmail": "Jira account email",
+        "jiraToken": "Jira API token",
+        "hubspotToken": "HubSpot private app token",
+        "salesforceUrl": "Salesforce instance URL",
+        "salesforceToken": "Salesforce access token",
+        "zapierWebhook": "Zapier webhook URL"
+      }
+    },
+    "templates": {
+      "new": "New template",
+      "builtin": "BUILT-IN",
+      "custom": "CUSTOM",
+      "sectionsGenerated": "Sections generated",
+      "use": "Use this template",
+      "edit": "Edit",
+      "delete": "Delete",
+      "name": "Name",
+      "description": "Description",
+      "structure": "Structure (markdown ## sections)",
+      "structureHint": "Write {{token}} where the standard Decisions / Action Items / Next Steps block should go.",
+      "saved": "Template saved",
+      "save": "Save template",
+      "cancel": "Cancel",
+      "setAsTemplate": "\"{{name}}\" set as your recording template"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "coach": "Meeting Coach",
+      "coachDesc": "Live analysis during recording — 100% local.",
+      "redactedWords": "Redacted words",
+      "autoRedacted": "Auto-redacted",
+      "appearsAs": "Redacted text appears as:",
+      "redactNote": "(█████) from transcripts — and therefore from notes, search, and every export.",
+      "redactPlaceholder": "acme corp, project nova, jane (comma separated)",
+      "neverRecord": "Never record these meetings",
+      "neverRecordDesc": "Calendar events matching these patterns are never prompted, briefed, or auto-recorded.",
+      "excludePlaceholder": "1:1 with lawyer, therapy, comp review (title contains)",
+      "autoDelete": "Auto-delete meetings after",
+      "autoDeleteDesc": "Old meetings are removed automatically once they pass this age.",
+      "retentionNever": "Never (keep everything)",
+      "d30": "30 days",
+      "d90": "90 days",
+      "d180": "180 days",
+      "y1": "1 year",
+      "muteNote": "During a recording you can also hit **Mute zone** in the Coach panel — silence is written instead of audio until you unmute."
+    },
+    "export": {
+      "title": "Exports",
+      "actionsCsv": "Action items CSV",
+      "actionsCsvDesc": "Every action across all meetings.",
+      "csvExported": "CSV exported",
+      "export": "Export",
+      "timelinePdf": "Decision timeline PDF",
+      "timelinePdfDesc": "Chronological decision log.",
+      "timelineExported": "Timeline exported",
+      "mobile": "Mobile",
+      "iosSoon": "Aguacate for iOS — coming soon",
+      "mobileBlurb": "The mobile companion app lets you review notes, complete actions, and search meetings on your iPhone. Connected devices are listed below and can be revoked at any time.",
+      "qrToken": "QR Setup Token",
+      "connectMobile": "Connect mobile app",
+      "connectedDevices": "Connected devices",
+      "deviceRevoked": "Device revoked",
+      "revoke": "Revoke",
+      "revoked": "Revoked",
+      "backup": "Backup",
+      "vault": "Encrypted Vault",
+      "vaultBlurb": "Your entire meeting corpus — notes, transcripts, database — as one password-encrypted portable file. Only a local-first app can offer this.",
+      "vaultPlaceholder": "Vault password (min 8 chars)",
+      "vaultExported": "Vault exported",
+      "encrypting": "Encrypting…",
+      "exportVault": "Export vault"
+    },
+    "workspace": {
+      "title": "Team Workspace",
+      "create": "Create a workspace",
+      "createDesc": "Start a team space to share meetings with teammates.",
+      "namePlaceholder": "Workspace name",
+      "displayNamePlaceholder": "Your display name",
+      "created": "Workspace created",
+      "createBtn": "Create workspace",
+      "join": "Join a workspace",
+      "joinDesc": "Enter an invite code from a teammate.",
+      "invitePlaceholder": "Invite code (e.g. AB12CD34)",
+      "joined": "Joined workspace",
+      "joinBtn": "Join workspace",
+      "inviteCode": "Invite code:",
+      "memberCount_one": "{{count}} member",
+      "memberCount_other": "{{count}} members",
+      "left": "Left workspace",
+      "leave": "Leave",
+      "members": "Members",
+      "memberFallback": "Member",
+      "joinedDate": "joined {{date}}",
+      "syncFolder": "Sync folder",
+      "sharedPath": "Shared folder path",
+      "syncNote": "Point to a shared network drive or Dropbox folder that all members can access. Aguacate writes meeting JSON files here when you share to team.",
+      "syncPlaceholder": "/Volumes/SharedDrive  or  ~/Dropbox/team",
+      "syncSaved": "Sync path saved",
+      "savePath": "Save path"
+    },
+    "license": {
+      "title": "Subscription",
+      "currentPlan": "Current plan",
+      "remaining": "{{remaining}} of {{limit}} free meetings remaining.",
+      "manage": "Manage subscription",
+      "manageDesc": "Re-check your license or upgrade to Pro.",
+      "opening": "Opening…",
+      "revalidate": "Re-validate",
+      "getPro": "Get Pro — $20/mo",
+      "starting": "Starting…",
+      "devTesting": "Developer Testing",
+      "switchFree": "Switch to Free",
+      "switchPro": "Switch to Pro",
+      "planPro": "Pro",
+      "planFree": "Free"
+    },
+    "toast": {
+      "noSubscription": "No active subscription found",
+      "portalUnavailable": "Unable to reach billing portal. Try again later.",
+      "checkoutFailed": "Could not start checkout",
+      "checkoutFailedStatus": "Checkout failed ({{status}})",
+      "noCheckoutUrl": "No checkout URL returned",
+      "switched": "Switched to {{plan}}",
+      "savedKeychain": "{{name}} saved to keychain",
+      "disconnected": "{{name}} disconnected"
+    },
+    "secret": {
+      "configured": "● configured",
+      "savedKeychainPlaceholder": "••••••••  (saved in macOS Keychain)",
+      "pasteValue": "Paste value",
+      "save": "Save",
+      "saving": "Saving…",
+      "configuration": "Configuration",
+      "disconnect": "Disconnect"
+    },
+    "oauth": {
+      "connectCalendar": "Connect {{provider}} Calendar",
+      "explain": "Aguacate connects to your calendar with {{provider}}'s official sign-in (OAuth) — you approve access in your browser and your password is never shared with Aguacate.",
+      "setupNote": "One quick one-time setup is needed first: Aguacate has to be registered as an app in your {{provider}} account so it's allowed to ask for calendar access. The guide below walks you through it in about two minutes — then come back here and hit Connect again.",
+      "learnMore": "Learn more",
+      "close": "Close"
+    }
+  },
+  "notes": {
+    "empty": {
+      "selectMeeting": "Select a meeting",
+      "selectMeetingSub": "Choose a meeting from the list to view its notes"
+    },
+    "processing": {
+      "recording": "Recording in progress…",
+      "transcribingPct": "Transcribing locally — {{pct}}%",
+      "transcribing": "Transcribing locally with Whisper…",
+      "writing": "Claude is writing your notes…",
+      "processing": "Processing…",
+      "audioLocal": "Audio never leaves this Mac."
+    },
+    "action": {
+      "tbd": "TBD",
+      "owner": "Owner",
+      "assign": "Assign",
+      "copied": "Copied",
+      "copy": "Copy",
+      "markIncomplete": "Mark incomplete",
+      "markComplete": "Mark complete",
+      "done": "Done",
+      "complete": "Complete",
+      "myItems": "My items",
+      "download": "Download",
+      "setNameFilter": "Set your name in Settings → General to filter your items",
+      "noneAssigned": "No action items assigned to you in this meeting."
+    },
+    "conflict": {
+      "detected": "Conflict detected",
+      "new": "NEW",
+      "supersedes": "New decision supersedes",
+      "markReviewed": "Mark reviewed"
+    },
+    "coach": {
+      "speakingDensity": "speaking density",
+      "questions": "questions",
+      "fillers": "fillers",
+      "longSilences": "long silences"
+    },
+    "transcript": {
+      "none": "No transcript available.",
+      "full": "Full Transcript"
+    },
+    "confirm": {
+      "delete": "Delete this meeting? This cannot be undone."
+    },
+    "toast": {
+      "linkCopied": "Link copied",
+      "copyFailed": "Copy failed — select and copy manually",
+      "oldSuperseded": "Old decision superseded",
+      "markedReviewed": "Marked reviewed",
+      "exported": "Exported {{fmt}}",
+      "slackCopied": "Slack digest copied",
+      "exportedActions": "Exported your action items",
+      "sendingTo": "Sending to {{label}}…",
+      "regenerating": "Regenerating notes…",
+      "sharedTeam": "Shared to team workspace"
+    },
+    "header": {
+      "recorded": "Recorded",
+      "attendee_one": "{{count}} attendee",
+      "attendee_other": "{{count}} attendees",
+      "followupSent": "Follow-up sent",
+      "moreOptions": "More options",
+      "shareMeeting": "Share meeting",
+      "shareTeam": "Share to team",
+      "deleteMeeting": "Delete meeting"
+    },
+    "error": {
+      "processingFailed": "Processing failed",
+      "processingFailedSub": "Something went wrong while processing this meeting.",
+      "retry": "Retry notes generation",
+      "noNotes": "No notes for this meeting yet."
+    },
+    "tab": {
+      "notes": "Notes",
+      "transcript": "Transcript",
+      "shared": "Shared"
+    },
+    "bar": {
+      "actions": "Actions",
+      "decisions": "Decisions",
+      "participants": "Participants",
+      "coachRecap": "Coach recap",
+      "headsUp": "Heads up"
+    },
+    "section": {
+      "actionItems": "Action Items",
+      "keyDecisions": "Key Decisions",
+      "relatedMeetings": "Related Meetings"
+    },
+    "toolbar": {
+      "followup": "Follow-up",
+      "pdf": "PDF",
+      "md": "MD",
+      "slackDigest": "Slack digest",
+      "sendTo": "Send to…",
+      "regenerate": "Regenerate"
+    },
+    "share": {
+      "created": "Meeting link created",
+      "copyLink": "Copy link",
+      "expires": "Link expires in 30 days. Anyone with this link can view a read-only summary of this meeting.",
+      "close": "Close"
+    }
+  },
+  "store": {
+    "toast": {
+      "calendarConnected": "Calendar connected",
+      "msFailed": "Microsoft sign-in failed",
+      "momentFlagged": "Moment flagged",
+      "micDenied": "Microphone access denied — open System Settings → Privacy & Security → Microphone",
+      "processingFailed": "Processing failed",
+      "recordingFailed": "Recording failed"
+    },
+    "notify": {
+      "recordingStartedTitle": "Recording started",
+      "recordingStartedBody": "Aguacate is capturing this meeting locally.",
+      "briefReadyTitle": "Meeting brief ready",
+      "briefReadyBody": "{{title}} starts in {{minutes}} min — you have history with this group.",
+      "pulseTitle": "Action Pulse",
+      "pulseBody_one": "{{count}} stale action needs attention.",
+      "pulseBody_other": "{{count}} stale actions need attention.",
+      "conflictTitle": "Conflict detected",
+      "conflictBody": "A new decision contradicts an earlier one.",
+      "transcriptionDoneTitle": "Transcription complete",
+      "transcriptionDoneBody": "Claude is writing your notes now.",
+      "notesReadyTitle": "Notes ready",
+      "notesReadyBody": "Your meeting notes and action items are ready to review.",
+      "meetingDetectedTitle": "Meeting detected",
+      "meetingDetectedBody": "{{title}} is about to start.",
+      "fallbackMeeting": "A meeting"
+    }
+  }
+}
