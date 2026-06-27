@@ -159,7 +159,7 @@ export default function IntelligenceView() {
               </button>
             </div>
           )}
-          {view?.map((item, i) => (
+          {(view || []).map((item, i) => (
             <button
               key={item.id || item.name || i}
               className={`intel-row${selected === i ? " active" : ""}`}
@@ -201,7 +201,7 @@ export default function IntelligenceView() {
                       {item.name}
                     </div>
                     <div className="intel-sub">
-                      {item.meetings.length} meeting{item.meetings.length !== 1 ? "s" : ""}
+                      {item.meetings?.length ?? 0} meeting{(item.meetings?.length ?? 0) !== 1 ? "s" : ""}
                     </div>
                   </div>
                   <span className="count-badge">{item.mentions}</span>
@@ -223,7 +223,7 @@ export default function IntelligenceView() {
               )}
               {nav === "people" && (
                 <>
-                  <span className="avatar">{initials(item.name)}</span>
+                  <span className="avatar">{initials(item.name ?? "")}</span>
                   <div className="intel-main">
                     <div className="intel-text" style={{ fontWeight: 600 }}>
                       {item.name}
@@ -303,7 +303,7 @@ export default function IntelligenceView() {
               </div>
               <div className="section-card">
                 <div className="section-label">Discussed in</div>
-                {sel.meetings.map((mt, i) => (
+                {(sel.meetings ?? []).map((mt, i) => (
                   <button key={i} className="related-row" onClick={() => goToMeeting(mt.id)}>
                     <span className="related-title">{mt.title}</span>
                     <span className="intel-sub">{fmtDate(mt.date)}</span>
@@ -334,7 +334,7 @@ export default function IntelligenceView() {
                   </span>
                 </div>
               )}
-              {sel.recurring_topics.length > 0 && (
+              {(sel.recurring_topics?.length ?? 0) > 0 && (
                 <div className="section-card">
                   <div className="section-label">Recurring topics</div>
                   <div className="section-body">
@@ -352,7 +352,7 @@ export default function IntelligenceView() {
               )}
               <div className="section-card">
                 <div className="section-label">In this series</div>
-                {sel.meetings.map((mt) => (
+                {(sel.meetings ?? []).map((mt) => (
                   <button key={mt.id} className="related-row" onClick={() => goToMeeting(mt.id)}>
                     <span className="related-title">{mt.title}</span>
                     <span className="intel-sub">{fmtDate(mt.date)}</span>
@@ -371,7 +371,7 @@ export default function IntelligenceView() {
                 {sel.open_actions > 0 && <span className="pill">{sel.open_actions} open</span>}
                 {sel.meeting_count > 0 && <span className="pill">{sel.meeting_count} meeting{sel.meeting_count !== 1 ? "s" : ""}</span>}
               </div>
-              {sel.recent_actions.length > 0 && (
+              {(sel.recent_actions?.length ?? 0) > 0 && (
                 <div className="section-card">
                   <div className="section-label">Recent actions</div>
                   {sel.recent_actions.map((a, i) => (
