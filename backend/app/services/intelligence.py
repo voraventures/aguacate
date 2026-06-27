@@ -174,7 +174,41 @@ def aggregate_topics() -> list[dict]:
         g["meetings"].append(
             {"id": r["meeting_id"], "title": r["meeting_title"], "date": r["meeting_date"]}
         )
+    # Trend: split each topic's meetings into recent (last 30d) vs older.
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).date().isoformat()
+    for g in grouped.values():
+        recent = sum(1 for mt in g["meetings"] if (mt["date"] or "")[:10] >= cutoff)
+        older = len(g["meetings"]) - recent
+        if len(g["meetings"]) < 2 or recent == older:
+            g["trend"] = "recurring"
+        else:
+            g["trend"] = "rising" if recent > older else "fading"
     return sorted(grouped.values(), key=lambda g: g["mentions"], reverse=True)
+
+
+def _name_subset(short: str, long: str) -> bool:
+    """True if `short` is a distinct whole-word substring of `long`."""
+    if short == long:
+        return False
+    return re.search(rf"\b{re.escape(short.lower())}\b", long.lower()) is not None
+
+
+def _merge_people(people: dict[str, dict]) -> list[dict]:
+    """Fuzzy-merge owners where one name is a whole-word substring of a longer
+    one ('Devin' -> 'Devin Park'); the longer name is canonical."""
+    canon: list[dict] = []
+    for p in sorted(people.values(), key=lambda p: len(p["name"]), reverse=True):
+        target = next((c for c in canon if _name_subset(p["name"], c["name"])), None)
+        if target:
+            target["action_count"] += p["action_count"]
+            target["open_actions"] += p["open_actions"]
+            target["meeting_count"] += p["meeting_count"]
+            for a in p["recent_actions"]:
+                if len(target["recent_actions"]) < 3:
+                    target["recent_actions"].append(a)
+        else:
+            canon.append(p)
+    return canon
 
 
 def aggregate_people() -> list[dict]:
@@ -182,9 +216,9 @@ def aggregate_people() -> list[dict]:
     people: dict[str, dict] = {}
 
     def bucket(name: str) -> dict:
-        key = name.strip().lower()
+        canon = name.strip().title()
         return people.setdefault(
-            key, {"name": name.strip(), "action_count": 0, "open_actions": 0,
+            canon.lower(), {"name": canon, "action_count": 0, "open_actions": 0,
                   "recent_actions": [], "meeting_count": 0}
         )
 
@@ -215,7 +249,7 @@ def aggregate_people() -> list[dict]:
             if isinstance(n, str) and n.strip():
                 bucket(n)["meeting_count"] += 1
 
-    return sorted(people.values(), key=lambda p: p["action_count"], reverse=True)
+    return sorted(_merge_people(people), key=lambda p: p["action_count"], reverse=True)
 
 
 def _norm_series_title(title: str) -> str:
@@ -289,6 +323,22 @@ def detect_series() -> list[dict]:
             }
         )
     return sorted(series, key=lambda s: s["count"], reverse=True)
+
+
+def aggregate_conflicts() -> list[dict]:
+    """Open contradictions between decisions as flat pairs. Each row already
+    pairs the two conflicting decisions with both meeting sources."""
+    db = get_db()
+    rows = db.execute(
+        """SELECT c.id, c.new_decision, c.old_decision, c.explanation, c.created_at,
+                  c.meeting_id AS new_meeting_id, m.title AS new_meeting_title,
+                  m.started_at AS new_date,
+                  c.old_meeting_id, c.old_meeting_title, c.old_date
+           FROM conflicts c JOIN meetings m ON m.id = c.meeting_id
+           WHERE c.status='open'
+           ORDER BY c.created_at DESC"""
+    ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def action_pulse() -> dict:

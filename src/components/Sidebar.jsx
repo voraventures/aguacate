@@ -14,6 +14,7 @@ import {
   SunIcon,
   TagIcon,
   UsersIcon,
+  WarnIcon,
 } from "./icons.jsx";
 
 const NAV_ITEMS = [
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { key: "topics", label: "Topics", Icon: TagIcon },
   { key: "people", label: "People", Icon: UsersIcon },
   { key: "series", label: "Series", Icon: SeriesIcon },
+  { key: "conflicts", label: "Conflicts", Icon: WarnIcon },
 ];
 
 function Waveform() {
