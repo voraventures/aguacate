@@ -15,6 +15,41 @@ const platform = window.aguacate?.platform || "darwin";
 const MIN_LIST = 240;
 const MAX_LIST = 480;
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    console.error("[Aguacate] Render error caught by ErrorBoundary:", error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="boot">
+          <div className="logo">
+            <img className="logo-img" src={this.props.logoUrl} alt="" aria-hidden="true" /> Aguacate
+          </div>
+          <h2 style={{ margin: "16px 0 4px", fontSize: 18, fontWeight: 600, color: "var(--text)" }}>
+            Something went wrong.
+          </h2>
+          <div className="boot-sub">Please restart the app.</div>
+          <button className="btn" style={{ marginTop: 16 }} onClick={() => window.location.reload()}>
+            Restart
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const { ready, connectionFailed, nav, toast } = useStore();
   const logoUrl = useLogo();
@@ -113,7 +148,7 @@ export default function App() {
       : `240px ${Math.max(listWidth, 320)}px 1fr`;
 
   return (
-    <>
+    <ErrorBoundary logoUrl={logoUrl}>
       {platform === "win32" && <Titlebar />}
       <div
         className={`app ${platform}`}
@@ -155,6 +190,6 @@ export default function App() {
         {toast && <div className={`toast ${toast.kind}`}>{toast.message}</div>}
       </div>
       {tourActive && <OnboardingTour onComplete={() => setTourActive(false)} />}
-    </>
+    </ErrorBoundary>
   );
 }
