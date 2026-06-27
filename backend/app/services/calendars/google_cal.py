@@ -20,9 +20,9 @@ log = logging.getLogger("aguacate.google")
 SCOPES = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/drive.file"
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
-# Desktop-app OAuth client secret (non-confidential for installed apps; Google
-# requires it in the token exchange even with PKCE for Desktop client types).
-GOOGLE_CLIENT_SECRET = "REMOVED-LEAKED-CLIENT-SECRET"
+# Token exchange/refresh are brokered server-side so the client_secret never
+# lives on the device — the broker holds it. See vora-aguacate-license.
+OAUTH_BROKER = "https://license.aguacatenotes.com/api/oauth/google"
 
 # CSRF state tokens with TTL (C9)
 _pending: dict[str, dict] = {}
@@ -114,14 +114,11 @@ def exchange_code(state: str, code: str) -> None:
     if pending is None:
         raise RuntimeError("Invalid or expired OAuth state")
     resp = httpx.post(
-        TOKEN_URL,
-        data={
-            "client_id": client_id(),
-            "client_secret": GOOGLE_CLIENT_SECRET,
+        f"{OAUTH_BROKER}/exchange",
+        json={
             "code": code,
-            "code_verifier": pending["verifier"],
-            "grant_type": "authorization_code",
             "redirect_uri": pending["redirect_uri"],
+            "code_verifier": pending["verifier"],
         },
         timeout=15,
     )
@@ -142,13 +139,8 @@ def get_access_token() -> str | None:
         return None
     try:
         resp = httpx.post(
-            TOKEN_URL,
-            data={
-                "client_id": client_id(),
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "refresh_token": refresh,
-                "grant_type": "refresh_token",
-            },
+            f"{OAUTH_BROKER}/refresh",
+            json={"refresh_token": refresh},
             timeout=15,
         )
         resp.raise_for_status()
