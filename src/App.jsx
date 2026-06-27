@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore, useLogo } from "./store.jsx";
+import i18n from "./i18n.js";
 import BriefPanel from "./components/BriefPanel.jsx";
 import CoachPanel from "./components/CoachPanel.jsx";
 import IntelligenceView from "./components/IntelligenceView.jsx";
@@ -37,11 +39,11 @@ class ErrorBoundary extends React.Component {
             <img className="logo-img" src={this.props.logoUrl} alt="" aria-hidden="true" /> Aguacate
           </div>
           <h2 style={{ margin: "16px 0 4px", fontSize: 18, fontWeight: 600, color: "var(--text)" }}>
-            Something went wrong.
+            {i18n.t("app.error.title")}
           </h2>
-          <div className="boot-sub">Please restart the app.</div>
+          <div className="boot-sub">{i18n.t("app.error.restartHint")}</div>
           <button className="btn" style={{ marginTop: 16 }} onClick={() => window.location.reload()}>
-            Restart
+            {i18n.t("app.error.restart")}
           </button>
         </div>
       );
@@ -51,6 +53,7 @@ class ErrorBoundary extends React.Component {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const { ready, connectionFailed, nav, toast } = useStore();
   const logoUrl = useLogo();
   const [listWidth, setListWidth] = useState(() => {
@@ -121,7 +124,7 @@ export default function App() {
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> Aguacate
         </div>
         <div className="boot-sub">
-          COULDN'T REACH THE LOCAL ENGINE — RESTART THE APP
+          {t("app.engine.unreachable")}
         </div>
       </div>
     );
@@ -134,7 +137,7 @@ export default function App() {
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> Aguacate
         </div>
         <div className="processing-ring" />
-        <div className="boot-sub">STARTING LOCAL ENGINE…</div>
+        <div className="boot-sub">{t("app.engine.starting")}</div>
       </div>
     );
   }
@@ -163,15 +166,15 @@ export default function App() {
                   className={`resize-handle${dragging ? " dragging" : ""}`}
                   ref={dragRef}
                   onMouseDown={onDragStart}
-                  title="Drag to resize"
+                  title={t("app.dragResize")}
                 />
               </MeetingList>
             ) : (
               <div className="expand-rail">
                 <button
                   className="collapse-btn"
-                  title="Expand list"
-                  aria-label="Expand meeting list"
+                  title={t("app.expandList")}
+                  aria-label={t("app.expandMeetingList")}
                   onClick={toggleCollapsed}
                 >
                   ›

@@ -28,6 +28,32 @@ const IS_WIN = process.platform === "win32";
 const PROJECT_ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(app.getPath("appData"), "Aguacate");
 
+// ---------- native-UI localization ----------
+// English is loaded as the base/fallback at startup; applyLocale() overlays the
+// OS language (app.getLocale()) once the app is ready.
+const LOCALES_DIR = path.join(__dirname, "locales");
+const SUPPORTED_LOCALES = ["en", "es", "pt", "fr", "zh", "ko"];
+function loadLocaleFile(lang) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, `${lang}.json`), "utf8"));
+  } catch {
+    return null;
+  }
+}
+let T = loadLocaleFile("en") || {};
+function applyLocale(tag) {
+  const base = String(tag || "").toLowerCase().split("-")[0];
+  if (base !== "en" && SUPPORTED_LOCALES.includes(base)) {
+    const loaded = loadLocaleFile(base);
+    if (loaded) T = { ...T, ...loaded }; // overlay onto the English fallback
+  }
+}
+function tr(key, vars) {
+  let s = T[key] != null ? T[key] : key;
+  if (vars) for (const [k, v] of Object.entries(vars)) s = s.split(`{{${k}}}`).join(v);
+  return s;
+}
+
 let mainWindow = null;
 let tray = null;
 let backendProc = null;
@@ -101,8 +127,8 @@ function startBackend() {
     backendProc = null;
     if (!isQuitting) {
       dialog.showErrorBox(
-        "Aguacate backend failed to start",
-        `The local engine could not be launched (${err.code || err.message}).`
+        tr("backendFailedTitle"),
+        tr("backendFailedMsg", { error: err.code || err.message })
       );
     }
   });
@@ -110,8 +136,8 @@ function startBackend() {
     backendProc = null;
     if (code !== 0 && code !== null && mainWindow && !isQuitting) {
       dialog.showErrorBox(
-        "Aguacate backend stopped",
-        "The local engine exited unexpectedly. Restart the app to continue."
+        tr("backendStoppedTitle"),
+        tr("backendStoppedMsg")
       );
     }
   });
@@ -234,19 +260,19 @@ function buildTrayIcon() {
 
 function createTray() {
   tray = new Tray(buildTrayIcon());
-  tray.setToolTip("Aguacate — AI meeting notes");
+  tray.setToolTip(tr("trayTooltip"));
   const menu = Menu.buildFromTemplate([
-    { label: "Show Aguacate", click: () => showWindow() },
-    { label: "Hide", click: () => mainWindow?.hide() },
+    { label: tr("trayShow"), click: () => showWindow() },
+    { label: tr("trayHide"), click: () => mainWindow?.hide() },
     { type: "separator" },
     {
-      label: "Start / stop recording",
+      label: tr("trayToggleRecord"),
       accelerator: "CommandOrControl+Shift+R",
       click: () => sendShortcut("toggle-record"),
     },
     { type: "separator" },
     {
-      label: "Quit Aguacate",
+      label: tr("trayQuit"),
       click: () => {
         isQuitting = true;
         app.quit();
@@ -274,11 +300,11 @@ function toggleAmbient() {
     mainWindow?.hide();
     if (process.platform === "darwin") app.dock?.hide();
     sendShortcut("ambient-start"); // renderer starts recording if idle
-    tray?.setToolTip("Aguacate — recording (ambient)");
+    tray?.setToolTip(tr("trayRecordingAmbient"));
   } else {
     if (process.platform === "darwin") app.dock?.show();
     showWindow();
-    tray?.setToolTip("Aguacate — AI meeting notes");
+    tray?.setToolTip(tr("trayTooltip"));
   }
 }
 
@@ -434,12 +460,10 @@ function checkScreenRecordingPermission() {
   dialog
     .showMessageBox(mainWindow, {
       type: "info",
-      title: "Screen Recording Permission Required",
-      message: "Aguacate needs Screen Recording permission to capture system audio from your meetings.",
-      detail:
-        "Without it, audio from other participants (system audio) will not be recorded. " +
-        "Grant access in System Settings → Privacy & Security → Screen Recording, then restart Aguacate.",
-      buttons: ["Open System Settings", "Later"],
+      title: tr("screenRecTitle"),
+      message: tr("screenRecMsg"),
+      detail: tr("screenRecDetail"),
+      buttons: [tr("openSettings"), tr("later")],
       defaultId: 0,
       cancelId: 1,
     })
@@ -454,6 +478,7 @@ function checkScreenRecordingPermission() {
 }
 
 app.whenReady().then(() => {
+  applyLocale(app.getLocale());
   if (IS_DEV && process.platform === "darwin") {
     try {
       app.dock.setIcon(path.join(__dirname, "assets", "icon.png"));

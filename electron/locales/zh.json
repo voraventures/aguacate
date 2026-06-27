@@ -1,0 +1,17 @@
+{
+  "backendFailedTitle": "Aguacate 后端启动失败",
+  "backendFailedMsg": "无法启动本地引擎（{{error}}）。",
+  "backendStoppedTitle": "Aguacate 后端已停止",
+  "backendStoppedMsg": "本地引擎意外退出。请重启应用以继续。",
+  "trayTooltip": "Aguacate — AI 会议笔记",
+  "trayShow": "显示 Aguacate",
+  "trayHide": "隐藏",
+  "trayToggleRecord": "开始／停止录制",
+  "trayQuit": "退出 Aguacate",
+  "trayRecordingAmbient": "Aguacate — 录制中（环境音）",
+  "screenRecTitle": "需要屏幕录制权限",
+  "screenRecMsg": "Aguacate 需要屏幕录制权限来采集你会议中的系统音频。",
+  "screenRecDetail": "若没有该权限，其他参会者的音频（系统音频）将不会被录制。请在系统设置 → 隐私与安全性 → 屏幕录制中授予访问权限，然后重启 Aguacate。",
+  "openSettings": "打开系统设置",
+  "later": "稍后"
+}

@@ -1,0 +1,17 @@
+{
+  "backendFailedTitle": "El backend de Aguacate no se pudo iniciar",
+  "backendFailedMsg": "No se pudo iniciar el motor local ({{error}}).",
+  "backendStoppedTitle": "El backend de Aguacate se detuvo",
+  "backendStoppedMsg": "El motor local se cerró inesperadamente. Reinicia la aplicación para continuar.",
+  "trayTooltip": "Aguacate — notas de reuniones con IA",
+  "trayShow": "Mostrar Aguacate",
+  "trayHide": "Ocultar",
+  "trayToggleRecord": "Iniciar / detener grabación",
+  "trayQuit": "Salir de Aguacate",
+  "trayRecordingAmbient": "Aguacate — grabando (ambiente)",
+  "screenRecTitle": "Se requiere permiso de Grabación de pantalla",
+  "screenRecMsg": "Aguacate necesita el permiso de Grabación de pantalla para capturar el audio del sistema de tus reuniones.",
+  "screenRecDetail": "Sin él, el audio de los demás participantes (audio del sistema) no se grabará. Concede el acceso en Ajustes del Sistema → Privacidad y seguridad → Grabación de pantalla, luego reinicia Aguacate.",
+  "openSettings": "Abrir Ajustes del Sistema",
+  "later": "Más tarde"
+}

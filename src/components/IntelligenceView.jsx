@@ -1,19 +1,11 @@
 // Cross-meeting intelligence: list column + detail panel for
 // Actions / Decisions / Topics / People / Series / Conflicts.
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "../api.js";
 import { useStore } from "../store.jsx";
 import { ArrowIcon, CheckIcon, ClockIcon, SearchIcon, WarnIcon } from "./icons.jsx";
 import { EMPTY_ART } from "./illustrations.jsx";
-
-const TITLES = {
-  actions: "Actions",
-  decisions: "Decisions",
-  topics: "Topics",
-  people: "People",
-  series: "Series",
-  conflicts: "Conflicts",
-};
 
 const TREND = { rising: "↑", recurring: "→", fading: "↓" };
 
@@ -21,33 +13,6 @@ function ageDays(iso) {
   if (!iso) return 0;
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 }
-
-const EMPTY_COPY = {
-  actions: {
-    headline: "No open actions",
-    sub: "Action items from your meetings will appear here",
-  },
-  decisions: {
-    headline: "No decisions recorded",
-    sub: "Decisions captured in your meetings will appear here",
-  },
-  topics: {
-    headline: "No topics yet",
-    sub: "Topics will surface as you record more meetings",
-  },
-  people: {
-    headline: "No contributors yet",
-    sub: "People from your meetings will appear here",
-  },
-  series: {
-    headline: "No recurring meetings yet",
-    sub: "When the same meeting happens twice, Aguacate starts tracking the series",
-  },
-  conflicts: {
-    headline: "No conflicts detected",
-    sub: "When a new decision contradicts an earlier one, it shows up here",
-  },
-};
 
 function fmtDate(iso) {
   if (!iso) return "";
@@ -78,6 +43,7 @@ function nextExpected(sel) {
 }
 
 export default function IntelligenceView() {
+  const { t } = useTranslation();
   const { nav, setNav, selectMeeting, showToast, refreshMyWork } = useStore();
   const [items, setItems] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -126,8 +92,8 @@ export default function IntelligenceView() {
 
   // Debounce the search box.
   useEffect(() => {
-    const t = setTimeout(() => setQuery(searchInput.trim().toLowerCase()), 200);
-    return () => clearTimeout(t);
+    const tmr = setTimeout(() => setQuery(searchInput.trim().toLowerCase()), 200);
+    return () => clearTimeout(tmr);
   }, [searchInput]);
 
   const goToMeeting = (meetingId) => {
@@ -229,7 +195,7 @@ export default function IntelligenceView() {
           <SearchIcon size={14} />
           <input
             className="intel-search-input"
-            placeholder={`Search ${TITLES[nav].toLowerCase()}…`}
+            placeholder={t("intel.searchPlaceholder", { section: t(`intel.title.${nav}`) })}
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
@@ -245,22 +211,17 @@ export default function IntelligenceView() {
             }}
             style={{ fontSize: 12 }}
           >
-            <option value={0}>All time</option>
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
+            <option value={0}>{t("intel.range.all")}</option>
+            <option value={7}>{t("intel.range.d7")}</option>
+            <option value={30}>{t("intel.range.d30")}</option>
+            <option value={90}>{t("intel.range.d90")}</option>
           </select>
         </div>
         <div className="list-header">
-          <div className="list-title serif">{TITLES[nav]}</div>
+          <div className="list-title serif">{t(`intel.title.${nav}`)}</div>
           {nav === "actions" && (
             <div className="segmented" style={{ marginTop: 10, maxWidth: 380 }}>
-              {[
-                ["all", "All"],
-                ["open", "Open"],
-                ["completed", "Completed"],
-                ["mine", "Mine"],
-              ].map(([key, label]) => (
+              {["all", "open", "completed", "mine"].map((key) => (
                 <button
                   key={key}
                   className={actionFilter === key ? "active" : ""}
@@ -269,7 +230,7 @@ export default function IntelligenceView() {
                     setSelected(null);
                   }}
                 >
-                  {label}
+                  {t(`intel.filter.${key}`)}
                 </button>
               ))}
             </div>
@@ -288,18 +249,18 @@ export default function IntelligenceView() {
               </div>
               <div className="empty-title" style={{ fontSize: 16 }}>
                 {mineNoName
-                  ? "Set your name in Settings → General to use this filter"
+                  ? t("intel.filter.mineHint")
                   : nav === "actions" && actionFilter === "completed"
-                    ? "No completed actions"
-                    : EMPTY_COPY[nav].headline}
+                    ? t("intel.list.noCompleted")
+                    : t(`intel.empty.${nav}.head`)}
               </div>
               {!mineNoName && (
                 <>
                   <div className="empty-sub" style={{ fontSize: 12, textAlign: "center", lineHeight: 1.5 }}>
-                    {EMPTY_COPY[nav].sub}
+                    {t(`intel.empty.${nav}.sub`)}
                   </div>
                   <button className="empty-cta" onClick={() => setNav("meetings")}>
-                    Go to Meetings
+                    {t("intel.list.goToMeetings")}
                   </button>
                 </>
               )}
@@ -314,7 +275,7 @@ export default function IntelligenceView() {
               {nav === "actions" && (
                 <>
                   <span className={`owner-chip${!item.owner || item.owner === "TBD" ? " tbd" : ""}`}>
-                    {item.owner || "TBD"}
+                    {item.owner || t("intel.list.tbd")}
                   </span>
                   <div className="intel-main">
                     <div className={`intel-text${item.status === "done" ? " done" : ""}`}
@@ -323,10 +284,10 @@ export default function IntelligenceView() {
                       {item.action}
                     </div>
                     <div className="intel-sub">
-                      {item.due ? `Due ${item.due} · ` : ""}
+                      {item.due ? `${t("intel.list.due", { due: item.due })} · ` : ""}
                       {item.meeting_title}
                       {item.status === "open" && ageDays(item.meeting_date) > 14 && (
-                        <span className="stale-chip"> stale · {ageDays(item.meeting_date)}d</span>
+                        <span className="stale-chip"> {t("intel.list.staleDays", { days: ageDays(item.meeting_date) })}</span>
                       )}
                     </div>
                   </div>
@@ -341,7 +302,7 @@ export default function IntelligenceView() {
                     {item.text}
                   </div>
                   <div className="intel-sub">
-                    {isSuperseded(item) && <span className="stale-chip">Superseded</span>}{" "}
+                    {isSuperseded(item) && <span className="stale-chip">{t("intel.list.superseded")}</span>}{" "}
                     {fmtDate(item.meeting_date)} · {item.meeting_title}
                   </div>
                 </div>
@@ -358,7 +319,7 @@ export default function IntelligenceView() {
                       {item.name}
                     </div>
                     <div className="intel-sub">
-                      {item.meetings?.length ?? 0} meeting{(item.meetings?.length ?? 0) !== 1 ? "s" : ""}
+                      {t("intel.list.meetingCount", { count: item.meetings?.length ?? 0 })}
                     </div>
                   </div>
                   <span className="count-badge">{item.mentions}</span>
@@ -371,8 +332,8 @@ export default function IntelligenceView() {
                       {item.name}
                     </div>
                     <div className="intel-sub">
-                      {item.count} occurrences
-                      {item.cadence_days ? ` · every ~${item.cadence_days}d` : ""}
+                      {t("intel.list.occurrenceCount", { count: item.count })}
+                      {item.cadence_days ? ` · ${t("intel.list.cadence", { cadence: item.cadence_days })}` : ""}
                     </div>
                   </div>
                   <span className="count-badge">{item.count}</span>
@@ -386,7 +347,7 @@ export default function IntelligenceView() {
                   <div className="intel-main">
                     <div className="intel-text">{item.new_decision}</div>
                     <div className="intel-sub">
-                      contradicts an earlier decision · {fmtDate(item.new_date)}
+                      {t("intel.list.contradicts", { date: fmtDate(item.new_date) })}
                     </div>
                   </div>
                 </>
@@ -399,8 +360,8 @@ export default function IntelligenceView() {
                       {item.name}
                     </div>
                     <div className="intel-sub">
-                      {item.action_count} action{item.action_count !== 1 ? "s" : ""}
-                      {item.open_actions ? ` · ${item.open_actions} open` : ""}
+                      {t("intel.detail.actionCount", { count: item.action_count })}
+                      {item.open_actions ? ` · ${t("intel.detail.openCount", { count: item.open_actions })}` : ""}
                     </div>
                   </div>
                 </>
@@ -417,34 +378,34 @@ export default function IntelligenceView() {
               <div className="empty-art">
                 {React.createElement(EMPTY_ART[nav] || EMPTY_ART.meetings, { size: 120 })}
               </div>
-              <div className="empty-title">Select {nav === "people" ? "a person" : `a ${nav.slice(0, -1)}`}</div>
-              <div className="empty-sub">Pick an item from the list to see its detail</div>
+              <div className="empty-title">{t(`intel.detail.select.${nav}`)}</div>
+              <div className="empty-sub">{t("intel.detail.selectPrompt")}</div>
             </div>
           ) : nav === "actions" ? (
             <>
               <div className="detail-head">
-                <div className="detail-kicker">Action Item</div>
+                <div className="detail-kicker">{t("intel.detail.kicker.actions")}</div>
                 <div className="detail-title">{sel.action}</div>
               </div>
               <div className="meta-pills">
                 {sel.owner && sel.owner !== "TBD" ? (
                   <button className="pill rec" style={{ cursor: "pointer" }} onClick={() => goToPerson(sel.owner)}>
-                    Owner: {sel.owner}
+                    {t("intel.detail.owner", { owner: sel.owner })}
                   </button>
                 ) : (
-                  <span className="pill">Owner: TBD</span>
+                  <span className="pill">{t("intel.detail.ownerTbd")}</span>
                 )}
                 {sel.due && (
                   <span className="pill">
-                    <ClockIcon size={11} /> Due {sel.due}
+                    <ClockIcon size={11} /> {t("intel.detail.due", { due: sel.due })}
                   </span>
                 )}
-                <span className="pill">{sel.status === "done" ? "Done" : "Open"}</span>
+                <span className="pill">{sel.status === "done" ? t("intel.detail.done") : t("intel.detail.open")}</span>
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
                 <button className="btn secondary" onClick={() => toggleDone(sel)}>
                   <CheckIcon size={13} />
-                  {sel.status === "done" ? "Reopen" : "Mark done"}
+                  {sel.status === "done" ? t("intel.detail.reopen") : t("intel.detail.markDone")}
                 </button>
                 <button className="source-link" style={{ marginTop: 0 }} onClick={() => goToMeeting(sel.meeting_id)}>
                   {sel.meeting_title} <ArrowIcon size={13} />
@@ -454,7 +415,7 @@ export default function IntelligenceView() {
           ) : nav === "decisions" ? (
             <>
               <div className="detail-head">
-                <div className="detail-kicker">Decision</div>
+                <div className="detail-kicker">{t("intel.detail.kicker.decisions")}</div>
                 <div
                   className="detail-title"
                   style={isSuperseded(sel) ? { textDecoration: "line-through", opacity: 0.55 } : undefined}
@@ -463,7 +424,7 @@ export default function IntelligenceView() {
                 </div>
               </div>
               <div className="meta-pills">
-                {isSuperseded(sel) && <span className="pill">Superseded</span>}
+                {isSuperseded(sel) && <span className="pill">{t("intel.list.superseded")}</span>}
                 <span className="pill">
                   <ClockIcon size={11} /> {fmtDate(sel.meeting_date)}
                 </span>
@@ -475,15 +436,15 @@ export default function IntelligenceView() {
           ) : nav === "topics" ? (
             <>
               <div className="detail-head">
-                <div className="detail-kicker">Topic</div>
+                <div className="detail-kicker">{t("intel.detail.kicker.topics")}</div>
                 <div className="detail-title">{sel.name}</div>
               </div>
               <div className="meta-pills">
-                <span className="pill rec">{sel.mentions} mention{sel.mentions !== 1 ? "s" : ""}</span>
-                {sel.trend && <span className="pill">{TREND[sel.trend]} {sel.trend}</span>}
+                <span className="pill rec">{t("intel.detail.mentionCount", { count: sel.mentions })}</span>
+                {sel.trend && <span className="pill">{TREND[sel.trend]} {t(`intel.trend.${sel.trend}`)}</span>}
               </div>
               <div className="section-card">
-                <div className="section-label">Discussed in</div>
+                <div className="section-label">{t("intel.detail.discussedIn")}</div>
                 {(sel.meetings ?? []).map((mt, i) => (
                   <button key={i} className="related-row" onClick={() => goToMeeting(mt.id)}>
                     <span className="related-title">{mt.title}</span>
@@ -493,7 +454,7 @@ export default function IntelligenceView() {
               </div>
               {relatedDecisions.length > 0 && (
                 <div className="section-card">
-                  <div className="section-label">Related decisions</div>
+                  <div className="section-label">{t("intel.detail.relatedDecisions")}</div>
                   {relatedDecisions.map((d, i) => (
                     <button key={i} className="related-row" onClick={() => goToMeeting(d.meeting_id)}>
                       <span className="related-title">{d.text}</span>
@@ -506,42 +467,42 @@ export default function IntelligenceView() {
           ) : nav === "series" ? (
             <>
               <div className="detail-head">
-                <div className="detail-kicker">Meeting Series</div>
+                <div className="detail-kicker">{t("intel.detail.kicker.series")}</div>
                 <div className="detail-title">{sel.name}</div>
               </div>
               <div className="meta-pills">
-                <span className="pill rec">{sel.count} meetings</span>
-                {sel.cadence_days > 0 && <span className="pill">every ~{sel.cadence_days} days</span>}
+                <span className="pill rec">{t("intel.detail.meetingCount", { count: sel.count })}</span>
+                {sel.cadence_days > 0 && <span className="pill">{t("intel.detail.series.cadenceDays", { cadence: sel.cadence_days })}</span>}
                 {sel.completion_pct != null && (
-                  <span className="pill">{sel.completion_pct}% actions completed</span>
+                  <span className="pill">{t("intel.detail.series.completion", { pct: sel.completion_pct })}</span>
                 )}
               </div>
               {nextExpected(sel) && (
                 <div className="ai-meta-bar">
                   <span className="ai-meta-item">
-                    Next expected: <strong>{nextExpected(sel)}</strong>
+                    {t("intel.detail.series.nextExpected", { date: nextExpected(sel) })}
                   </span>
                 </div>
               )}
               {sel.open_actions + sel.done_actions > 0 && (
                 <div className="ai-meta-bar">
                   <span className="ai-meta-item">
-                    <strong>{sel.open_actions}</strong> open actions
+                    {t("intel.detail.series.openActions", { count: sel.open_actions })}
                   </span>
                   <span className="ai-meta-item">
-                    <strong>{sel.done_actions}</strong> completed
+                    {t("intel.detail.series.completedCount", { count: sel.done_actions })}
                   </span>
                 </div>
               )}
               <div className="section-card">
-                <div className="section-label">Carry-over actions</div>
+                <div className="section-label">{t("intel.detail.series.carryOver")}</div>
                 {carryOver.length === 0 ? (
-                  <div className="section-body">No carry-over actions</div>
+                  <div className="section-body">{t("intel.detail.series.noCarryOver")}</div>
                 ) : (
                   <ul>
                     {carryOver.map((c, i) => (
                       <li key={i}>
-                        <strong>{c.action}</strong> — still open across {c.meetings.size} meetings
+                        <strong>{c.action}</strong> — {t("intel.detail.series.stillOpen", { count: c.meetings.size })}
                       </li>
                     ))}
                   </ul>
@@ -549,14 +510,14 @@ export default function IntelligenceView() {
               </div>
               {(sel.recurring_topics?.length ?? 0) > 0 && (
                 <div className="section-card">
-                  <div className="section-label">Recurring topics</div>
+                  <div className="section-label">{t("intel.detail.series.recurringTopics")}</div>
                   <div className="section-body">
                     <ul>
-                      {sel.recurring_topics.map((t) => (
-                        <li key={t.name}>
-                          <strong className="topic-chip">{t.name}</strong> — has come up in{" "}
-                          {t.meetings} of {sel.count} meetings
-                          {t.meetings >= 3 ? " without resolution dropping off the agenda" : ""}
+                      {sel.recurring_topics.map((tp) => (
+                        <li key={tp.name}>
+                          <strong className="topic-chip">{tp.name}</strong> —{" "}
+                          {t("intel.detail.series.cameUpIn", { count: tp.meetings, total: sel.count })}
+                          {tp.meetings >= 3 ? ` ${t("intel.detail.series.noResolution")}` : ""}
                         </li>
                       ))}
                     </ul>
@@ -564,7 +525,7 @@ export default function IntelligenceView() {
                 </div>
               )}
               <div className="section-card">
-                <div className="section-label">In this series</div>
+                <div className="section-label">{t("intel.detail.series.inSeries")}</div>
                 {(sel.meetings ?? []).map((mt) => (
                   <button key={mt.id} className="related-row" onClick={() => goToMeeting(mt.id)}>
                     <span className="related-title">{mt.title}</span>
@@ -576,19 +537,19 @@ export default function IntelligenceView() {
           ) : nav === "conflicts" ? (
             <>
               <div className="detail-head">
-                <div className="detail-kicker">Conflict</div>
-                <div className="detail-title">{sel.explanation || "Contradicting decisions"}</div>
+                <div className="detail-kicker">{t("intel.detail.kicker.conflicts")}</div>
+                <div className="detail-title">{sel.explanation || t("intel.detail.contradicting")}</div>
               </div>
               <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
                 <div className="section-card" style={{ flex: 1 }}>
-                  <div className="section-label">New decision</div>
+                  <div className="section-label">{t("intel.detail.newDecision")}</div>
                   <div className="section-body">{sel.new_decision}</div>
                   <button className="source-link" onClick={() => goToMeeting(sel.new_meeting_id)}>
                     {sel.new_meeting_title} <ArrowIcon size={13} />
                   </button>
                 </div>
                 <div className="section-card" style={{ flex: 1 }}>
-                  <div className="section-label">Prior decision</div>
+                  <div className="section-label">{t("intel.detail.priorDecision")}</div>
                   <div className="section-body" style={{ textDecoration: "line-through", opacity: 0.6 }}>
                     {sel.old_decision}
                   </div>
@@ -601,23 +562,23 @@ export default function IntelligenceView() {
           ) : (
             <>
               <div className="detail-head">
-                <div className="detail-kicker">Person</div>
+                <div className="detail-kicker">{t("intel.detail.kicker.people")}</div>
                 <div className="detail-title">{sel.name}</div>
               </div>
               <div className="meta-pills">
-                <span className="pill rec">{sel.action_count} action{sel.action_count !== 1 ? "s" : ""}</span>
-                {sel.open_actions > 0 && <span className="pill">{sel.open_actions} open</span>}
-                {sel.meeting_count > 0 && <span className="pill">{sel.meeting_count} meeting{sel.meeting_count !== 1 ? "s" : ""}</span>}
+                <span className="pill rec">{t("intel.detail.actionCount", { count: sel.action_count })}</span>
+                {sel.open_actions > 0 && <span className="pill">{t("intel.detail.openCount", { count: sel.open_actions })}</span>}
+                {sel.meeting_count > 0 && <span className="pill">{t("intel.detail.meetingCount", { count: sel.meeting_count })}</span>}
               </div>
               {(sel.recent_actions?.length ?? 0) > 0 && (
                 <div className="section-card">
-                  <div className="section-label">Recent actions</div>
+                  <div className="section-label">{t("intel.detail.recentActions")}</div>
                   {sel.recent_actions.map((a, i) => (
                     <div className="action-row" key={i}>
                       <span className="action-text">{a.action}</span>
                       {a.due && <span className="action-due">{a.due}</span>}
                       <button className="tool-btn" onClick={() => goToMeeting(a.meeting_id)}>
-                        View
+                        {t("intel.detail.view")}
                       </button>
                     </div>
                   ))}
@@ -631,7 +592,7 @@ export default function IntelligenceView() {
                 const mtgs = [...seen.entries()];
                 return mtgs.length > 0 ? (
                   <div className="section-card">
-                    <div className="section-label">Meetings</div>
+                    <div className="section-label">{t("intel.detail.meetings")}</div>
                     {mtgs.map(([id, title]) => (
                       <button key={id} className="related-row" onClick={() => goToMeeting(id)}>
                         <span className="related-title">{title}</span>

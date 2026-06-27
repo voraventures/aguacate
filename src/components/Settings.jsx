@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n, { setLanguage } from "../i18n.js";
 import { api, openExternal } from "../api.js";
 import { THEMES, useStore } from "../store.jsx";
 import { UsersIcon, XIcon } from "./icons.jsx";
@@ -283,10 +285,27 @@ const INTEGRATIONS = [
 
 const FIELD_LABELS = Object.fromEntries(SECRET_FIELDS.map((f) => [f.name, f.label]));
 
+// Maps each secret field name to its i18n suffix under settings.integrations.fields.*
+const FIELD_KEYS = {
+  anthropic_api_key: "anthropicKey",
+  slack_webhook_url: "slackWebhook",
+  notion_token: "notionToken",
+  notion_database_id: "notionDb",
+  linear_api_key: "linearKey",
+  jira_base_url: "jiraBase",
+  jira_email: "jiraEmail",
+  jira_token: "jiraToken",
+  hubspot_token: "hubspotToken",
+  salesforce_instance_url: "salesforceUrl",
+  salesforce_token: "salesforceToken",
+  zapier_webhook_url: "zapierWebhook",
+};
+
 function SecretField({ name, label, isSet, onSaved }) {
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const { showToast } = useStore();
+  const { t } = useTranslation();
 
   const save = () => {
     if (!value.trim()) return;
@@ -295,7 +314,7 @@ function SecretField({ name, label, isSet, onSaved }) {
       .post("/api/secrets", { name, value: value.trim() })
       .then(() => {
         setValue("");
-        showToast(`${label} saved to keychain`);
+        showToast(t('settings.toast.savedKeychain', { name: label }));
         onSaved();
       })
       .catch((e) => showToast(e.message, "error"))
@@ -306,19 +325,19 @@ function SecretField({ name, label, isSet, onSaved }) {
     <div className="field">
       <label className="field-label">
         {label}{" "}
-        {isSet && <span style={{ color: "var(--accent)", fontSize: 10.5 }}>● configured</span>}
+        {isSet && <span style={{ color: "var(--accent)", fontSize: 10.5 }}>{t('settings.secret.configured')}</span>}
       </label>
       <div style={{ display: "flex", gap: 7 }}>
         <input
           className="text-input"
           type="password"
-          placeholder={isSet ? "••••••••  (saved in macOS Keychain)" : "Paste value"}
+          placeholder={isSet ? t('settings.secret.savedKeychainPlaceholder') : t('settings.secret.pasteValue')}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && save()}
         />
         <button className="btn" disabled={busy || !value.trim()} onClick={save}>
-          Save
+          {t('settings.secret.save')}
         </button>
       </div>
     </div>
@@ -330,6 +349,7 @@ function SecretField({ name, label, isSet, onSaved }) {
 // clears them via the existing DELETE /api/secrets/{name} endpoint.
 function IntegrationConfig({ ig, secrets, onSaved }) {
   const { showToast } = useStore();
+  const { t } = useTranslation();
   const [values, setValues] = useState({});
   const [busy, setBusy] = useState(false);
 
@@ -344,7 +364,7 @@ function IntegrationConfig({ ig, secrets, onSaved }) {
     Promise.all(entries.map(([name, value]) => api.post("/api/secrets", { name, value })))
       .then(() => {
         setValues({});
-        showToast(`${ig.name} saved to keychain`);
+        showToast(t('settings.toast.savedKeychain', { name: ig.name }));
         onSaved();
       })
       .catch((e) => showToast(e.message, "error"))
@@ -355,7 +375,7 @@ function IntegrationConfig({ ig, secrets, onSaved }) {
     setBusy(true);
     Promise.all(ig.fields.map((name) => api.delete(`/api/secrets/${name}`)))
       .then(() => {
-        showToast(`${ig.name} disconnected`);
+        showToast(t('settings.toast.disconnected', { name: ig.name }));
         onSaved();
       })
       .catch((e) => showToast(e.message, "error"))
@@ -364,14 +384,14 @@ function IntegrationConfig({ ig, secrets, onSaved }) {
 
   return (
     <>
-      <div className="tpl-sections-label">Configuration</div>
+      <div className="tpl-sections-label">{t('settings.secret.configuration')}</div>
       {ig.fields.map((f) => (
         <div className="ig-field" key={f}>
-          <label className="ig-field-label">{FIELD_LABELS[f] || f}</label>
+          <label className="ig-field-label">{FIELD_KEYS[f] ? t('settings.integrations.fields.' + FIELD_KEYS[f]) : (FIELD_LABELS[f] || f)}</label>
           <input
             className="text-input"
             type="password"
-            placeholder={secrets[f] ? "••••••••  (saved in macOS Keychain)" : "Paste value"}
+            placeholder={secrets[f] ? t('settings.secret.savedKeychainPlaceholder') : t('settings.secret.pasteValue')}
             value={values[f] || ""}
             onChange={(e) => setValues((s) => ({ ...s, [f]: e.target.value }))}
             onKeyDown={(e) => e.key === "Enter" && save()}
@@ -379,11 +399,11 @@ function IntegrationConfig({ ig, secrets, onSaved }) {
         </div>
       ))}
       <button className="tpl-use-btn" disabled={busy} onClick={save}>
-        {busy ? "Saving…" : "Save"}
+        {busy ? t('settings.secret.saving') : t('settings.secret.save')}
       </button>
       {connected && (
         <button className="ig-disconnect" disabled={busy} onClick={disconnect}>
-          Disconnect
+          {t('settings.secret.disconnect')}
         </button>
       )}
     </>
@@ -410,6 +430,7 @@ export default function Settings() {
     workspace,
     refreshWorkspace,
   } = useStore();
+  const { t } = useTranslation();
   const [tab, setTab] = useState("general");
   const [tplDetailId, setTplDetailId] = useState(null);
   const [secrets, setSecrets] = useState({});
@@ -526,13 +547,13 @@ export default function Settings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ install_id }),
       });
-      if (!resp.ok) throw new Error(`Checkout failed (${resp.status})`);
+      if (!resp.ok) throw new Error(t('settings.toast.checkoutFailedStatus', { status: resp.status }));
       const data = await resp.json();
-      if (!data?.url) throw new Error("No checkout URL returned");
+      if (!data?.url) throw new Error(t('settings.toast.noCheckoutUrl'));
       openExternal(data.url);
       startProUpgradePolling();
     } catch (e) {
-      showToast(e.message || "Could not start checkout", "error");
+      showToast(e.message || t('settings.toast.checkoutFailed'), "error");
     } finally {
       setCheckoutLoading(false);
     }
@@ -546,12 +567,12 @@ export default function Settings() {
         if (r?.url) {
           openExternal(r.url);
         } else if (r?.error === "no_subscription") {
-          showToast("No active subscription found", "error");
+          showToast(t('settings.toast.noSubscription'), "error");
         } else {
-          showToast("Unable to reach billing portal. Try again later.", "error");
+          showToast(t('settings.toast.portalUnavailable'), "error");
         }
       })
-      .catch(() => showToast("Unable to reach billing portal. Try again later.", "error"))
+      .catch(() => showToast(t('settings.toast.portalUnavailable'), "error"))
       .finally(() => setPortalLoading(false));
   };
 
@@ -563,7 +584,7 @@ export default function Settings() {
       .post("/api/dev/set-tier", { tier })
       .then(() => {
         refreshLicense();
-        showToast(`Switched to ${tier === "pro" ? "Pro" : "Free"}`);
+        showToast(t('settings.toast.switched', { plan: tier === "pro" ? t('settings.license.planPro') : t('settings.license.planFree') }));
       })
       .catch((e) => showToast(e.message, "error"));
   };
@@ -586,14 +607,14 @@ export default function Settings() {
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setSettingsOpen(false)}>
       <div className="modal" style={{ width: 760 }}>
         <div className="modal-header">
-          <div className="modal-title">Settings</div>
+          <div className="modal-title">{t('settings.title')}</div>
           <button className="icon-btn" onClick={() => setSettingsOpen(false)}>
             <XIcon size={15} />
           </button>
         </div>
         <div className={`settings-tabs-wrap${tabFade.left ? " fade-left" : ""}${tabFade.right ? " fade-right" : ""}`}>
           {tabFade.left && (
-            <button className="tab-arrow left" aria-label="Scroll tabs left" onClick={() => scrollTabs(-1)}>
+            <button className="tab-arrow left" aria-label={t('settings.scrollLeft')} onClick={() => scrollTabs(-1)}>
               ‹
             </button>
           )}
@@ -605,12 +626,12 @@ export default function Settings() {
                 className={`settings-tab${tab === key ? " active" : ""}`}
                 onClick={() => setTab(key)}
               >
-                {label}
+                {t('settings.tabs.' + key)}
               </button>
             ))}
           </div>
           {tabFade.right && (
-            <button className="tab-arrow right" aria-label="Scroll tabs right" onClick={() => scrollTabs(1)}>
+            <button className="tab-arrow right" aria-label={t('settings.scrollRight')} onClick={() => scrollTabs(1)}>
               ›
             </button>
           )}
@@ -618,40 +639,59 @@ export default function Settings() {
         <div className="modal-body">
           {tab === "general" && (
             <>
-              <div className="set-section-label first">General</div>
+              <div className="set-section-label first">{t('settings.general.label')}</div>
               <div className="set-card stack">
                 <div className="set-card-icon"><UsersIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Your name</div>
-                  <div className="set-card-desc">Used to identify your action items in meetings</div>
+                  <div className="set-card-name">{t('settings.general.yourName')}</div>
+                  <div className="set-card-desc">{t('settings.general.yourNameDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <input
                     className="text-input"
                     value={userName}
-                    placeholder="e.g. Sir David Attenborough"
+                    placeholder={t('settings.general.namePlaceholder')}
                     onChange={(e) => setUserName(e.target.value)}
                     onBlur={() => {
                       const v = userName.trim();
                       if (v)
                         api
                           .post("/api/settings/user-name", { name: v })
-                          .then(() => showToast("Name saved"))
+                          .then(() => showToast(t('settings.general.nameSaved')))
                           .catch((e) => showToast(e.message, "error"));
                     }}
                   />
+                </div>
+              </div>
+              <div className="set-card stack">
+                <div className="set-card-main">
+                  <div className="set-card-name">{t('settings.general.language')}</div>
+                </div>
+                <div className="set-card-control">
+                  <select
+                    className="select-input"
+                    value={i18n.language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                  >
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="pt">Português</option>
+                    <option value="fr">Français</option>
+                    <option value="zh">中文</option>
+                    <option value="ko">한국어</option>
+                  </select>
                 </div>
               </div>
             </>
           )}
           {tab === "appearance" && (
             <>
-              <div className="set-section-label first">Appearance</div>
+              <div className="set-section-label first">{t('settings.appearance.label')}</div>
               <div className="set-card stack">
                 <div className="set-card-icon"><PaletteIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Theme</div>
-                  <div className="set-card-desc">Sets the color palette across the whole app.</div>
+                  <div className="set-card-name">{t('settings.appearance.theme')}</div>
+                  <div className="set-card-desc">{t('settings.appearance.themeDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <div className="theme-grid">
@@ -667,7 +707,7 @@ export default function Settings() {
                           ))}
                         </span>
                         <span className="swatch-name">
-                          {name === "default" ? "Default" : name[0].toUpperCase() + name.slice(1)}
+                          {t('settings.appearance.themes.' + name)}
                         </span>
                       </button>
                     ))}
@@ -677,13 +717,13 @@ export default function Settings() {
               <div className="set-card">
                 <div className="set-card-icon"><TextSizeIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Font size</div>
-                  <div className="set-card-desc">Adjusts text size across the whole app. Medium is the default.</div>
+                  <div className="set-card-name">{t('settings.appearance.fontSize')}</div>
+                  <div className="set-card-desc">{t('settings.appearance.fontSizeDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   {(() => {
                     const fontSizes = ["small", "medium", "large"];
-                    const fontLabels = ["Small", "Medium", "Large"];
+                    const fontLabels = [t('settings.appearance.small'), t('settings.appearance.medium'), t('settings.appearance.large')];
                     const currentIndex = fontSizes.indexOf(settings.font_size || "medium");
                     return (
                       <div className="segmented seg-slider" style={{ position: "relative", maxWidth: 300 }}>
@@ -733,15 +773,15 @@ export default function Settings() {
               <div className="set-card">
                 <div className="set-card-icon"><ActivityIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Reduce motion</div>
-                  <div className="set-card-desc">Disables animations and transitions.</div>
+                  <div className="set-card-name">{t('settings.appearance.reduceMotion')}</div>
+                  <div className="set-card-desc">{t('settings.appearance.reduceMotionDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <button
                     className={`btn${settings.reduce_motion ? "" : " secondary"}`}
                     onClick={() => saveSetting("reduce_motion", !settings.reduce_motion)}
                   >
-                    {settings.reduce_motion ? "Enabled" : "Disabled"}
+                    {settings.reduce_motion ? t('settings.appearance.enabled') : t('settings.appearance.disabled')}
                   </button>
                 </div>
               </div>
@@ -750,28 +790,28 @@ export default function Settings() {
 
           {tab === "recording" && (
             <>
-              <div className="set-section-label first">Startup</div>
+              <div className="set-section-label first">{t('settings.recording.startup')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><PowerIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Launch Aguacate at login</div>
-                  <div className="set-card-desc">Never miss an auto-recorded meeting.</div>
+                  <div className="set-card-name">{t('settings.recording.launchLogin')}</div>
+                  <div className="set-card-desc">{t('settings.recording.launchLoginDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <button
                     className={`btn${autoLaunch ? "" : " secondary"}`}
                     onClick={toggleAutoLaunch}
                   >
-                    {autoLaunch ? "On" : "Off"}
+                    {autoLaunch ? t('settings.recording.on') : t('settings.recording.off')}
                   </button>
                 </div>
               </div>
               <div className="set-card">
                 <div className="set-card-icon"><KeyboardIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Global shortcut</div>
+                  <div className="set-card-name">{t('settings.recording.globalShortcut')}</div>
                   <div className="set-card-desc">
-                    Start or stop recording from anywhere — even when Aguacate is in the tray.
+                    {t('settings.recording.globalShortcutDesc')}
                   </div>
                 </div>
                 <div className="set-card-control">
@@ -779,12 +819,12 @@ export default function Settings() {
                 </div>
               </div>
 
-              <div className="set-section-label">Capture</div>
+              <div className="set-section-label">{t('settings.recording.capture')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><CalendarClockIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Auto-record mode</div>
-                  <div className="set-card-desc">How Aguacate decides when to start recording.</div>
+                  <div className="set-card-name">{t('settings.recording.autoMode')}</div>
+                  <div className="set-card-desc">{t('settings.recording.autoModeDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <select
@@ -792,18 +832,18 @@ export default function Settings() {
                     value={settings.recording_mode || "confirm_30s"}
                     onChange={(e) => saveSetting("recording_mode", e.target.value)}
                   >
-                    <option value="all">Record all meetings automatically</option>
-                    <option value="confirm_30s">Ask me 30 seconds before each meeting</option>
-                    <option value="manual">Manual only (show calendar, never prompt)</option>
-                    <option value="off">Off</option>
+                    <option value="all">{t('settings.recording.modeAll')}</option>
+                    <option value="confirm_30s">{t('settings.recording.mode30')}</option>
+                    <option value="manual">{t('settings.recording.modeManual')}</option>
+                    <option value="off">{t('settings.recording.modeOff')}</option>
                   </select>
                 </div>
               </div>
               <div className="set-card">
                 <div className="set-card-icon"><MicrophoneIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Microphone</div>
-                  <div className="set-card-desc">Input device for your voice.</div>
+                  <div className="set-card-name">{t('settings.recording.microphone')}</div>
+                  <div className="set-card-desc">{t('settings.recording.micDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <select
@@ -813,7 +853,7 @@ export default function Settings() {
                       saveSetting("mic_device", e.target.value === "" ? null : Number(e.target.value))
                     }
                   >
-                    <option value="">System default</option>
+                    <option value="">{t('settings.recording.systemDefault')}</option>
                     {devices.devices.map((d) => (
                       <option key={d.index} value={d.index}>{d.name}</option>
                     ))}
@@ -823,11 +863,11 @@ export default function Settings() {
               <div className="set-card stack">
                 <div className="set-card-icon"><VolumeIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">System audio device</div>
+                  <div className="set-card-name">{t('settings.recording.systemAudio')}</div>
                   <div className="set-card-desc">
                     {isWin
-                      ? "Windows: pick the \"(loopback)\" entry matching your speakers — Aguacate taps system audio via WASAPI, no driver needed."
-                      : "macOS: install BlackHole (free) and select it here to capture meeting audio from Zoom/Meet. Aguacate mixes it with your mic locally."}
+                      ? t('settings.recording.winHint')
+                      : t('settings.recording.macHint')}
                   </div>
                 </div>
                 <div className="set-card-control">
@@ -838,22 +878,22 @@ export default function Settings() {
                       saveSetting("system_device", e.target.value === "" ? null : Number(e.target.value))
                     }
                   >
-                    <option value="">None</option>
+                    <option value="">{t('settings.recording.none')}</option>
                     {devices.devices.map((d) => (
                       <option key={d.index} value={d.index}>
-                        {d.name}{d.is_loopback_like ? "  ← loopback" : ""}
+                        {d.name}{d.is_loopback_like ? t('settings.recording.loopbackSuffix') : ""}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="set-section-label">Transcription</div>
+              <div className="set-section-label">{t('settings.recording.transcription')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><CpuIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Whisper model</div>
-                  <div className="set-card-desc">Transcription runs 100% on this Mac. Models download once on first use.</div>
+                  <div className="set-card-name">{t('settings.recording.whisperModel')}</div>
+                  <div className="set-card-desc">{t('settings.recording.whisperDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <select
@@ -861,10 +901,10 @@ export default function Settings() {
                     value={settings.whisper_model || "base"}
                     onChange={(e) => saveSetting("whisper_model", e.target.value)}
                   >
-                    <option value="tiny">tiny — fastest</option>
-                    <option value="base">base — balanced</option>
-                    <option value="small">small — better accuracy</option>
-                    <option value="medium">medium — high accuracy, slower</option>
+                    <option value="tiny">{t('settings.recording.modelTiny')}</option>
+                    <option value="base">{t('settings.recording.modelBase')}</option>
+                    <option value="small">{t('settings.recording.modelSmall')}</option>
+                    <option value="medium">{t('settings.recording.modelMedium')}</option>
                   </select>
                 </div>
               </div>
@@ -884,13 +924,12 @@ export default function Settings() {
             const selectedModel = settings[active.modelKey] || defaultModelId;
             return (
               <>
-                <div className="set-section-label first">AI Provider & Model</div>
+                <div className="set-section-label first">{t('settings.ai.title')}</div>
                 <div className="set-card stack">
                   <div className="set-card-main">
-                    <div className="set-card-name">Provider</div>
+                    <div className="set-card-name">{t('settings.ai.provider')}</div>
                     <div className="set-card-desc">
-                      Only the transcript text is sent to {active.name} to write your notes. Audio never
-                      leaves this Mac.
+                      {t('settings.ai.privacyNote', { name: active.name })}
                     </div>
                   </div>
                   <div className="set-card-control">
@@ -912,7 +951,7 @@ export default function Settings() {
                   <div className="set-card-icon"><KeyIcon size={14} /></div>
                   <SecretField
                     name={active.keyName}
-                    label={active.keyLabel}
+                    label={t('settings.ai.keyLabel.' + active.id)}
                     isSet={secrets[active.keyName]}
                     onSaved={loadSecrets}
                   />
@@ -922,15 +961,15 @@ export default function Settings() {
                     onClick={() => openExternal(active.link)}
                     style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", fontSize: 11, padding: 0 }}
                   >
-                    Get your {active.name} API key →
+                    {t('settings.ai.getKey', { name: active.name })}
                   </button>
                 </div>
 
                 <div className="set-card stack">
                   <div className="set-card-icon"><StarIcon size={14} /></div>
                   <div className="set-card-main">
-                    <div className="set-card-name">Model</div>
-                    <div className="set-card-desc">Choose the {active.name} model used to write your notes.</div>
+                    <div className="set-card-name">{t('settings.ai.model')}</div>
+                    <div className="set-card-desc">{t('settings.ai.modelDesc', { name: active.name })}</div>
                   </div>
                   <div className="set-card-control">
                     <select
@@ -938,7 +977,7 @@ export default function Settings() {
                       value={selectedModel}
                       onChange={(e) => saveSetting(active.modelKey, e.target.value)}
                     >
-                      {providerModels.length === 0 && <option value="">Loading…</option>}
+                      {providerModels.length === 0 && <option value="">{t('settings.ai.loading')}</option>}
                       {providerModels.map((m) => (
                         <option key={m.id} value={m.id}>{m.name}</option>
                       ))}
@@ -951,13 +990,13 @@ export default function Settings() {
 
           {tab === "calendars" && (
             <>
-              <div className="set-section-label first">Connected calendars</div>
+              <div className="set-section-label first">{t('settings.calendars.connected')}</div>
               <div className="set-card">
                 <div className="set-card-icon cal-google" style={{ background: "rgba(66,133,244,0.08)" }}><div style={{ width: 14, height: 14, borderRadius: 3, background: "#4285F4", color: "white", fontSize: 8, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>G</div></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Google Calendar</div>
+                  <div className="set-card-name">{t('settings.calendars.google')}</div>
                   <div className="set-card-desc">
-                    {calendarStatus.google ? "Connected." : "Connects via Google OAuth."}
+                    {calendarStatus.google ? t('settings.calendars.connectedDot') : t('settings.calendars.googleVia')}
                   </div>
                 </div>
                 <div className="set-card-control">
@@ -966,7 +1005,7 @@ export default function Settings() {
                       className="btn secondary"
                       onClick={() => api.post("/api/calendar/google/disconnect").then(refreshCalendar)}
                     >
-                      Disconnect
+                      {t('settings.calendars.disconnect')}
                     </button>
                   ) : (
                     <button
@@ -975,7 +1014,7 @@ export default function Settings() {
                         calendarStatus.google_configured ? connectGoogle() : setSetupModal("google")
                       }
                     >
-                      Connect
+                      {t('settings.calendars.connect')}
                     </button>
                   )}
                 </div>
@@ -983,9 +1022,9 @@ export default function Settings() {
               <div className="set-card">
                 <div className="set-card-icon cal-microsoft" style={{ background: "rgba(0,120,212,0.08)" }}><div style={{ width: 14, height: 14, borderRadius: 3, background: "#0078D4", color: "white", fontSize: 8, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>M</div></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Microsoft Calendar</div>
+                  <div className="set-card-name">{t('settings.calendars.microsoft')}</div>
                   <div className="set-card-desc">
-                    {calendarStatus.microsoft ? "Connected." : "Connects via Microsoft OAuth."}
+                    {calendarStatus.microsoft ? t('settings.calendars.connectedDot') : t('settings.calendars.msVia')}
                   </div>
                 </div>
                 <div className="set-card-control">
@@ -994,7 +1033,7 @@ export default function Settings() {
                       className="btn secondary"
                       onClick={() => api.post("/api/calendar/microsoft/disconnect").then(refreshCalendar)}
                     >
-                      Disconnect
+                      {t('settings.calendars.disconnect')}
                     </button>
                   ) : (
                     <button
@@ -1005,7 +1044,7 @@ export default function Settings() {
                           : setSetupModal("microsoft")
                       }
                     >
-                      Connect
+                      {t('settings.calendars.connect')}
                     </button>
                   )}
                 </div>
@@ -1014,8 +1053,7 @@ export default function Settings() {
                 <div className="section-card" style={{ marginTop: 4 }}>
                   <div className="section-body">
                     <p>
-                      Enter code <strong>{msFlow.user_code}</strong> at{" "}
-                      {msFlow.verification_uri}
+                      {t('settings.calendars.enterCode', { code: msFlow.user_code, uri: msFlow.verification_uri })}
                     </p>
                   </div>
                 </div>
@@ -1024,9 +1062,9 @@ export default function Settings() {
                 <div className="set-card">
                   <div className="set-card-icon cal-apple" style={{ background: "rgba(0,0,0,0.06)" }}><div style={{ width: 14, height: 14, borderRadius: 3, background: "#555555", color: "white", fontSize: 8, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>A</div></div>
                   <div className="set-card-main">
-                    <div className="set-card-name">Apple Calendar</div>
+                    <div className="set-card-name">{t('settings.calendars.apple')}</div>
                     <div className="set-card-desc">
-                      {calendarStatus.apple ? "Enabled (local)." : "Click to enable."}
+                      {calendarStatus.apple ? t('settings.calendars.appleEnabled') : t('settings.calendars.appleClick')}
                     </div>
                   </div>
                   <div className="set-card-control">
@@ -1038,7 +1076,7 @@ export default function Settings() {
                           .then((resp) => {
                             if (resp?.error === "access_denied") {
                               showToast(
-                                "Calendar access denied. Grant access in System Settings → Privacy & Security → Calendars.",
+                                t('settings.calendars.accessDenied'),
                                 "error"
                               );
                             }
@@ -1047,22 +1085,20 @@ export default function Settings() {
                           .catch((e) => {
                             if (String(e?.message || "").includes("access_denied")) {
                               showToast(
-                                "Calendar access denied. Grant access in System Settings → Privacy & Security → Calendars.",
+                                t('settings.calendars.accessDenied'),
                                 "error"
                               );
                             }
                           })
                       }
                     >
-                      {calendarStatus.apple ? "Disable" : "Enable"}
+                      {calendarStatus.apple ? t('settings.calendars.disable') : t('settings.calendars.enable')}
                     </button>
                   </div>
                 </div>
               )}
               <div className="field-help" style={{ marginTop: 10 }}>
-                Aguacate polls connected calendars every 30 seconds and merges duplicate events
-                across calendars automatically. macOS will ask for Calendar permission the first
-                time Apple Calendar is enabled.
+                {t('settings.calendars.pollNote')}
               </div>
             </>
           )}
@@ -1100,18 +1136,18 @@ export default function Settings() {
                     </span>
                     <div className="ig-detail-title">{activeIg.name}</div>
                     <span className={`connect-state${activeConnected ? " on" : ""}`}>
-                      {activeConnected ? "CONNECTED" : "NOT CONFIGURED"}
+                      {activeConnected ? t('settings.integrations.connected') : t('settings.integrations.notConfigured')}
                     </span>
                   </div>
-                  <div className="ig-detail-desc">{activeIg.desc}</div>
+                  <div className="ig-detail-desc">{t('settings.integrations.desc.' + (activeIg.key === "google_drive" ? "googleDrive" : activeIg.key))}</div>
                   {activeIg.oauth ? (
                     activeConnected ? (
                       <div className="field-help">
-                        Connected through your Google account. Manage it in the Calendars tab.
+                        {t('settings.integrations.googleNote')}
                       </div>
                     ) : (
                       <button className="btn" onClick={() => setTab("calendars")}>
-                        Connect Google in Calendars →
+                        {t('settings.integrations.connectGoogle')}
                       </button>
                     )
                   ) : (
@@ -1156,7 +1192,7 @@ export default function Settings() {
                           }
                         >
                           <span className="tpl-item-icon"><StarIcon size={14} /></span>
-                          <span className="tpl-item-label">New template</span>
+                          <span className="tpl-item-label">{t('settings.templates.new')}</span>
                         </button>
                       </div>
                       <div className="tpl-detail">
@@ -1166,14 +1202,14 @@ export default function Settings() {
                               <div className="tpl-detail-title">
                                 {activeTpl.name}
                                 <span className={`tpl-badge ${activeTpl.builtin ? "builtin" : "custom"}`}>
-                                  {activeTpl.builtin ? "BUILT-IN" : "CUSTOM"}
+                                  {activeTpl.builtin ? t('settings.templates.builtin') : t('settings.templates.custom')}
                                 </span>
                               </div>
                               {activeTpl.description && (
                                 <div className="tpl-detail-desc">{activeTpl.description}</div>
                               )}
                             </div>
-                            <div className="tpl-sections-label">Sections generated</div>
+                            <div className="tpl-sections-label">{t('settings.templates.sectionsGenerated')}</div>
                             <div className="tpl-chips">
                               {templateSections(activeTpl.body).map((s, i) => (
                                 <span className="tpl-chip" key={i}>{s}</span>
@@ -1183,15 +1219,15 @@ export default function Settings() {
                               className="tpl-use-btn"
                               onClick={() => {
                                 setSelectedTemplate(activeTpl.id);
-                                showToast(`"${activeTpl.name}" set as your recording template`);
+                                showToast(t('settings.templates.setAsTemplate', { name: activeTpl.name }));
                               }}
                             >
-                              Use this template
+                              {t('settings.templates.use')}
                             </button>
                             {!activeTpl.builtin && (
                               <div className="tpl-detail-actions">
                                 <button className="btn secondary" onClick={() => setEditingTemplate(activeTpl)}>
-                                  Edit
+                                  {t('settings.templates.edit')}
                                 </button>
                                 <button
                                   className="btn secondary"
@@ -1202,7 +1238,7 @@ export default function Settings() {
                                     })
                                   }
                                 >
-                                  Delete
+                                  {t('settings.templates.delete')}
                                 </button>
                               </div>
                             )}
@@ -1215,7 +1251,7 @@ export default function Settings() {
               ) : (
                 <>
                   <div className="field">
-                    <label className="field-label">Name</label>
+                    <label className="field-label">{t('settings.templates.name')}</label>
                     <input
                       className="text-input"
                       value={editingTemplate.name}
@@ -1223,7 +1259,7 @@ export default function Settings() {
                     />
                   </div>
                   <div className="field">
-                    <label className="field-label">Description</label>
+                    <label className="field-label">{t('settings.templates.description')}</label>
                     <input
                       className="text-input"
                       value={editingTemplate.description}
@@ -1233,7 +1269,7 @@ export default function Settings() {
                     />
                   </div>
                   <div className="field">
-                    <label className="field-label">Structure (markdown ## sections)</label>
+                    <label className="field-label">{t('settings.templates.structure')}</label>
                     <textarea
                       className="text-input"
                       style={{ minHeight: 220, resize: "vertical", fontSize: 11.5, lineHeight: 1.55 }}
@@ -1241,8 +1277,7 @@ export default function Settings() {
                       onChange={(e) => setEditingTemplate({ ...editingTemplate, body: e.target.value })}
                     />
                     <div className="field-help">
-                      Write {"{SHARED_TAIL}"} where the standard Decisions / Action Items /
-                      Next Steps block should go.
+                      {t('settings.templates.structureHint', { token: '{SHARED_TAIL}' })}
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -1262,15 +1297,15 @@ export default function Settings() {
                           .then(() => {
                             setEditingTemplate(null);
                             refreshTemplates();
-                            showToast("Template saved");
+                            showToast(t('settings.templates.saved'));
                           })
                           .catch((e) => showToast(e.message, "error"));
                       }}
                     >
-                      Save template
+                      {t('settings.templates.save')}
                     </button>
                     <button className="btn secondary" onClick={() => setEditingTemplate(null)}>
-                      Cancel
+                      {t('settings.templates.cancel')}
                     </button>
                   </div>
                 </>
@@ -1280,39 +1315,38 @@ export default function Settings() {
 
           {tab === "privacy" && (
             <>
-              <div className="set-section-label first">Privacy</div>
+              <div className="set-section-label first">{t('settings.privacy.title')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><ShieldIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Meeting Coach</div>
-                  <div className="set-card-desc">Live analysis during recording — 100% local.</div>
+                  <div className="set-card-name">{t('settings.privacy.coach')}</div>
+                  <div className="set-card-desc">{t('settings.privacy.coachDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <button
                     className={`btn${settings.coach_enabled !== false ? "" : " secondary"}`}
                     onClick={() => saveSetting("coach_enabled", settings.coach_enabled === false)}
                   >
-                    {settings.coach_enabled !== false ? "On" : "Off"}
+                    {settings.coach_enabled !== false ? t('settings.recording.on') : t('settings.recording.off')}
                   </button>
                 </div>
               </div>
               <div className="set-card stack">
                 <div className="set-card-icon icon-redact"><RedactIcon /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Redacted words</div>
+                  <div className="set-card-name">{t('settings.privacy.redactedWords')}</div>
                   <div className="set-card-desc">
-                    Auto-redacted{" "}
+                    {t('settings.privacy.autoRedacted')}{" "}
                     <span style={{ fontSize: 10, color: "var(--muted)", marginBottom: 4, display: "block" }}>
-                      Redacted text appears as:
+                      {t('settings.privacy.appearsAs')}
                     </span>
-                    (█████) from transcripts — and therefore from notes,
-                    search, and every export.
+                    {t('settings.privacy.redactNote')}
                   </div>
                 </div>
                 <div className="set-card-control">
                   <input
                     className="text-input"
-                    placeholder="acme corp, project nova, jane (comma separated)"
+                    placeholder={t('settings.privacy.redactPlaceholder')}
                     defaultValue={(settings.redact_words || []).join(", ")}
                     onBlur={(e) =>
                       saveSetting(
@@ -1326,16 +1360,15 @@ export default function Settings() {
               <div className="set-card stack">
                 <div className="set-card-icon"><BanIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Never record these meetings</div>
+                  <div className="set-card-name">{t('settings.privacy.neverRecord')}</div>
                   <div className="set-card-desc">
-                    Calendar events matching these patterns are never prompted, briefed,
-                    or auto-recorded.
+                    {t('settings.privacy.neverRecordDesc')}
                   </div>
                 </div>
                 <div className="set-card-control">
                   <input
                     className="text-input"
-                    placeholder="1:1 with lawyer, therapy, comp review (title contains)"
+                    placeholder={t('settings.privacy.excludePlaceholder')}
                     defaultValue={(settings.exclude_patterns || []).join(", ")}
                     onBlur={(e) =>
                       saveSetting(
@@ -1349,8 +1382,8 @@ export default function Settings() {
               <div className="set-card">
                 <div className="set-card-icon"><TrashIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Auto-delete meetings after</div>
-                  <div className="set-card-desc">Old meetings are removed automatically once they pass this age.</div>
+                  <div className="set-card-name">{t('settings.privacy.autoDelete')}</div>
+                  <div className="set-card-desc">{t('settings.privacy.autoDeleteDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <select
@@ -1358,72 +1391,70 @@ export default function Settings() {
                     value={settings.retention_days || 0}
                     onChange={(e) => saveSetting("retention_days", Number(e.target.value))}
                   >
-                    <option value={0}>Never (keep everything)</option>
-                    <option value={30}>30 days</option>
-                    <option value={90}>90 days</option>
-                    <option value={180}>180 days</option>
-                    <option value={365}>1 year</option>
+                    <option value={0}>{t('settings.privacy.retentionNever')}</option>
+                    <option value={30}>{t('settings.privacy.d30')}</option>
+                    <option value={90}>{t('settings.privacy.d90')}</option>
+                    <option value={180}>{t('settings.privacy.d180')}</option>
+                    <option value={365}>{t('settings.privacy.y1')}</option>
                   </select>
                 </div>
               </div>
               <div className="field-help">
-                During a recording you can also hit <strong>Mute zone</strong> in the
-                Coach panel — silence is written instead of audio until you unmute.
+                {t('settings.privacy.muteNote')}
               </div>
             </>
           )}
 
           {tab === "export" && (
             <>
-              <div className="set-section-label first">Exports</div>
+              <div className="set-section-label first">{t('settings.export.title')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><SpreadsheetIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Action items CSV</div>
-                  <div className="set-card-desc">Every action across all meetings.</div>
+                  <div className="set-card-name">{t('settings.export.actionsCsv')}</div>
+                  <div className="set-card-desc">{t('settings.export.actionsCsvDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <button
                     className="btn secondary"
                     onClick={() =>
                       api.post("/api/export/pack/actions_csv").then(({ path }) => {
-                        showToast("CSV exported");
+                        showToast(t('settings.export.csvExported'));
                         window.aguacate?.showInFolder?.(path);
                       }).catch((e) => showToast(e.message, "error"))
                     }
                   >
-                    Export
+                    {t('settings.export.export')}
                   </button>
                 </div>
               </div>
               <div className="set-card">
                 <div className="set-card-icon"><FileTextIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Decision timeline PDF</div>
-                  <div className="set-card-desc">Chronological decision log.</div>
+                  <div className="set-card-name">{t('settings.export.timelinePdf')}</div>
+                  <div className="set-card-desc">{t('settings.export.timelinePdfDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   <button
                     className="btn secondary"
                     onClick={() =>
                       api.post("/api/export/pack/timeline_pdf").then(({ path }) => {
-                        showToast("Timeline exported");
+                        showToast(t('settings.export.timelineExported'));
                         window.aguacate?.showInFolder?.(path);
                       }).catch((e) => showToast(e.message, "error"))
                     }
                   >
-                    Export
+                    {t('settings.export.export')}
                   </button>
                 </div>
               </div>
 
-              <div className="set-section-label">Mobile</div>
+              <div className="set-section-label">{t('settings.export.mobile')}</div>
               <div className="set-card stack">
                 <div className="set-card-main">
-                  <div className="set-card-name">Aguacate for iOS — coming soon</div>
+                  <div className="set-card-name">{t('settings.export.iosSoon')}</div>
                   <div className="set-card-desc">
-                    The mobile companion app lets you review notes, complete actions, and search meetings on your iPhone.
-                    Connected devices are listed below and can be revoked at any time.
+                    {t('settings.export.mobileBlurb')}
                   </div>
                 </div>
                 <div className="set-card-control">
@@ -1431,7 +1462,7 @@ export default function Settings() {
                     className="btn secondary"
                     onClick={() => {
                       api
-                        .post("/api/mobile/auth", { device_id: "manual-qr-" + Date.now(), device_name: "QR Setup Token" })
+                        .post("/api/mobile/auth", { device_id: "manual-qr-" + Date.now(), device_name: t('settings.export.qrToken') })
                         .then((r) => {
                           showToast("Mobile token: " + r.mobile_token.slice(0, 12) + "…  (copy from logs)");
                           loadMobileSessions();
@@ -1439,14 +1470,14 @@ export default function Settings() {
                         .catch((e) => showToast(e.message, "error"));
                     }}
                   >
-                    Connect mobile app
+                    {t('settings.export.connectMobile')}
                   </button>
                 </div>
               </div>
               {mobileSessions.length > 0 && (
                 <div className="set-card stack">
                   <div className="set-card-main">
-                    <div className="set-card-name">Connected devices</div>
+                    <div className="set-card-name">{t('settings.export.connectedDevices')}</div>
                   </div>
                   <div className="set-card-control" style={{ flexDirection: "column", gap: 6, width: "100%" }}>
                     {mobileSessions.map((s) => (
@@ -1460,28 +1491,27 @@ export default function Settings() {
                             onClick={() =>
                               api
                                 .post(`/api/mobile/sessions/${s.id}/revoke`)
-                                .then(() => { loadMobileSessions(); showToast("Device revoked"); })
+                                .then(() => { loadMobileSessions(); showToast(t('settings.export.deviceRevoked')); })
                                 .catch((e) => showToast(e.message, "error"))
                             }
                           >
-                            Revoke
+                            {t('settings.export.revoke')}
                           </button>
                         )}
-                        {s.revoked && <span style={{ color: "var(--muted)", fontSize: 11 }}>Revoked</span>}
+                        {s.revoked && <span style={{ color: "var(--muted)", fontSize: 11 }}>{t('settings.export.revoked')}</span>}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="set-section-label">Backup</div>
+              <div className="set-section-label">{t('settings.export.backup')}</div>
               <div className="set-card stack">
                 <div className="set-card-icon"><LockIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Encrypted Vault</div>
+                  <div className="set-card-name">{t('settings.export.vault')}</div>
                   <div className="set-card-desc">
-                    Your entire meeting corpus — notes, transcripts, database — as one
-                    password-encrypted portable file. Only a local-first app can offer this.
+                    {t('settings.export.vaultBlurb')}
                   </div>
                 </div>
                 <div className="set-card-control">
@@ -1489,7 +1519,7 @@ export default function Settings() {
                     <input
                       className="text-input"
                       type="password"
-                      placeholder="Vault password (min 8 chars)"
+                      placeholder={t('settings.export.vaultPlaceholder')}
                       value={vaultPassword}
                       onChange={(e) => setVaultPassword(e.target.value)}
                     />
@@ -1502,14 +1532,14 @@ export default function Settings() {
                           .post("/api/vault/export", { password: vaultPassword })
                           .then(({ path }) => {
                             setVaultPassword("");
-                            showToast("Vault exported");
+                            showToast(t('settings.export.vaultExported'));
                             window.aguacate?.showInFolder?.(path);
                           })
                           .catch((e) => showToast(e.message, "error"))
                           .finally(() => setBusy(false));
                       }}
                     >
-                      {busy ? "Encrypting…" : "Export vault"}
+                      {busy ? t('settings.export.encrypting') : t('settings.export.exportVault')}
                     </button>
                   </div>
                 </div>
@@ -1519,24 +1549,24 @@ export default function Settings() {
 
           {tab === "workspace" && (
             <>
-              <div className="set-section-label first">Team Workspace</div>
+              <div className="set-section-label first">{t('settings.workspace.title')}</div>
               {!workspace?.workspace ? (
                 <>
                   <div className="set-card stack">
                     <div className="set-card-main">
-                      <div className="set-card-name">Create a workspace</div>
-                      <div className="set-card-desc">Start a team space to share meetings with teammates.</div>
+                      <div className="set-card-name">{t('settings.workspace.create')}</div>
+                      <div className="set-card-desc">{t('settings.workspace.createDesc')}</div>
                     </div>
                     <div className="set-card-control" style={{ flexDirection: "column", gap: 6 }}>
                       <input
                         className="text-input"
-                        placeholder="Workspace name"
+                        placeholder={t('settings.workspace.namePlaceholder')}
                         value={wsName}
                         onChange={(e) => setWsName(e.target.value)}
                       />
                       <input
                         className="text-input"
-                        placeholder="Your display name"
+                        placeholder={t('settings.workspace.displayNamePlaceholder')}
                         value={wsDisplayName}
                         onChange={(e) => setWsDisplayName(e.target.value)}
                       />
@@ -1550,31 +1580,31 @@ export default function Settings() {
                             .then(() => {
                               refreshWorkspace();
                               setWsName("");
-                              showToast("Workspace created");
+                              showToast(t('settings.workspace.created'));
                             })
                             .catch((e) => showToast(e.message, "error"))
                             .finally(() => setBusy(false));
                         }}
                       >
-                        Create workspace
+                        {t('settings.workspace.createBtn')}
                       </button>
                     </div>
                   </div>
                   <div className="set-card stack">
                     <div className="set-card-main">
-                      <div className="set-card-name">Join a workspace</div>
-                      <div className="set-card-desc">Enter an invite code from a teammate.</div>
+                      <div className="set-card-name">{t('settings.workspace.join')}</div>
+                      <div className="set-card-desc">{t('settings.workspace.joinDesc')}</div>
                     </div>
                     <div className="set-card-control" style={{ flexDirection: "column", gap: 6 }}>
                       <input
                         className="text-input"
-                        placeholder="Invite code (e.g. AB12CD34)"
+                        placeholder={t('settings.workspace.invitePlaceholder')}
                         value={wsInviteCode}
                         onChange={(e) => setWsInviteCode(e.target.value.toUpperCase())}
                       />
                       <input
                         className="text-input"
-                        placeholder="Your display name"
+                        placeholder={t('settings.workspace.displayNamePlaceholder')}
                         value={wsDisplayName}
                         onChange={(e) => setWsDisplayName(e.target.value)}
                       />
@@ -1588,13 +1618,13 @@ export default function Settings() {
                             .then(() => {
                               refreshWorkspace();
                               setWsInviteCode("");
-                              showToast("Joined workspace");
+                              showToast(t('settings.workspace.joined'));
                             })
                             .catch((e) => showToast(e.message, "error"))
                             .finally(() => setBusy(false));
                         }}
                       >
-                        Join workspace
+                        {t('settings.workspace.joinBtn')}
                       </button>
                     </div>
                   </div>
@@ -1605,9 +1635,9 @@ export default function Settings() {
                     <div className="set-card-main">
                       <div className="set-card-name">{workspace.workspace.name}</div>
                       <div className="set-card-desc">
-                        Invite code: <strong>{workspace.workspace.invite_code}</strong>
+                        {t('settings.workspace.inviteCode')} <strong>{workspace.workspace.invite_code}</strong>
                         {" · "}
-                        {workspace.members?.length ?? 0} member{workspace.members?.length !== 1 ? "s" : ""}
+                        {t('settings.workspace.memberCount', { count: workspace.members?.length ?? 0 })}
                       </div>
                     </div>
                     <div className="set-card-control">
@@ -1617,43 +1647,42 @@ export default function Settings() {
                           setBusy(true);
                           api
                             .post("/api/workspace/leave")
-                            .then(() => { refreshWorkspace(); showToast("Left workspace"); })
+                            .then(() => { refreshWorkspace(); showToast(t('settings.workspace.left')); })
                             .catch((e) => showToast(e.message, "error"))
                             .finally(() => setBusy(false));
                         }}
                       >
-                        Leave
+                        {t('settings.workspace.leave')}
                       </button>
                     </div>
                   </div>
                   {workspace.members && workspace.members.length > 0 && (
                     <div className="set-card stack">
                       <div className="set-card-main">
-                        <div className="set-card-name">Members</div>
+                        <div className="set-card-name">{t('settings.workspace.members')}</div>
                       </div>
                       <div className="set-card-control" style={{ flexDirection: "column", gap: 4 }}>
                         {workspace.members.map((m, i) => (
                           <div key={i} style={{ fontSize: 12.5 }}>
-                            {m.display_name || "Member"}{" "}
-                            <span style={{ color: "var(--muted)", fontSize: 11 }}>joined {m.joined_at?.slice(0, 10)}</span>
+                            {m.display_name || t('settings.workspace.memberFallback')}{" "}
+                            <span style={{ color: "var(--muted)", fontSize: 11 }}>{t('settings.workspace.joinedDate', { date: m.joined_at?.slice(0, 10) })}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
-                  <div className="set-section-label">Sync folder</div>
+                  <div className="set-section-label">{t('settings.workspace.syncFolder')}</div>
                   <div className="set-card stack">
                     <div className="set-card-main">
-                      <div className="set-card-name">Shared folder path</div>
+                      <div className="set-card-name">{t('settings.workspace.sharedPath')}</div>
                       <div className="set-card-desc">
-                        Point to a shared network drive or Dropbox folder that all members can access.
-                        Aguacate writes meeting JSON files here when you share to team.
+                        {t('settings.workspace.syncNote')}
                       </div>
                     </div>
                     <div className="set-card-control" style={{ flexDirection: "column", gap: 6 }}>
                       <input
                         className="text-input"
-                        placeholder="/Volumes/SharedDrive  or  ~/Dropbox/team"
+                        placeholder={t('settings.workspace.syncPlaceholder')}
                         value={wsSharePath}
                         onChange={(e) => setWsSharePath(e.target.value)}
                       />
@@ -1663,11 +1692,11 @@ export default function Settings() {
                         onClick={() => {
                           api
                             .post("/api/workspace/share-path", { path: wsSharePath.trim() })
-                            .then(() => { refreshWorkspace(); showToast("Sync path saved"); })
+                            .then(() => { refreshWorkspace(); showToast(t('settings.workspace.syncSaved')); })
                             .catch((e) => showToast(e.message, "error"));
                         }}
                       >
-                        Save path
+                        {t('settings.workspace.savePath')}
                       </button>
                     </div>
                   </div>
@@ -1678,43 +1707,43 @@ export default function Settings() {
 
           {tab === "license" && (
             <>
-              <div className="set-section-label first">Subscription</div>
+              <div className="set-section-label first">{t('settings.license.title')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><CrownIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Current plan</div>
+                  <div className="set-card-name">{t('settings.license.currentPlan')}</div>
                   {license?.tier !== "pro" && (
                     <div className="set-card-desc">
-                      {license?.remaining ?? 5} of {license?.free_limit ?? 5} free meetings remaining.
+                      {t('settings.license.remaining', { remaining: license?.remaining ?? 5, limit: license?.free_limit ?? 5 })}
                     </div>
                   )}
                 </div>
                 <div className="set-card-control">
                   <span style={{ color: "var(--accent)", fontWeight: 600 }}>
-                    {license?.plan_name || (license?.tier === "pro" ? "Pro" : "Free")}
+                    {license?.plan_name || (license?.tier === "pro" ? t('settings.license.planPro') : t('settings.license.planFree'))}
                   </span>
                 </div>
               </div>
               <div className="set-card">
                 <div className="set-card-icon"><RefreshIcon size={14} /></div>
                 <div className="set-card-main">
-                  <div className="set-card-name">Manage subscription</div>
-                  <div className="set-card-desc">Re-check your license or upgrade to Pro.</div>
+                  <div className="set-card-name">{t('settings.license.manage')}</div>
+                  <div className="set-card-desc">{t('settings.license.manageDesc')}</div>
                 </div>
                 <div className="set-card-control">
                   {license?.tier === "pro" && (
                     <button className="btn secondary" disabled={portalLoading} onClick={openPortal}>
-                      {portalLoading ? "Opening…" : "Manage subscription"}
+                      {portalLoading ? t('settings.license.opening') : t('settings.license.manage')}
                     </button>
                   )}
                   {license?.tier !== "pro" && (
                     <button className="btn secondary" onClick={() => api.post("/api/license/refresh").then(refreshLicense)}>
-                      Re-validate
+                      {t('settings.license.revalidate')}
                     </button>
                   )}
                   {license?.tier !== "pro" && (
                     <button className="btn" disabled={checkoutLoading} onClick={startProCheckout}>
-                      {checkoutLoading ? "Starting…" : "Get Pro — $20/mo"}
+                      {checkoutLoading ? t('settings.license.starting') : t('settings.license.getPro')}
                     </button>
                   )}
                 </div>
@@ -1723,14 +1752,14 @@ export default function Settings() {
               {import.meta.env.DEV && (
                 <div className="dev-testing">
                   <div className="dev-testing-label">
-                    <CodeIcon size={11} /> Developer Testing
+                    <CodeIcon size={11} /> {t('settings.license.devTesting')}
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button className="dev-tier-btn" onClick={() => switchTier("free")}>
-                      Switch to Free
+                      {t('settings.license.switchFree')}
                     </button>
                     <button className="dev-tier-btn" onClick={() => switchTier("pro")}>
-                      Switch to Pro
+                      {t('settings.license.switchPro')}
                     </button>
                   </div>
                 </div>
@@ -1748,7 +1777,7 @@ export default function Settings() {
           <div className="modal" style={{ width: 460 }}>
             <div className="modal-header">
               <div className="modal-title">
-                Connect {setupModal === "google" ? "Google" : "Microsoft"} Calendar
+                {t('settings.oauth.connectCalendar', { provider: setupModal === "google" ? "Google" : "Microsoft" })}
               </div>
               <button className="icon-btn" onClick={() => setSetupModal(null)}>
                 <XIcon size={15} />
@@ -1756,17 +1785,10 @@ export default function Settings() {
             </div>
             <div className="modal-body">
               <p style={{ fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                Aguacate connects to your calendar with{" "}
-                {setupModal === "google" ? "Google's" : "Microsoft's"} official sign-in
-                (OAuth) — you approve access in your browser and your password is never
-                shared with Aguacate.
+                {t('settings.oauth.explain', { provider: setupModal === "google" ? "Google" : "Microsoft" })}
               </p>
               <p style={{ fontSize: 13, lineHeight: 1.65, marginBottom: 12, color: "var(--muted)" }}>
-                One quick one-time setup is needed first: Aguacate has to be registered
-                as an app in your {setupModal === "google" ? "Google" : "Microsoft"}{" "}
-                account so it's allowed to ask for calendar access. The guide below
-                walks you through it in about two minutes — then come back here and
-                hit Connect again.
+                {t('settings.oauth.setupNote', { provider: setupModal === "google" ? "Google" : "Microsoft" })}
               </p>
               <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
                 <button
@@ -1779,10 +1801,10 @@ export default function Settings() {
                     )
                   }
                 >
-                  Learn more
+                  {t('settings.oauth.learnMore')}
                 </button>
                 <button className="btn secondary" onClick={() => setSetupModal(null)}>
-                  Close
+                  {t('settings.oauth.close')}
                 </button>
               </div>
             </div>

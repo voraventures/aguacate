@@ -1,0 +1,17 @@
+{
+  "backendFailedTitle": "Aguacate 백엔드를 시작하지 못했습니다",
+  "backendFailedMsg": "로컬 엔진을 실행할 수 없습니다 ({{error}}).",
+  "backendStoppedTitle": "Aguacate 백엔드가 중지되었습니다",
+  "backendStoppedMsg": "로컬 엔진이 예기치 않게 종료되었습니다. 계속하려면 앱을 다시 시작하세요.",
+  "trayTooltip": "Aguacate — AI 회의 노트",
+  "trayShow": "Aguacate 표시",
+  "trayHide": "숨기기",
+  "trayToggleRecord": "녹음 시작 / 중지",
+  "trayQuit": "Aguacate 종료",
+  "trayRecordingAmbient": "Aguacate — 녹음 중 (주변음)",
+  "screenRecTitle": "화면 기록 권한 필요",
+  "screenRecMsg": "Aguacate가 회의의 시스템 오디오를 캡처하려면 화면 기록 권한이 필요합니다.",
+  "screenRecDetail": "권한이 없으면 다른 참가자의 오디오(시스템 오디오)가 녹음되지 않습니다. 시스템 설정 → 개인정보 보호 및 보안 → 화면 기록에서 접근을 허용한 다음 Aguacate를 다시 시작하세요.",
+  "openSettings": "시스템 설정 열기",
+  "later": "나중에"
+}

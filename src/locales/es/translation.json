@@ -1,0 +1,613 @@
+{
+  "sidebar": {
+    "nav": {
+      "meetings": "Reuniones",
+      "actions": "Acciones",
+      "decisions": "Decisiones",
+      "topics": "Temas",
+      "people": "Personas",
+      "series": "Series",
+      "conflicts": "Conflictos"
+    },
+    "status": {
+      "recording": "Grabando",
+      "ready": "Listo",
+      "online": "En línea",
+      "starting": "Iniciando"
+    },
+    "time": {
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "now": "ahora",
+      "inHM": "en {{h}} h {{m}} min",
+      "inM": "en {{m}} min"
+    },
+    "brand": {
+      "pro": "Pro"
+    },
+    "templateSelectTitle": "Plantilla de notas para la próxima grabación",
+    "record": "Grabar",
+    "stop": "Detener",
+    "meetingCard": {
+      "next": "Próxima reunión",
+      "none": "No se detectaron próximas reuniones"
+    },
+    "call": {
+      "prompt": "{{app}} detectado: ¿grabar esta llamada?",
+      "title": "Llamada de {{app}}",
+      "record": "Grabar ahora",
+      "dismiss": "Descartar"
+    },
+    "free": {
+      "planLabel": "PLAN GRATIS",
+      "usage": "{{used}} de {{limit}} reuniones gratuitas usadas",
+      "unlock": "Desbloquea con Pro:",
+      "unlimited": "Reuniones ilimitadas",
+      "crossMeeting": "Inteligencia entre reuniones",
+      "allIntegrations": "Todas las integraciones",
+      "upgrade": "Mejora a Pro — $20/mo"
+    },
+    "myWork": {
+      "title": "Mi trabajo",
+      "refresh": "Actualizar conteos",
+      "openActions": "Acciones abiertas",
+      "decisionsWeek": "Decisiones esta semana",
+      "meetingsProcessed": "Reuniones procesadas"
+    },
+    "navigate": "Navegar",
+    "toggleTheme": "Alternar claro/oscuro",
+    "settings": "Ajustes"
+  },
+  "app": {
+    "error": {
+      "title": "Algo salió mal.",
+      "restartHint": "Por favor, reinicia la aplicación.",
+      "restart": "Reiniciar"
+    },
+    "engine": {
+      "unreachable": "NO SE PUDO CONECTAR CON EL MOTOR LOCAL — REINICIA LA APLICACIÓN",
+      "starting": "INICIANDO EL MOTOR LOCAL…"
+    },
+    "dragResize": "Arrastra para redimensionar",
+    "expandList": "Expandir lista",
+    "expandMeetingList": "Expandir lista de reuniones"
+  },
+  "intel": {
+    "title": {
+      "actions": "Acciones",
+      "decisions": "Decisiones",
+      "topics": "Temas",
+      "people": "Personas",
+      "series": "Series",
+      "conflicts": "Conflictos"
+    },
+    "empty": {
+      "actions": {
+        "head": "Sin acciones abiertas",
+        "sub": "Los elementos de acción de tus reuniones aparecerán aquí"
+      },
+      "decisions": {
+        "head": "Sin decisiones registradas",
+        "sub": "Las decisiones capturadas en tus reuniones aparecerán aquí"
+      },
+      "topics": {
+        "head": "Aún no hay temas",
+        "sub": "Los temas surgirán a medida que grabes más reuniones"
+      },
+      "people": {
+        "head": "Aún no hay colaboradores",
+        "sub": "Las personas de tus reuniones aparecerán aquí"
+      },
+      "series": {
+        "head": "Aún no hay reuniones recurrentes",
+        "sub": "Cuando la misma reunión ocurre dos veces, Aguacate empieza a rastrear la serie"
+      },
+      "conflicts": {
+        "head": "No se detectaron conflictos",
+        "sub": "Cuando una nueva decisión contradice una anterior, aparece aquí"
+      }
+    },
+    "searchPlaceholder": "Buscar {{section}}…",
+    "range": {
+      "all": "Todo el tiempo",
+      "d7": "Últimos 7 días",
+      "d30": "Últimos 30 días",
+      "d90": "Últimos 90 días"
+    },
+    "filter": {
+      "all": "Todas",
+      "open": "Abiertas",
+      "completed": "Completadas",
+      "mine": "Mías",
+      "mineHint": "Configura tu nombre en Ajustes → General para usar este filtro"
+    },
+    "list": {
+      "tbd": "Por definir",
+      "due": "Vence {{due}}",
+      "superseded": "Reemplazada",
+      "staleDays": "obsoleto · {{days}} d",
+      "meetingCount_one": "{{count}} reunión",
+      "meetingCount_other": "{{count}} reuniones",
+      "occurrenceCount_one": "{{count}} aparición",
+      "occurrenceCount_other": "{{count}} apariciones",
+      "cadence": "cada ~{{cadence}} d",
+      "actionCount_one": "{{count}} acción",
+      "actionCount_other": "{{count}} acciones",
+      "openCount": "{{count}} abiertas",
+      "contradicts": "contradice una decisión anterior · {{date}}",
+      "noCompleted": "Sin acciones completadas",
+      "goToMeetings": "Ir a Reuniones"
+    },
+    "detail": {
+      "kicker": {
+        "actions": "Elemento de acción",
+        "decisions": "Decisión",
+        "topics": "Tema",
+        "series": "Serie de reuniones",
+        "conflicts": "Conflicto",
+        "people": "Persona"
+      },
+      "selectPrompt": "Elige un elemento de la lista para ver su detalle",
+      "select": {
+        "actions": "Selecciona una acción",
+        "decisions": "Selecciona una decisión",
+        "topics": "Selecciona un tema",
+        "people": "Selecciona una persona",
+        "series": "Selecciona una serie",
+        "conflicts": "Selecciona un conflicto"
+      },
+      "owner": "Responsable: {{owner}}",
+      "ownerTbd": "Responsable: por definir",
+      "due": "Vence {{due}}",
+      "done": "Hecha",
+      "open": "Abierta",
+      "reopen": "Reabrir",
+      "markDone": "Marcar como hecha",
+      "discussedIn": "Tratado en",
+      "relatedDecisions": "Decisiones relacionadas",
+      "mentionCount_one": "{{count}} mención",
+      "mentionCount_other": "{{count}} menciones",
+      "contradicting": "Decisiones contradictorias",
+      "newDecision": "Nueva decisión",
+      "priorDecision": "Decisión previa",
+      "recentActions": "Acciones recientes",
+      "view": "Ver",
+      "meetings": "Reuniones",
+      "actionCount_one": "{{count}} acción",
+      "actionCount_other": "{{count}} acciones",
+      "openCount": "{{count}} abiertas",
+      "meetingCount_one": "{{count}} reunión",
+      "meetingCount_other": "{{count}} reuniones",
+      "series": {
+        "cadenceDays": "cada ~{{cadence}} días",
+        "completion": "{{pct}} % de acciones completadas",
+        "nextExpected": "Próxima prevista: {{date}}",
+        "openActions_one": "{{count}} acción abierta",
+        "openActions_other": "{{count}} acciones abiertas",
+        "completedCount": "{{count}} completadas",
+        "carryOver": "Acciones pendientes arrastradas",
+        "noCarryOver": "Sin acciones arrastradas",
+        "stillOpen": "siguen abiertas a lo largo de {{count}} reuniones",
+        "recurringTopics": "Temas recurrentes",
+        "cameUpIn": "ha surgido en {{count}} de {{total}} reuniones",
+        "noResolution": "sin resolución, desapareciendo de la agenda",
+        "inSeries": "En esta serie"
+      }
+    },
+    "trend": {
+      "rising": "en aumento",
+      "recurring": "recurrente",
+      "fading": "decayendo"
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "scrollLeft": "Desplazar pestañas a la izquierda",
+    "scrollRight": "Desplazar pestañas a la derecha",
+    "tabs": {
+      "general": "General",
+      "appearance": "Apariencia",
+      "recording": "Grabación",
+      "templates": "Plantillas",
+      "ai": "IA",
+      "calendars": "Calendarios",
+      "integrations": "Integraciones",
+      "privacy": "Privacidad",
+      "export": "Exportar",
+      "workspace": "Espacio de trabajo",
+      "license": "Licencia"
+    },
+    "general": {
+      "label": "General",
+      "yourName": "Tu nombre",
+      "yourNameDesc": "Se usa para identificar tus elementos de acción en las reuniones",
+      "namePlaceholder": "p. ej. Sir David Attenborough",
+      "nameSaved": "Nombre guardado",
+      "language": "Idioma"
+    },
+    "appearance": {
+      "label": "Apariencia",
+      "theme": "Tema",
+      "themeDesc": "Establece la paleta de colores en toda la aplicación.",
+      "themes": {
+        "default": "Predeterminado",
+        "dark": "Oscuro",
+        "purple": "Morado",
+        "navy": "Azul marino",
+        "warm": "Cálido",
+        "neon": "Neón"
+      },
+      "fontSize": "Tamaño de fuente",
+      "fontSizeDesc": "Ajusta el tamaño del texto en toda la aplicación. Mediano es el valor predeterminado.",
+      "small": "Pequeño",
+      "medium": "Mediano",
+      "large": "Grande",
+      "reduceMotion": "Reducir movimiento",
+      "reduceMotionDesc": "Desactiva las animaciones y transiciones.",
+      "enabled": "Activado",
+      "disabled": "Desactivado"
+    },
+    "recording": {
+      "startup": "Inicio",
+      "launchLogin": "Abrir Aguacate al iniciar sesión",
+      "launchLoginDesc": "No te pierdas ninguna reunión grabada automáticamente.",
+      "on": "Activado",
+      "off": "Desactivado",
+      "globalShortcut": "Atajo global",
+      "globalShortcutDesc": "Inicia o detén la grabación desde cualquier lugar, incluso cuando Aguacate está en la bandeja.",
+      "capture": "Captura",
+      "autoMode": "Modo de grabación automática",
+      "autoModeDesc": "Cómo decide Aguacate cuándo empezar a grabar.",
+      "modeAll": "Grabar todas las reuniones automáticamente",
+      "mode30": "Preguntarme 30 segundos antes de cada reunión",
+      "modeManual": "Solo manual (mostrar calendario, nunca preguntar)",
+      "modeOff": "Desactivado",
+      "microphone": "Micrófono",
+      "micDesc": "Dispositivo de entrada para tu voz.",
+      "systemDefault": "Predeterminado del sistema",
+      "systemAudio": "Dispositivo de audio del sistema",
+      "winHint": "Windows: elige la entrada \"(loopback)\" que coincida con tus altavoces; Aguacate capta el audio del sistema vía WASAPI, sin necesidad de controladores.",
+      "macHint": "macOS: instala BlackHole (gratis) y selecciónalo aquí para capturar el audio de las reuniones de Zoom/Meet. Aguacate lo mezcla con tu micrófono localmente.",
+      "none": "Ninguno",
+      "loopbackSuffix": "  ← loopback",
+      "transcription": "Transcripción",
+      "whisperModel": "Modelo de Whisper",
+      "whisperDesc": "La transcripción se ejecuta 100 % en este Mac. Los modelos se descargan una vez en el primer uso.",
+      "modelTiny": "tiny — el más rápido",
+      "modelBase": "base — equilibrado",
+      "modelSmall": "small — mejor precisión",
+      "modelMedium": "medium — alta precisión, más lento"
+    },
+    "ai": {
+      "title": "Proveedor y modelo de IA",
+      "provider": "Proveedor",
+      "privacyNote": "Solo el texto de la transcripción se envía a {{name}} para escribir tus notas. El audio nunca sale de este Mac.",
+      "getKey": "Consigue tu clave de API de {{name}} →",
+      "model": "Modelo",
+      "modelDesc": "Elige el modelo de {{name}} que se usa para escribir tus notas.",
+      "loading": "Cargando…",
+      "keyLabel": {
+        "anthropic": "Clave de API de Anthropic",
+        "openai": "Clave de API de OpenAI",
+        "google": "Clave de API de Google"
+      }
+    },
+    "calendars": {
+      "connected": "Calendarios conectados",
+      "google": "Google Calendar",
+      "connectedDot": "Conectado.",
+      "googleVia": "Se conecta vía Google OAuth.",
+      "disconnect": "Desconectar",
+      "connect": "Conectar",
+      "microsoft": "Microsoft Calendar",
+      "msVia": "Se conecta vía Microsoft OAuth.",
+      "enterCode": "Introduce el código {{code}} en {{uri}}",
+      "apple": "Apple Calendar",
+      "appleEnabled": "Activado (local).",
+      "appleClick": "Haz clic para activar.",
+      "accessDenied": "Acceso al calendario denegado. Concede el acceso en Ajustes del Sistema → Privacidad y seguridad → Calendarios.",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "pollNote": "Aguacate consulta los calendarios conectados cada 30 segundos y fusiona automáticamente los eventos duplicados entre calendarios. macOS pedirá permiso de Calendario la primera vez que se active Apple Calendar."
+    },
+    "integrations": {
+      "connected": "CONECTADO",
+      "notConfigured": "NO CONFIGURADO",
+      "googleNote": "Conectado a través de tu cuenta de Google. Gestiónalo en la pestaña Calendarios.",
+      "connectGoogle": "Conectar Google en Calendarios →",
+      "desc": {
+        "slack": "Publica un resumen formateado de la reunión en un canal mediante un webhook entrante.",
+        "notion": "Crea una página con las notas completas en cualquier base de datos de Notion.",
+        "linear": "Registra las notas de la reunión como una incidencia de Linear en tu equipo.",
+        "jira": "Crea una tarea de Jira con las notas completas.",
+        "hubspot": "Registra la reunión como una nota en la cronología de tu CRM de HubSpot.",
+        "salesforce": "Guarda las notas como un objeto Note de Salesforce.",
+        "googleDrive": "Sube las notas como Markdown. Usa tu conexión de Google Calendar, sin clave adicional.",
+        "zapier": "Envía el título y las notas en JSON a cualquier Zap mediante un webhook de tipo catch-hook."
+      },
+      "fields": {
+        "anthropicKey": "Clave de API de Anthropic",
+        "slackWebhook": "URL del webhook de Slack",
+        "notionToken": "Token de integración de Notion",
+        "notionDb": "ID de la base de datos de Notion",
+        "linearKey": "Clave de API de Linear",
+        "jiraBase": "URL base de Jira",
+        "jiraEmail": "Correo de la cuenta de Jira",
+        "jiraToken": "Token de API de Jira",
+        "hubspotToken": "Token de app privada de HubSpot",
+        "salesforceUrl": "URL de la instancia de Salesforce",
+        "salesforceToken": "Token de acceso de Salesforce",
+        "zapierWebhook": "URL del webhook de Zapier"
+      }
+    },
+    "templates": {
+      "new": "Nueva plantilla",
+      "builtin": "INTEGRADA",
+      "custom": "PERSONALIZADA",
+      "sectionsGenerated": "Secciones generadas",
+      "use": "Usar esta plantilla",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "name": "Nombre",
+      "description": "Descripción",
+      "structure": "Estructura (secciones ## en markdown)",
+      "structureHint": "Escribe {{token}} donde debe ir el bloque estándar de Decisiones / Elementos de acción / Próximos pasos.",
+      "saved": "Plantilla guardada",
+      "save": "Guardar plantilla",
+      "cancel": "Cancelar",
+      "setAsTemplate": "\"{{name}}\" establecida como tu plantilla de grabación"
+    },
+    "privacy": {
+      "title": "Privacidad",
+      "coach": "Coach de reuniones",
+      "coachDesc": "Análisis en vivo durante la grabación — 100 % local.",
+      "redactedWords": "Palabras censuradas",
+      "autoRedacted": "Censura automática",
+      "appearsAs": "El texto censurado aparece como:",
+      "redactNote": "(█████) en las transcripciones, y por lo tanto en las notas, las búsquedas y todas las exportaciones.",
+      "redactPlaceholder": "acme corp, proyecto nova, jane (separados por comas)",
+      "neverRecord": "Nunca grabar estas reuniones",
+      "neverRecordDesc": "Los eventos del calendario que coincidan con estos patrones nunca se preguntan, se resumen ni se graban automáticamente.",
+      "excludePlaceholder": "1:1 con abogado, terapia, revisión salarial (el título contiene)",
+      "autoDelete": "Eliminar reuniones automáticamente tras",
+      "autoDeleteDesc": "Las reuniones antiguas se eliminan automáticamente una vez superada esta antigüedad.",
+      "retentionNever": "Nunca (conservar todo)",
+      "d30": "30 días",
+      "d90": "90 días",
+      "d180": "180 días",
+      "y1": "1 año",
+      "muteNote": "Durante una grabación también puedes pulsar **Mute zone** en el panel del Coach: se escribe silencio en lugar de audio hasta que reactives el sonido."
+    },
+    "export": {
+      "title": "Exportaciones",
+      "actionsCsv": "CSV de elementos de acción",
+      "actionsCsvDesc": "Todas las acciones de todas las reuniones.",
+      "csvExported": "CSV exportado",
+      "export": "Exportar",
+      "timelinePdf": "PDF de cronología de decisiones",
+      "timelinePdfDesc": "Registro cronológico de decisiones.",
+      "timelineExported": "Cronología exportada",
+      "mobile": "Móvil",
+      "iosSoon": "Aguacate para iOS — próximamente",
+      "mobileBlurb": "La aplicación complementaria para móvil te permite revisar notas, completar acciones y buscar reuniones en tu iPhone. Los dispositivos conectados se enumeran a continuación y se pueden revocar en cualquier momento.",
+      "qrToken": "Token de configuración QR",
+      "connectMobile": "Conectar la aplicación móvil",
+      "connectedDevices": "Dispositivos conectados",
+      "deviceRevoked": "Dispositivo revocado",
+      "revoke": "Revocar",
+      "revoked": "Revocado",
+      "backup": "Copia de seguridad",
+      "vault": "Bóveda cifrada",
+      "vaultBlurb": "Todo tu corpus de reuniones —notas, transcripciones, base de datos— como un único archivo portátil cifrado con contraseña. Solo una aplicación local-first puede ofrecer esto.",
+      "vaultPlaceholder": "Contraseña de la bóveda (mín. 8 caracteres)",
+      "vaultExported": "Bóveda exportada",
+      "encrypting": "Cifrando…",
+      "exportVault": "Exportar bóveda"
+    },
+    "workspace": {
+      "title": "Espacio de trabajo del equipo",
+      "create": "Crear un espacio de trabajo",
+      "createDesc": "Inicia un espacio de equipo para compartir reuniones con tus compañeros.",
+      "namePlaceholder": "Nombre del espacio de trabajo",
+      "displayNamePlaceholder": "Tu nombre visible",
+      "created": "Espacio de trabajo creado",
+      "createBtn": "Crear espacio de trabajo",
+      "join": "Unirse a un espacio de trabajo",
+      "joinDesc": "Introduce un código de invitación de un compañero.",
+      "invitePlaceholder": "Código de invitación (p. ej. AB12CD34)",
+      "joined": "Te uniste al espacio de trabajo",
+      "joinBtn": "Unirse al espacio de trabajo",
+      "inviteCode": "Código de invitación:",
+      "memberCount_one": "{{count}} miembro",
+      "memberCount_other": "{{count}} miembros",
+      "left": "Saliste del espacio de trabajo",
+      "leave": "Salir",
+      "members": "Miembros",
+      "memberFallback": "Miembro",
+      "joinedDate": "se unió el {{date}}",
+      "syncFolder": "Carpeta de sincronización",
+      "sharedPath": "Ruta de la carpeta compartida",
+      "syncNote": "Apunta a una unidad de red compartida o carpeta de Dropbox a la que puedan acceder todos los miembros. Aguacate escribe aquí los archivos JSON de las reuniones cuando compartes con el equipo.",
+      "syncPlaceholder": "/Volumes/SharedDrive  o  ~/Dropbox/team",
+      "syncSaved": "Ruta de sincronización guardada",
+      "savePath": "Guardar ruta"
+    },
+    "license": {
+      "title": "Suscripción",
+      "currentPlan": "Plan actual",
+      "remaining": "{{remaining}} de {{limit}} reuniones gratuitas restantes.",
+      "manage": "Gestionar suscripción",
+      "manageDesc": "Vuelve a verificar tu licencia o mejora a Pro.",
+      "opening": "Abriendo…",
+      "revalidate": "Volver a validar",
+      "getPro": "Obtener Pro — $20/mo",
+      "starting": "Iniciando…",
+      "devTesting": "Pruebas de desarrollador",
+      "switchFree": "Cambiar a Gratis",
+      "switchPro": "Cambiar a Pro",
+      "planPro": "Pro",
+      "planFree": "Gratis"
+    },
+    "toast": {
+      "noSubscription": "No se encontró ninguna suscripción activa",
+      "portalUnavailable": "No se pudo conectar con el portal de facturación. Inténtalo de nuevo más tarde.",
+      "checkoutFailed": "No se pudo iniciar el pago",
+      "checkoutFailedStatus": "El pago falló ({{status}})",
+      "noCheckoutUrl": "No se devolvió ninguna URL de pago",
+      "switched": "Cambiado a {{plan}}",
+      "savedKeychain": "{{name}} guardado en el llavero",
+      "disconnected": "{{name}} desconectado"
+    },
+    "secret": {
+      "configured": "● configurado",
+      "savedKeychainPlaceholder": "••••••••  (guardado en el Llavero de macOS)",
+      "pasteValue": "Pega el valor",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "configuration": "Configuración",
+      "disconnect": "Desconectar"
+    },
+    "oauth": {
+      "connectCalendar": "Conectar {{provider}} Calendar",
+      "explain": "Aguacate se conecta a tu calendario con el inicio de sesión oficial de {{provider}} (OAuth): tú apruebas el acceso en tu navegador y tu contraseña nunca se comparte con Aguacate.",
+      "setupNote": "Primero se necesita una configuración rápida y única: Aguacate debe registrarse como una aplicación en tu cuenta de {{provider}} para que pueda solicitar acceso al calendario. La guía de abajo te lo explica en unos dos minutos; luego vuelve aquí y pulsa Conectar de nuevo.",
+      "learnMore": "Más información",
+      "close": "Cerrar"
+    }
+  },
+  "notes": {
+    "empty": {
+      "selectMeeting": "Selecciona una reunión",
+      "selectMeetingSub": "Elige una reunión de la lista para ver sus notas"
+    },
+    "processing": {
+      "recording": "Grabación en curso…",
+      "transcribingPct": "Transcribiendo localmente — {{pct}} %",
+      "transcribing": "Transcribiendo localmente con Whisper…",
+      "writing": "Claude está escribiendo tus notas…",
+      "processing": "Procesando…",
+      "audioLocal": "El audio nunca sale de este Mac."
+    },
+    "action": {
+      "tbd": "Por definir",
+      "owner": "Responsable",
+      "assign": "Asignar",
+      "copied": "Copiado",
+      "copy": "Copiar",
+      "markIncomplete": "Marcar como incompleta",
+      "markComplete": "Marcar como completada",
+      "done": "Hecha",
+      "complete": "Completar",
+      "myItems": "Mis elementos",
+      "download": "Descargar",
+      "setNameFilter": "Configura tu nombre en Ajustes → General para filtrar tus elementos",
+      "noneAssigned": "No tienes elementos de acción asignados en esta reunión."
+    },
+    "conflict": {
+      "detected": "Conflicto detectado",
+      "new": "NUEVO",
+      "supersedes": "La nueva decisión reemplaza a",
+      "markReviewed": "Marcar como revisado"
+    },
+    "coach": {
+      "speakingDensity": "densidad del habla",
+      "questions": "preguntas",
+      "fillers": "muletillas",
+      "longSilences": "silencios largos"
+    },
+    "transcript": {
+      "none": "No hay transcripción disponible.",
+      "full": "Transcripción completa"
+    },
+    "confirm": {
+      "delete": "¿Eliminar esta reunión? Esto no se puede deshacer."
+    },
+    "toast": {
+      "linkCopied": "Enlace copiado",
+      "copyFailed": "Error al copiar: selecciona y copia manualmente",
+      "oldSuperseded": "Decisión antigua reemplazada",
+      "markedReviewed": "Marcado como revisado",
+      "exported": "{{fmt}} exportado",
+      "slackCopied": "Resumen de Slack copiado",
+      "exportedActions": "Tus elementos de acción se exportaron",
+      "sendingTo": "Enviando a {{label}}…",
+      "regenerating": "Regenerando notas…",
+      "sharedTeam": "Compartido en el espacio de trabajo del equipo"
+    },
+    "header": {
+      "recorded": "Grabada",
+      "attendee_one": "{{count}} asistente",
+      "attendee_other": "{{count}} asistentes",
+      "followupSent": "Seguimiento enviado",
+      "moreOptions": "Más opciones",
+      "shareMeeting": "Compartir reunión",
+      "shareTeam": "Compartir con el equipo",
+      "deleteMeeting": "Eliminar reunión"
+    },
+    "error": {
+      "processingFailed": "El procesamiento falló",
+      "processingFailedSub": "Algo salió mal al procesar esta reunión.",
+      "retry": "Reintentar la generación de notas",
+      "noNotes": "Aún no hay notas para esta reunión."
+    },
+    "tab": {
+      "notes": "Notas",
+      "transcript": "Transcripción",
+      "shared": "Compartido"
+    },
+    "bar": {
+      "actions": "Acciones",
+      "decisions": "Decisiones",
+      "participants": "Participantes",
+      "coachRecap": "Resumen del Coach",
+      "headsUp": "Aviso"
+    },
+    "section": {
+      "actionItems": "Elementos de acción",
+      "keyDecisions": "Decisiones clave",
+      "relatedMeetings": "Reuniones relacionadas"
+    },
+    "toolbar": {
+      "followup": "Seguimiento",
+      "pdf": "PDF",
+      "md": "MD",
+      "slackDigest": "Resumen de Slack",
+      "sendTo": "Enviar a…",
+      "regenerate": "Regenerar"
+    },
+    "share": {
+      "created": "Enlace de la reunión creado",
+      "copyLink": "Copiar enlace",
+      "expires": "El enlace caduca en 30 días. Cualquiera con este enlace puede ver un resumen de solo lectura de esta reunión.",
+      "close": "Cerrar"
+    }
+  },
+  "store": {
+    "toast": {
+      "calendarConnected": "Calendario conectado",
+      "msFailed": "El inicio de sesión de Microsoft falló",
+      "momentFlagged": "Momento marcado",
+      "micDenied": "Acceso al micrófono denegado — abre Ajustes del Sistema → Privacidad y seguridad → Micrófono",
+      "processingFailed": "El procesamiento falló",
+      "recordingFailed": "La grabación falló"
+    },
+    "notify": {
+      "recordingStartedTitle": "Grabación iniciada",
+      "recordingStartedBody": "Aguacate está capturando esta reunión localmente.",
+      "briefReadyTitle": "Resumen de la reunión listo",
+      "briefReadyBody": "{{title}} comienza en {{minutes}} min — tienes historial con este grupo.",
+      "pulseTitle": "Pulso de acciones",
+      "pulseBody_one": "{{count}} acción obsoleta necesita atención.",
+      "pulseBody_other": "{{count}} acciones obsoletas necesitan atención.",
+      "conflictTitle": "Conflicto detectado",
+      "conflictBody": "Una nueva decisión contradice una anterior.",
+      "transcriptionDoneTitle": "Transcripción completada",
+      "transcriptionDoneBody": "Claude está escribiendo tus notas ahora.",
+      "notesReadyTitle": "Notas listas",
+      "notesReadyBody": "Tus notas de reunión y elementos de acción están listos para revisar.",
+      "meetingDetectedTitle": "Reunión detectada",
+      "meetingDetectedBody": "{{title}} está a punto de comenzar.",
+      "fallbackMeeting": "Una reunión"
+    }
+  }
+}

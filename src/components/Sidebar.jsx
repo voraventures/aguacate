@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { openExternal } from "../api.js";
 import { useStore, useLogo } from "../store.jsx";
 import {
@@ -18,13 +19,13 @@ import {
 } from "./icons.jsx";
 
 const NAV_ITEMS = [
-  { key: "meetings", label: "Meetings", Icon: CalendarIcon },
-  { key: "actions", label: "Actions", Icon: CheckIcon },
-  { key: "decisions", label: "Decisions", Icon: GavelIcon },
-  { key: "topics", label: "Topics", Icon: TagIcon },
-  { key: "people", label: "People", Icon: UsersIcon },
-  { key: "series", label: "Series", Icon: SeriesIcon },
-  { key: "conflicts", label: "Conflicts", Icon: WarnIcon },
+  { key: "meetings", Icon: CalendarIcon },
+  { key: "actions", Icon: CheckIcon },
+  { key: "decisions", Icon: GavelIcon },
+  { key: "topics", Icon: TagIcon },
+  { key: "people", Icon: UsersIcon },
+  { key: "series", Icon: SeriesIcon },
+  { key: "conflicts", Icon: WarnIcon },
 ];
 
 function Waveform() {
@@ -42,11 +43,11 @@ function _meetingDate(start) {
   return isNaN(d.getTime()) ? null : d;
 }
 
-function _dayLabel(d, now) {
+function _dayLabel(d, now, t) {
   const startOfDay = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
   const days = Math.round((startOfDay(d) - startOfDay(new Date(now))) / 86400000);
-  if (days === 0) return "Today";
-  if (days === 1) return "Tomorrow";
+  if (days === 0) return t("sidebar.time.today");
+  if (days === 1) return t("sidebar.time.tomorrow");
   return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 }
 
@@ -54,15 +55,16 @@ function _timeLabel(d) {
   return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }
 
-function _countdown(d, now) {
+function _countdown(d, now, t) {
   const mins = Math.round((d.getTime() - now) / 60000);
-  if (mins <= 0) return "now";
+  if (mins <= 0) return t("sidebar.time.now");
   const h = Math.floor(mins / 60);
   const m = mins % 60;
-  return h > 0 ? `in ${h}h ${m}m` : `in ${m}m`;
+  return h > 0 ? t("sidebar.time.inHM", { h, m }) : t("sidebar.time.inM", { m });
 }
 
 export default function Sidebar() {
+  const { t } = useTranslation();
   const {
     theme,
     setTheme,
@@ -103,7 +105,7 @@ export default function Sidebar() {
         <div className="logo">
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" />
           Aguacate
-          {license && !free && <span className="brand-pill">Pro</span>}
+          {license && !free && <span className="brand-pill">{t("sidebar.brand.pro")}</span>}
         </div>
       </div>
 
@@ -112,13 +114,13 @@ export default function Sidebar() {
         <div className="status-row">
           <span className="status-label">
             <span className={`status-dot${recording.active ? " rec" : ""}`} />
-            {recording.active ? "Recording" : "Ready"}
+            {recording.active ? t("sidebar.status.recording") : t("sidebar.status.ready")}
           </span>
         </div>
         {recording.active ? (
           <button className="record-btn recording" onClick={stopRecording}>
             <Waveform />
-            Stop
+            {t("sidebar.stop")}
             <StopIcon size={14} />
           </button>
         ) : (
@@ -127,18 +129,18 @@ export default function Sidebar() {
               <span className="mic-pulse" style={{ display: "inline-flex" }}>
                 <MicIcon size={16} />
               </span>
-              Record
+              {t("sidebar.record")}
             </button>
             {templates.length > 0 && (
               <select
                 className="template-select"
                 value={selectedTemplate}
                 onChange={(e) => setSelectedTemplate(e.target.value)}
-                title="Notes template for the next recording"
+                title={t("sidebar.templateSelectTitle")}
               >
-                {templates.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
+                {templates.map((tpl) => (
+                  <option key={tpl.id} value={tpl.id}>
+                    {tpl.name}
                   </option>
                 ))}
               </select>
@@ -170,7 +172,7 @@ export default function Sidebar() {
                     letterSpacing: "0.04em",
                   }}
                 >
-                  <CalendarIcon size={12} /> Next meeting
+                  <CalendarIcon size={12} /> {t("sidebar.meetingCard.next")}
                 </div>
                 <div style={{ fontWeight: 500, marginTop: 2, lineHeight: 1.3 }}>
                   {nextEvent.title}
@@ -188,7 +190,7 @@ export default function Sidebar() {
                     }}
                   >
                     <span style={{ fontSize: 11, color: "#767b72", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
-                      {_dayLabel(d, now)} · {_timeLabel(d)}
+                      {_dayLabel(d, now, t)} · {_timeLabel(d)}
                     </span>
                     <span
                       style={{
@@ -202,7 +204,7 @@ export default function Sidebar() {
                         flexShrink: 0,
                       }}
                     >
-                      {_countdown(d, now)}
+                      {_countdown(d, now, t)}
                     </span>
                   </div>
                 )}
@@ -212,30 +214,30 @@ export default function Sidebar() {
         ) : (
           <div className="calendar-hint">
             <CalendarIcon size={12} />
-            <span className="hint-text">No upcoming meetings detected</span>
+            <span className="hint-text">{t("sidebar.meetingCard.none")}</span>
           </div>
         )}
 
         {activeCall && !recording.active && (
           <div className="call-detection-banner">
             <span className="call-detection-text">
-              {activeCall.app} detected — record this call?
+              {t("sidebar.call.prompt", { app: activeCall.app })}
             </span>
             <div className="call-detection-actions">
               <button
                 className="call-detection-btn primary"
                 onClick={() => {
                   dismissActiveCall(activeCall.app);
-                  startRecording({ title: `${activeCall.app} call` });
+                  startRecording({ title: t("sidebar.call.title", { app: activeCall.app }) });
                 }}
               >
-                Record now
+                {t("sidebar.call.record")}
               </button>
               <button
                 className="call-detection-btn"
                 onClick={() => dismissActiveCall(activeCall.app)}
               >
-                Dismiss
+                {t("sidebar.call.dismiss")}
               </button>
             </div>
           </div>
@@ -244,19 +246,19 @@ export default function Sidebar() {
 
       {license && free && (
         <div className="plan-card free">
-          <div className="plan-eyebrow">FREE PLAN</div>
-          <div className="plan-usage">{used} of {limit} free meetings used</div>
-          <div className="plan-unlock-label">Unlock with Pro:</div>
+          <div className="plan-eyebrow">{t("sidebar.free.planLabel")}</div>
+          <div className="plan-usage">{t("sidebar.free.usage", { used, limit })}</div>
+          <div className="plan-unlock-label">{t("sidebar.free.unlock")}</div>
           <ul className="plan-features">
-            <li><CheckIcon size={11} /> Unlimited meetings</li>
-            <li><CheckIcon size={11} /> Cross-meeting intelligence</li>
-            <li><CheckIcon size={11} /> All integrations</li>
+            <li><CheckIcon size={11} /> {t("sidebar.free.unlimited")}</li>
+            <li><CheckIcon size={11} /> {t("sidebar.free.crossMeeting")}</li>
+            <li><CheckIcon size={11} /> {t("sidebar.free.allIntegrations")}</li>
           </ul>
           <button
             className="upgrade-cta"
             onClick={() => window.aguacate.openExternal("https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04")}
           >
-            Upgrade to Pro — $20/mo
+            {t("sidebar.free.upgrade")}
           </button>
         </div>
       )}
@@ -264,11 +266,11 @@ export default function Sidebar() {
       {myWork && (
         <div className="mywork" data-tour="my-work">
           <div className="mywork-head">
-            <div className="section-eyebrow">My Work</div>
+            <div className="section-eyebrow">{t("sidebar.myWork.title")}</div>
             <button
               className="mywork-refresh"
-              title="Refresh counts"
-              aria-label="Refresh counts"
+              title={t("sidebar.myWork.refresh")}
+              aria-label={t("sidebar.myWork.refresh")}
               onClick={() => refreshMyWork()}
             >
               <RefreshIcon size={13} />
@@ -278,36 +280,36 @@ export default function Sidebar() {
             className="mywork-row clickable"
             onClick={() => setNav("actions")}
           >
-            <span className="mywork-label">Open actions</span>
+            <span className="mywork-label">{t("sidebar.myWork.openActions")}</span>
             <span className="mywork-badge">{myWork.open_actions}</span>
           </button>
           <button
             className="mywork-row clickable"
             onClick={() => setNav("decisions")}
           >
-            <span className="mywork-label">Decisions this week</span>
+            <span className="mywork-label">{t("sidebar.myWork.decisionsWeek")}</span>
             <span className="mywork-badge">{myWork.decisions_this_week}</span>
           </button>
           <button
             className="mywork-row clickable"
             onClick={() => setNav("meetings")}
           >
-            <span className="mywork-label">Meetings processed</span>
+            <span className="mywork-label">{t("sidebar.myWork.meetingsProcessed")}</span>
             <span className="mywork-badge">{myWork.meetings_processed}</span>
           </button>
         </div>
       )}
 
       <nav className="nav" data-tour="nav-section">
-        <div className="section-eyebrow">Navigate</div>
-        {NAV_ITEMS.map(({ key, label, Icon }) => (
+        <div className="section-eyebrow">{t("sidebar.navigate")}</div>
+        {NAV_ITEMS.map(({ key, Icon }) => (
           <button
             key={key}
             className={`nav-item${nav === key ? " active" : ""}`}
             onClick={() => setNav(key)}
           >
             <Icon size={15} />
-            {label}
+            {t(`sidebar.nav.${key}`)}
           </button>
         ))}
       </nav>
@@ -315,19 +317,19 @@ export default function Sidebar() {
       <div className="sidebar-footer">
         <span className="online">
           <span className={`online-dot${ready ? "" : " off"}`} />
-          {ready ? "Online" : "Starting"}
+          {ready ? t("sidebar.status.online") : t("sidebar.status.starting")}
         </span>
         <div className="footer-actions">
           <button
             className="icon-btn"
-            title="Toggle light/dark"
+            title={t("sidebar.toggleTheme")}
             onClick={() => setTheme(isDarkish ? "default" : "dark")}
           >
             {isDarkish ? <SunIcon /> : <MoonIcon />}
           </button>
           <button
             className="icon-btn"
-            title="Settings"
+            title={t("sidebar.settings")}
             onClick={() => setSettingsOpen(true)}
           >
             <GearIcon size={15} />
