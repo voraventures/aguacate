@@ -11,7 +11,8 @@
     "build": "vite build",
     "start": "npm run build && electron .",
     "clean:mac": "rm -rf release/mac release/mac-arm64 release/Aguacate*.dmg release/Aguacate*.dmg.blockmap release/latest-mac.yml",
-    "dist:mac": "npm run clean:mac && npm run build && electron-builder --mac",
+    "build:backend": "backend/.venv/bin/pyinstaller backend/backend.spec --clean --distpath backend/dist --workpath backend/build --noconfirm",
+    "dist:mac": "npm run build:backend && npm run clean:mac && npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
     "dist": "npm run clean:mac && npm run build && electron-builder --mac --win"
   },
