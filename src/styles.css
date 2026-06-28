@@ -23,12 +23,16 @@
   --font-size-base: 14px; /* user preference: small 12 / medium 14 / large 16 (Settings → Appearance) */
 }
 
-/* Font size preference, driven by [data-fontsize] on <html> (see store.jsx). medium = default. */
+/* Font size preference, driven by [data-fontsize] on <html> (see store.jsx).
+   Sets the root font-size so rem/inherited text scales. */
 :root[data-fontsize="small"] {
-  --font-size-base: 12px;
+  font-size: 12px;
+}
+:root[data-fontsize="medium"] {
+  font-size: 14px;
 }
 :root[data-fontsize="large"] {
-  --font-size-base: 16px;
+  font-size: 16px;
 }
 
 :root,
@@ -213,7 +217,7 @@ body,
 }
 body {
   font-family: var(--font-body);
-  font-size: var(--font-size-base);
+  font-size: 1rem;
   letter-spacing: -0.005em;
   color: var(--text);
   background: var(--bg);
