@@ -1470,7 +1470,8 @@ h3 {
   border-color: var(--accent);
 }
 
-/* ===== Decorative SVG figures for the primary note cards ===== */
+/* ===== Fresh & Natural note cards ===== */
+.section-card[data-section="Heads Up"],
 .section-card[data-section="Executive Summary"],
 .section-card[data-section="Action Items"],
 .section-card[data-section="Key Decisions"],
@@ -1479,6 +1480,86 @@ h3 {
   isolation: isolate;
   overflow: hidden;
   min-height: 132px;
+}
+.section-card[data-section="Heads Up"] {
+  --card-accent: #D88A1D;
+  background: linear-gradient(135deg, #FFF7E8, #F7E4B8);
+  border-color: color-mix(in srgb, #D88A1D 26%, transparent);
+}
+.section-card[data-section="Executive Summary"] {
+  --card-accent: #3D7040;
+  background: linear-gradient(135deg, #EFF6E8, #DCEAD7);
+  border-color: color-mix(in srgb, #3D7040 22%, transparent);
+}
+.section-card[data-section="Action Items"] {
+  --card-accent: #C9771E;
+  --button-accent: #6BA368;
+  background: linear-gradient(135deg, #FFF3DD, #F7E8CC);
+  border-color: color-mix(in srgb, #C9771E 24%, transparent);
+}
+.section-card[data-section="Key Decisions"] {
+  --card-accent: #3182A0;
+  background: linear-gradient(135deg, #EAF6F8, #D4EBF0);
+  border-color: color-mix(in srgb, #3182A0 24%, transparent);
+}
+.section-card[data-section="Key Discussions"] {
+  --card-accent: #B86F2A;
+  background: linear-gradient(135deg, #FFF1DF, #F6E2C8);
+  border-color: color-mix(in srgb, #B86F2A 24%, transparent);
+}
+.section-card[data-section="Next Steps"] {
+  --card-accent: #6BA368;
+  background: linear-gradient(135deg, #F5F9EC, #E4F0D9);
+  border-color: color-mix(in srgb, #6BA368 24%, transparent);
+}
+.section-card[data-section="Heads Up"]::before,
+.section-card[data-section="Executive Summary"]::before,
+.section-card[data-section="Action Items"]::before,
+.section-card[data-section="Key Decisions"]::before,
+.section-card[data-section="Key Discussions"]::before,
+.section-card[data-section="Next Steps"]::before {
+  background: var(--card-accent);
+  opacity: 0.72;
+}
+.section-card[data-section="Heads Up"] .section-label,
+.section-card[data-section="Executive Summary"] .section-label,
+.section-card[data-section="Action Items"] .section-label,
+.section-card[data-section="Key Decisions"] .section-label,
+.section-card[data-section="Key Discussions"] .section-label,
+.section-card[data-section="Next Steps"] .section-label {
+  color: var(--card-accent);
+}
+.section-card[data-section="Heads Up"] .section-label::after,
+.section-card[data-section="Executive Summary"] .section-label::after,
+.section-card[data-section="Action Items"] .section-label::after,
+.section-card[data-section="Key Decisions"] .section-label::after,
+.section-card[data-section="Key Discussions"] .section-label::after,
+.section-card[data-section="Next Steps"] .section-label::after {
+  background: color-mix(in srgb, var(--card-accent) 20%, transparent);
+}
+.section-card[data-section="Heads Up"] .section-body li::marker,
+.section-card[data-section="Executive Summary"] .section-body li::marker,
+.section-card[data-section="Action Items"] .section-body li::marker,
+.section-card[data-section="Key Decisions"] .section-body li::marker,
+.section-card[data-section="Key Discussions"] .section-body li::marker,
+.section-card[data-section="Next Steps"] .section-body li::marker {
+  color: var(--card-accent);
+}
+.section-card[data-section="Heads Up"] .section-body .topic-chip,
+.section-card[data-section="Executive Summary"] .section-body .topic-chip,
+.section-card[data-section="Action Items"] .section-body .topic-chip,
+.section-card[data-section="Key Decisions"] .section-body .topic-chip,
+.section-card[data-section="Key Discussions"] .section-body .topic-chip,
+.section-card[data-section="Next Steps"] .section-body .topic-chip {
+  color: var(--card-accent);
+}
+.section-card[data-section="Action Items"] .toolbar-btn.primary {
+  background: color-mix(in srgb, var(--button-accent) 15%, transparent);
+  color: #3D7040;
+}
+.section-card[data-section="Action Items"] .toolbar-btn.primary:hover {
+  background: color-mix(in srgb, var(--button-accent) 22%, transparent);
+  color: #3D7040;
 }
 
 /* figure layer — sits above the card surface, below all card content */
@@ -1492,6 +1573,9 @@ h3 {
   height: calc(100% + 28px);
   opacity: 1;
   overflow: hidden;
+}
+.card-fig-heads-up {
+  width: min(44%, 280px);
 }
 .card-fig-action-items {
   width: min(52%, 330px);
@@ -1510,6 +1594,7 @@ h3 {
 .section-card[data-section="Action Items"] {
   min-height: 148px;
 }
+.section-card[data-section="Heads Up"] > *:not(.card-fig),
 .section-card[data-section="Executive Summary"] > *:not(.card-fig),
 .section-card[data-section="Action Items"] > *:not(.card-fig),
 .section-card[data-section="Key Decisions"] > *:not(.card-fig),
