@@ -251,7 +251,7 @@ const CalendarIcon = (p) => (
 const THEME_PREVIEW = {
   default: ["#fbfaf6", "#3f8b45", "#1e281d"],
   dark: ["#131711", "#6fbf74", "#e8ecdf"],
-  purple: ["#faf8fd", "#7445c4", "#271c38"],
+  rose: ["#fff8f9", "#c2185b", "#880e4f"],
   navy: ["#101726", "#5e9bdc", "#dde6f5"],
   warm: ["#fdf8f1", "#c0662b", "#38291a"],
   neon: ["#0a0e12", "#2fe08c", "#d8ffe9"],
