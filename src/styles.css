@@ -209,6 +209,11 @@ body,
 #root {
   height: 100%;
 }
+/* zoom-based font scaling can push the 100vh app past the viewport; allow the
+   document itself to scroll so the overflow stays reachable */
+html {
+  overflow-y: auto;
+}
 body {
   font-family: var(--font-body);
   font-size: var(--font-size-base);
@@ -216,7 +221,8 @@ body {
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
+  /* clip horizontally only; vertical overflow must reach html's scrollbar (above) */
+  overflow-x: hidden;
   user-select: none;
 }
 ::-webkit-scrollbar {
