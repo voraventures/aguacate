@@ -1512,6 +1512,45 @@ h3 {
   background: linear-gradient(135deg, #F5F9EC, #E4F0D9);
   border-color: color-mix(in srgb, #6BA368 24%, transparent);
 }
+
+/* dark themes: replace light pastels with darker, richer versions of the same hue.
+   Text stays var(--text); only the card surface changes. */
+:root[data-theme="dark"] .section-card[data-section="Heads Up"],
+:root[data-theme="navy"] .section-card[data-section="Heads Up"],
+:root[data-theme="neon"] .section-card[data-section="Heads Up"] {
+  background: rgba(194, 120, 40, 0.22);
+  color: var(--text);
+}
+:root[data-theme="dark"] .section-card[data-section="Executive Summary"],
+:root[data-theme="navy"] .section-card[data-section="Executive Summary"],
+:root[data-theme="neon"] .section-card[data-section="Executive Summary"] {
+  background: rgba(80, 140, 80, 0.20);
+  color: var(--text);
+}
+:root[data-theme="dark"] .section-card[data-section="Action Items"],
+:root[data-theme="navy"] .section-card[data-section="Action Items"],
+:root[data-theme="neon"] .section-card[data-section="Action Items"] {
+  background: rgba(194, 120, 40, 0.18);
+  color: var(--text);
+}
+:root[data-theme="dark"] .section-card[data-section="Key Decisions"],
+:root[data-theme="navy"] .section-card[data-section="Key Decisions"],
+:root[data-theme="neon"] .section-card[data-section="Key Decisions"] {
+  background: rgba(60, 120, 150, 0.20);
+  color: var(--text);
+}
+:root[data-theme="dark"] .section-card[data-section="Key Discussions"],
+:root[data-theme="navy"] .section-card[data-section="Key Discussions"],
+:root[data-theme="neon"] .section-card[data-section="Key Discussions"] {
+  background: rgba(194, 120, 40, 0.16);
+  color: var(--text);
+}
+:root[data-theme="dark"] .section-card[data-section="Next Steps"],
+:root[data-theme="navy"] .section-card[data-section="Next Steps"],
+:root[data-theme="neon"] .section-card[data-section="Next Steps"] {
+  background: rgba(80, 140, 80, 0.16);
+  color: var(--text);
+}
 .section-card[data-section="Heads Up"]::before,
 .section-card[data-section="Executive Summary"]::before,
 .section-card[data-section="Action Items"]::before,
