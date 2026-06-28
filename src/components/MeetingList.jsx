@@ -4,13 +4,40 @@ import { useStore } from "../store.jsx";
 import { ClockIcon, MicIcon, SearchIcon, UsersIcon } from "./icons.jsx";
 import { EmptyMeetings } from "./illustrations.jsx";
 
-const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+// Title-case keys so they match MONTH_COLORS; the .dmonth badge is uppercased by
+// CSS (text-transform), so the rendered label still reads "JUN".
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// Fixed accent color per calendar month, independent of year.
+const MONTH_COLORS = {
+  Jan: { bg: '#6BA368', text: '#fff' },
+  Feb: { bg: '#F7B731', text: '#2A3326' },
+  Mar: { bg: '#FF9F45', text: '#fff' },
+  Apr: { bg: '#E8688A', text: '#fff' },
+  May: { bg: '#5FB0C9', text: '#fff' },
+  Jun: { bg: '#6BA368', text: '#fff' },
+  Jul: { bg: '#F7B731', text: '#2A3326' },
+  Aug: { bg: '#FF9F45', text: '#fff' },
+  Sep: { bg: '#E8688A', text: '#fff' },
+  Oct: { bg: '#5FB0C9', text: '#fff' },
+  Nov: { bg: '#6BA368', text: '#fff' },
+  Dec: { bg: '#F7B731', text: '#2A3326' },
+};
 
 function DateIcon({ iso }) {
   const d = iso ? new Date(iso) : new Date();
+  const month = MONTHS[d.getMonth()];
   return (
     <div className="date-icon">
-      <div className="dmonth">{MONTHS[d.getMonth()]}</div>
+      <div
+        className="dmonth"
+        style={{
+          background: MONTH_COLORS[month]?.bg ?? 'var(--accent)',
+          color: MONTH_COLORS[month]?.text ?? '#fff',
+        }}
+      >
+        {month}
+      </div>
       <div className="dday">{d.getDate()}</div>
     </div>
   );

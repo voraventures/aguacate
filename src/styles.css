@@ -1470,6 +1470,128 @@ h3 {
   border-color: var(--accent);
 }
 
+/* ===== Direction 2: decorative gradient section cards + SVG figures =====
+   These selectors stay pinned to the three styled sections so unrelated
+   data-section cards cannot accidentally inherit dark-card treatment.
+   Appended after the action-items rules so equal-specificity overrides
+   (.topic-chip, .action-due) win on source order. */
+.section-card[data-section="Executive Summary"],
+.section-card[data-section="Action Items"],
+.section-card[data-section="Key Decisions"] {
+  background:
+    linear-gradient(135deg, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.5)),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--accent-deep) 55%, #111) 0%,
+      color-mix(in srgb, var(--accent-deep) 24%, #000) 100%);
+  border: none;
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, 0.35));
+  color: #fff;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 132px;
+}
+
+/* Text legibility on the dark gradient: override every element that sets its
+   own color (.section-body, .topic-chip, .action-due, .section-label, markers). */
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]),
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .section-body,
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .section-body .topic-chip,
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .action-text {
+  color: #fff;
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"])::before {
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.34);
+  opacity: 1;
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .section-label {
+  color: rgba(255, 255, 255, 0.88);
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .section-label::after {
+  background: rgba(255, 255, 255, 0.18);
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .action-due,
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .section-empty-note {
+  color: rgba(255, 255, 255, 0.76);
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .section-body li::marker {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* owner chip + action-row divider on dark cards */
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .owner-chip {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .owner-chip.tbd {
+  background: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.85);
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .action-row {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .toolbar-btn {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) .toolbar-btn.primary {
+  background: rgba(255, 255, 255, 0.92);
+  color: #142017;
+}
+
+/* figure layer — sits above the gradient, below all card content */
+.card-fig {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  top: -14px;
+  right: -18px;
+  width: min(54%, 340px);
+  height: calc(100% + 28px);
+  opacity: 0.38;
+  overflow: hidden;
+}
+.card-fig-action-items {
+  width: min(52%, 330px);
+}
+.card-fig-key-decisions {
+  top: -18px;
+  width: min(50%, 310px);
+}
+.section-card[data-section="Key Decisions"] {
+  min-height: 156px;
+}
+.section-card[data-section="Action Items"] {
+  min-height: 148px;
+}
+:is(.section-card[data-section="Executive Summary"], .section-card[data-section="Action Items"], .section-card[data-section="Key Decisions"]) > *:not(.card-fig) {
+  position: relative;
+  z-index: 2;
+}
+.action-section-label {
+  justify-content: space-between;
+}
+.action-section-label::after {
+  display: none;
+}
+.action-section-label > span:first-child,
+.action-section-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.action-section-tools {
+  flex-shrink: 0;
+}
+.section-empty-note {
+  padding: 4px 2px;
+  font-size: 13px;
+}
+
 /* related meetings */
 .related-row {
   display: flex;
@@ -3284,6 +3406,28 @@ body.reduce-motion *::after {
   color: var(--accent);
   animation: blink 1s step-end infinite;
   margin-left: 1px;
+}
+
+/* Sidebar section left-border accents */
+.plan-card.free {
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  border-left: 3px solid color-mix(in srgb, var(--accent) 78%, transparent);
+  border-radius: 12px;
+  padding-left: 12px;
+  background: color-mix(in srgb, var(--accent) 5%, var(--panel));
+}
+
+.mywork {
+  border: 1px solid var(--border);
+  border-left: 3px solid color-mix(in srgb, #F7B731 68%, transparent);
+  border-radius: 12px;
+  padding: 12px 14px 12px 12px;
+}
+
+nav.nav {
+  border-left: 3px solid color-mix(in srgb, #5FB0C9 68%, transparent);
+  border-radius: 10px;
+  padding-left: 10px;
 }
 
 /* ========== Feature 3: Call detection banner ========== */

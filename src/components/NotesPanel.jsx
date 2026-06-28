@@ -250,6 +250,49 @@ function TranscriptView({ segments }) {
   );
 }
 
+// Sections that get the Direction-2 gradient background + scattered SVG accents.
+const FIG_SECTIONS = new Set(["Executive Summary", "Action Items", "Key Decisions"]);
+
+// Decorative blob/circle figures positioned absolute inside a styled card.
+function CardFigures({ section }) {
+  if (!FIG_SECTIONS.has(section)) return null;
+  const className = `card-fig card-fig-${section.toLowerCase().replace(/\s+/g, "-")}`;
+  if (section === "Executive Summary") {
+    return (
+      <svg className={className} viewBox="0 0 420 320" preserveAspectRatio="xMaxYMid meet" aria-hidden="true" focusable="false">
+        <path d="M218 -28 C250 -46 288 -24 288 10 C288 39 322 32 337 58 C354 88 326 123 292 112 C260 102 259 77 232 75 C196 73 185 -10 218 -28 Z" fill="#6BA368" opacity="0.55"/>
+        <path d="M321 118 C349 93 384 112 377 143 C371 171 337 184 315 166 C293 148 296 140 321 118 Z" fill="#FF9F45" opacity="0.5"/>
+        <circle cx="388" cy="50" r="15" fill="#F7B731" opacity="0.34"/>
+        <circle cx="378" cy="215" r="18" fill="#5FB0C9" opacity="0.46"/>
+        <circle cx="320" cy="272" r="34" fill="#5FB0C9" opacity="0.42"/>
+        <path d="M300 274 C318 248 360 251 374 280 C388 309 358 332 330 323 C302 314 283 300 300 274 Z" fill="#5FB0C9" opacity="0.4"/>
+      </svg>
+    );
+  }
+  if (section === "Action Items") {
+    return (
+      <svg className={className} viewBox="0 0 420 320" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false">
+        <path d="M238 -16 C268 -41 310 -18 306 21 C303 50 346 43 355 78 C365 116 322 137 294 113 C270 92 276 66 245 63 C209 59 208 10 238 -16 Z" fill="#F7B731" opacity="0.55"/>
+        <path d="M345 174 C373 152 405 169 405 201 C405 233 370 252 343 232 C317 213 316 196 345 174 Z" fill="#E8688A" opacity="0.47"/>
+        <circle cx="309" cy="103" r="10" fill="#6BA368" opacity="0.4"/>
+        <circle cx="294" cy="250" r="14" fill="#6BA368" opacity="0.45"/>
+        <path d="M356 46 C386 26 419 47 417 82 C415 112 376 121 354 99 C332 78 329 64 356 46 Z" fill="#FF9F45" opacity="0.25"/>
+      </svg>
+    );
+  }
+  return (
+    <svg className={className} viewBox="0 0 420 320" preserveAspectRatio="xMaxYMid meet" aria-hidden="true" focusable="false">
+      <path d="M232 -36 C268 -64 326 -42 325 13 C324 56 284 73 249 58 C215 43 202 -12 232 -36 Z" fill="#5FB0C9" opacity="0.56"/>
+      <circle cx="362" cy="48" r="14" fill="#F7B731" opacity="0.55"/>
+      <circle cx="311" cy="66" r="10" fill="#FF9F45" opacity="0.67"/>
+      <path d="M361 124 C383 104 412 116 411 143 C410 169 378 188 357 171 C335 154 337 145 361 124 Z" fill="#E8688A" opacity="0.65"/>
+      <circle cx="279" cy="259" r="15" fill="#5FB0C9" opacity="0.43"/>
+      <circle cx="347" cy="244" r="11" fill="#F7B731" opacity="0.72"/>
+      <path d="M365 214 C401 197 438 224 428 262 C418 300 372 307 349 278 C326 249 332 230 365 214 Z" fill="#5FB0C9" opacity="0.35"/>
+    </svg>
+  );
+}
+
 export default function NotesPanel() {
   const { t } = useTranslation();
   const {
@@ -338,8 +381,9 @@ export default function NotesPanel() {
   const related = intel.related || [];
   const conflicts = (m.conflicts || []).filter((c) => c.status === "open");
   const sections = m.notes?.sections || {};
+  const executiveSummary = sections["Executive Summary"] || "";
   const sectionEntries = Object.entries(sections).filter(
-    ([name, body]) => !SPECIAL_SECTIONS.has(name) && body?.trim()
+    ([name, body]) => !SPECIAL_SECTIONS.has(name) && name !== "Executive Summary" && body?.trim()
   );
   const showMetaBar =
     actions.length > 0 || decisions.length > 0 || participants.length > 0;
@@ -657,13 +701,101 @@ export default function NotesPanel() {
               </div>
             )}
 
+            <div
+              className="section-card stagger"
+              data-section="Executive Summary"
+              style={{ animationDelay: "0ms" }}
+            >
+              <CardFigures section="Executive Summary" />
+              <div className="section-label">
+                <SparkIcon size={13} /> Executive Summary
+              </div>
+              <Markdown text={executiveSummary} />
+            </div>
+
+            <div
+              className="section-card stagger"
+              data-tour="action-items"
+              data-section="Action Items"
+              style={{ animationDelay: "60ms" }}
+            >
+              <CardFigures section="Action Items" />
+              <div className="section-label action-section-label">
+                <span><CheckIcon size={13} /> {t('notes.section.actionItems')}</span>
+                <span className="action-section-tools">
+                  <button
+                    className={`toolbar-btn${myItemsOnly ? " primary" : ""}`}
+                    onClick={() => {
+                      setMyItemsOnly((v) => !v);
+                      api
+                        .get("/api/settings/user-name")
+                        .then((r) => setUserName(r.user_name || ""))
+                        .catch(() => {});
+                    }}
+                  >
+                    {t('notes.action.myItems')}
+                  </button>
+                  {myItemsOnly && userName && (
+                    <button className="toolbar-btn" onClick={downloadMyActions}>
+                      <ExportIcon size={13} /> {t('notes.action.download')}
+                    </button>
+                  )}
+                </span>
+              </div>
+              {myItemsOnly && !userName ? (
+                <div className="section-empty-note">
+                  {t('notes.action.setNameFilter')}
+                </div>
+              ) : (
+                (() => {
+                  const list = myItemsOnly
+                    ? actions.filter(
+                        (a) =>
+                          (a.owner || "").trim().toLowerCase() ===
+                          userName.trim().toLowerCase()
+                      )
+                    : actions;
+                  if (myItemsOnly && list.length === 0) {
+                    return (
+                      <div className="section-empty-note">
+                        {t('notes.action.noneAssigned')}
+                      </div>
+                    );
+                  }
+                  return list.map((a) => (
+                    <ActionRow key={a.id} item={a} onAssign={assign} onComplete={completeAction} />
+                  ));
+                })()
+              )}
+            </div>
+
+            <div
+              className="section-card stagger"
+              data-section="Key Decisions"
+              style={{ animationDelay: "120ms" }}
+            >
+              <CardFigures section="Key Decisions" />
+              <div className="section-label">
+                <GavelIcon size={13} /> {t('notes.section.keyDecisions')}
+              </div>
+              <div className="section-body">
+                <ul>
+                  {decisions.map((d) => (
+                    <li key={d.id} className={d.status === "superseded" ? "superseded" : ""}>
+                      {d.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
             {/* Template-driven sections, in the order Claude produced them */}
             {sectionEntries.map(([name, body], i) => {
               const Icon = SECTION_ICONS[name];
-              const card = (
+              return (
                 <div
                   className={`section-card stagger${name === "Compliance Flags" ? " warning" : ""}`}
-                  style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+                  style={{ animationDelay: `${Math.min(i + 3, 6) * 60}ms` }}
                   key={name}
                 >
                   <div className="section-label">
@@ -672,82 +804,6 @@ export default function NotesPanel() {
                   <Markdown text={body} />
                 </div>
               );
-              // Action Items / Decisions cards are injected after the first section
-              if (i === 0) {
-                return (
-                  <React.Fragment key={name}>
-                    {card}
-                    {actions.length > 0 && (
-                      <div className="section-card stagger" data-tour="action-items" style={{ animationDelay: "60ms" }}>
-                        <div className="section-label" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <span><CheckIcon size={13} /> {t('notes.section.actionItems')}</span>
-                          <span style={{ display: "flex", gap: 6 }}>
-                            <button
-                              className={`toolbar-btn${myItemsOnly ? " primary" : ""}`}
-                              onClick={() => {
-                                setMyItemsOnly((v) => !v);
-                                api
-                                  .get("/api/settings/user-name")
-                                  .then((r) => setUserName(r.user_name || ""))
-                                  .catch(() => {});
-                              }}
-                            >
-                              {t('notes.action.myItems')}
-                            </button>
-                            {myItemsOnly && userName && (
-                              <button className="toolbar-btn" onClick={downloadMyActions}>
-                                <ExportIcon size={13} /> {t('notes.action.download')}
-                              </button>
-                            )}
-                          </span>
-                        </div>
-                        {myItemsOnly && !userName ? (
-                          <div style={{ color: "#767b72", padding: "4px 2px", fontSize: 13 }}>
-                            {t('notes.action.setNameFilter')}
-                          </div>
-                        ) : (
-                          (() => {
-                            const list = myItemsOnly
-                              ? actions.filter(
-                                  (a) =>
-                                    (a.owner || "").trim().toLowerCase() ===
-                                    userName.trim().toLowerCase()
-                                )
-                              : actions;
-                            if (myItemsOnly && list.length === 0) {
-                              return (
-                                <div style={{ color: "#767b72", padding: "4px 2px", fontSize: 13 }}>
-                                  {t('notes.action.noneAssigned')}
-                                </div>
-                              );
-                            }
-                            return list.map((a) => (
-                              <ActionRow key={a.id} item={a} onAssign={assign} onComplete={completeAction} />
-                            ));
-                          })()
-                        )}
-                      </div>
-                    )}
-                    {decisions.length > 0 && (
-                      <div className="section-card stagger" style={{ animationDelay: "120ms" }}>
-                        <div className="section-label">
-                          <GavelIcon size={13} /> {t('notes.section.keyDecisions')}
-                        </div>
-                        <div className="section-body">
-                          <ul>
-                            {decisions.map((d) => (
-                              <li key={d.id} className={d.status === "superseded" ? "superseded" : ""}>
-                                {d.text}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )}
-                  </React.Fragment>
-                );
-              }
-              return card;
             })}
 
             {related.length > 0 && (
