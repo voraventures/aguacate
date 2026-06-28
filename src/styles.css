@@ -1470,10 +1470,12 @@ h3 {
   border-color: var(--accent);
 }
 
-/* ===== Decorative SVG figures for the three primary note cards ===== */
+/* ===== Decorative SVG figures for the primary note cards ===== */
 .section-card[data-section="Executive Summary"],
 .section-card[data-section="Action Items"],
-.section-card[data-section="Key Decisions"] {
+.section-card[data-section="Key Decisions"],
+.section-card[data-section="Key Discussions"],
+.section-card[data-section="Next Steps"] {
   isolation: isolate;
   overflow: hidden;
   min-height: 132px;
@@ -1498,6 +1500,10 @@ h3 {
   top: -18px;
   width: min(50%, 310px);
 }
+.card-fig-key-discussions,
+.card-fig-next-steps {
+  width: min(46%, 300px);
+}
 .section-card[data-section="Key Decisions"] {
   min-height: 156px;
 }
@@ -1506,7 +1512,9 @@ h3 {
 }
 .section-card[data-section="Executive Summary"] > *:not(.card-fig),
 .section-card[data-section="Action Items"] > *:not(.card-fig),
-.section-card[data-section="Key Decisions"] > *:not(.card-fig) {
+.section-card[data-section="Key Decisions"] > *:not(.card-fig),
+.section-card[data-section="Key Discussions"] > *:not(.card-fig),
+.section-card[data-section="Next Steps"] > *:not(.card-fig) {
   position: relative;
   z-index: 2;
 }
