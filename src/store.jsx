@@ -78,13 +78,13 @@ export function StoreProvider({ children }) {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
-  // Appearance preferences: font size + reduce motion
+  // Appearance preferences: font size + reduce motion.
+  // Font size is applied via a [data-fontsize] attribute (CSS sets --font-size-base);
+  // mirrored to localStorage so it applies instantly before server settings load.
   useEffect(() => {
-    const sizes = { small: "13px", medium: "14px", large: "15px" };
-    document.documentElement.style.setProperty(
-      "--font-size-base",
-      sizes[settings.font_size] || sizes.medium
-    );
+    const size = settings.font_size || localStorage.getItem("aguacate_fontsize") || "medium";
+    document.documentElement.dataset.fontsize = size;
+    if (settings.font_size) localStorage.setItem("aguacate_fontsize", settings.font_size);
     document.body.classList.toggle("reduce-motion", !!settings.reduce_motion);
   }, [settings.font_size, settings.reduce_motion]);
 

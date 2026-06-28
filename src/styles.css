@@ -20,7 +20,15 @@
   --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-body: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-mono: "SF Mono", "Cascadia Mono", "Fira Code", ui-monospace, monospace;
-  --font-size-base: 14px; /* user preference: 13 / 14 / 15 (Settings → Appearance) */
+  --font-size-base: 14px; /* user preference: small 12 / medium 14 / large 16 (Settings → Appearance) */
+}
+
+/* Font size preference, driven by [data-fontsize] on <html> (see store.jsx). medium = default. */
+:root[data-fontsize="small"] {
+  --font-size-base: 12px;
+}
+:root[data-fontsize="large"] {
+  --font-size-base: 16px;
 }
 
 :root,
