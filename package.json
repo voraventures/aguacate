@@ -10,9 +10,10 @@
     "dev:renderer": "vite",
     "build": "vite build",
     "start": "npm run build && electron .",
-    "dist:mac": "npm run build && electron-builder --mac",
+    "clean:mac": "rm -rf release/mac release/mac-arm64 release/Aguacate*.dmg release/Aguacate*.dmg.blockmap release/latest-mac.yml",
+    "dist:mac": "npm run clean:mac && npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
-    "dist": "npm run build && electron-builder --mac --win"
+    "dist": "npm run clean:mac && npm run build && electron-builder --mac --win"
   },
   "devDependencies": {
     "@electron/notarize": "^3.1.1",
