@@ -24,16 +24,10 @@
 }
 
 /* Font size preference, driven by [data-fontsize] on <html> (see store.jsx).
-   Sets the root font-size so rem/inherited text scales. */
-:root[data-fontsize="small"] {
-  font-size: 12px;
-}
-:root[data-fontsize="medium"] {
-  font-size: 14px;
-}
-:root[data-fontsize="large"] {
-  font-size: 16px;
-}
+   zoom scales the whole UI, including hardcoded px sizes. medium = 1 (default). */
+:root[data-fontsize="small"]  { zoom: 0.86; }
+:root[data-fontsize="medium"] { zoom: 1; }
+:root[data-fontsize="large"]  { zoom: 1.14; }
 
 :root,
 :root[data-theme="default"] {
@@ -217,7 +211,7 @@ body,
 }
 body {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   letter-spacing: -0.005em;
   color: var(--text);
   background: var(--bg);
