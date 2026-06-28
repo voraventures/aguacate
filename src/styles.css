@@ -1470,15 +1470,7 @@ h3 {
   border-color: var(--accent);
 }
 
-/* ===== Direction 2: decorative gradient section card + SVG figures =====
-   The dark-card treatment is intentionally limited to Executive Summary.
-   Action Items and Key Decisions keep the default section-card surface. */
-.section-card[data-section="Executive Summary"] {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, #000) 0%, color-mix(in srgb, var(--accent) 70%, #000) 100%);
-  border: none;
-  box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, 0.35));
-  color: #fff;
-}
+/* ===== Decorative SVG figures for the three primary note cards ===== */
 .section-card[data-section="Executive Summary"],
 .section-card[data-section="Action Items"],
 .section-card[data-section="Key Decisions"] {
@@ -1487,59 +1479,7 @@ h3 {
   min-height: 132px;
 }
 
-/* Text legibility on the dark gradient: override every element that sets its
-   own color (.section-body, .topic-chip, .action-due, .section-label, markers). */
-.section-card[data-section="Executive Summary"],
-.section-card[data-section="Executive Summary"] .section-body,
-.section-card[data-section="Executive Summary"] .section-body .topic-chip,
-.section-card[data-section="Executive Summary"] .action-text {
-  color: #fff;
-}
-.section-card[data-section="Executive Summary"]::before {
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.34);
-  opacity: 1;
-}
-.section-card[data-section="Executive Summary"] .section-label {
-  color: rgba(255, 255, 255, 0.88);
-}
-.section-card[data-section="Executive Summary"] .section-label::after {
-  background: rgba(255, 255, 255, 0.18);
-}
-.section-card[data-section="Executive Summary"] .action-due,
-.section-card[data-section="Executive Summary"] .section-empty-note {
-  color: rgba(255, 255, 255, 0.76);
-}
-.section-card[data-section="Executive Summary"] .section-body li::marker {
-  color: rgba(255, 255, 255, 0.72);
-}
-
-/* owner chip + action-row divider on dark cards */
-.section-card[data-section="Executive Summary"] .owner-chip {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
-}
-.section-card[data-section="Executive Summary"] .owner-chip.tbd {
-  background: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.85);
-}
-.section-card[data-section="Executive Summary"] .action-row {
-  border-bottom-color: rgba(255, 255, 255, 0.2);
-}
-.section-card[data-section="Executive Summary"] .toolbar-btn {
-  background: rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.9);
-}
-.section-card[data-section="Executive Summary"] .toolbar-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
-}
-.section-card[data-section="Executive Summary"] .toolbar-btn.primary {
-  background: rgba(255, 255, 255, 0.92);
-  color: #142017;
-}
-
-/* figure layer — sits above the gradient, below all card content */
+/* figure layer — sits above the card surface, below all card content */
 .card-fig {
   position: absolute;
   pointer-events: none;
@@ -1553,12 +1493,10 @@ h3 {
 }
 .card-fig-action-items {
   width: min(52%, 330px);
-  opacity: 0.24;
 }
 .card-fig-key-decisions {
   top: -18px;
   width: min(50%, 310px);
-  opacity: 0.24;
 }
 .section-card[data-section="Key Decisions"] {
   min-height: 156px;
