@@ -23,12 +23,6 @@
   --font-size-base: 14px; /* user preference: small 12 / medium 14 / large 16 (Settings → Appearance) */
 }
 
-/* Font size preference, driven by [data-fontsize] on <html> (see store.jsx).
-   zoom scales the whole UI, including hardcoded px sizes. medium = 1 (default). */
-:root[data-fontsize="small"]  { zoom: 0.86; }
-:root[data-fontsize="medium"] { zoom: 1; }
-:root[data-fontsize="large"]  { zoom: 1.14; }
-
 :root,
 :root[data-theme="default"] {
   --accent-glow: rgba(63, 139, 69, 0.35);
@@ -209,11 +203,6 @@ body,
 #root {
   height: 100%;
 }
-/* zoom-based font scaling can push the 100vh app past the viewport; allow the
-   document itself to scroll so the overflow stays reachable */
-html {
-  overflow-y: auto;
-}
 body {
   font-family: var(--font-body);
   font-size: var(--font-size-base);
@@ -221,8 +210,7 @@ body {
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-  /* clip horizontally only; vertical overflow must reach html's scrollbar (above) */
-  overflow-x: hidden;
+  overflow: hidden;
   user-select: none;
 }
 ::-webkit-scrollbar {
