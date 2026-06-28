@@ -14,7 +14,7 @@ import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
 
 const StoreContext = createContext(null);
 
-export const THEMES = ["default", "dark", "purple", "warm"];
+export const THEMES = ["default", "dark", "rose", "warm"];
 
 // Themes with a dark --bg; the in-app logo uses white waveform bars on these
 // (green seed outline stays identical across every theme).
