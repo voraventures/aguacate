@@ -12,7 +12,7 @@ from ..config import (
 from ..db import get_db, get_setting, set_setting
 from ..services import exporter, license as license_svc, notes as notes_svc
 from ..services.integrations import SENDERS
-from ..services.keychain import KNOWN_SECRETS, delete_secret, secret_status, set_secret
+from ..services.keychain import KNOWN_SECRETS, delete_secret, get_secret, secret_status, set_secret
 from ..services.recorder import AUDIO_AVAILABLE
 from ..services.transcriber import is_available as whisper_available
 
@@ -100,17 +100,29 @@ def install_id():
 def license_portal_url():
     from .workspace import _install_id
 
-    try:
-        resp = httpx.post(
+    install = _install_id()
+
+    def _post(token):
+        return httpx.post(
             "https://license.aguacatenotes.com/api/portal",
-            json={"install_id": _install_id()},
+            json={"install_id": install, "portal_token": token},
             timeout=10,
         )
+
+    try:
+        resp = _post(get_secret("portal_token"))
+        # 401/403 => token missing or expired (24h TTL). Refresh the license,
+        # which mints and caches a fresh portal token, then retry once.
+        if resp.status_code in (401, 403):
+            license_svc.refresh()
+            resp = _post(get_secret("portal_token"))
     except httpx.HTTPError:
         return {"url": None, "error": "unavailable"}
 
     if resp.status_code == 404:
         return {"url": None, "error": "no_subscription"}
+    if resp.status_code in (401, 403):
+        return {"url": None, "error": "unauthorized"}
     if resp.status_code == 200:
         try:
             return {"url": resp.json().get("url")}
