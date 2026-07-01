@@ -11,6 +11,9 @@ KNOWN_SECRETS = [
     "openai_api_key",
     "google_api_key",
     "license_key",
+    # Internal: short-lived proof-of-ownership for the billing portal, minted by
+    # the license server and cached here (not a user-entered integration secret).
+    "portal_token",
     "hubspot_token",
     "salesforce_token",
     "salesforce_instance_url",
