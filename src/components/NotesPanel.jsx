@@ -20,6 +20,15 @@ import {
   WarnIcon,
 } from "./icons.jsx";
 import { EmptyNotes } from "./illustrations.jsx";
+import cornerHeadsUp from "../assets/illustrations/corner-headsup-right.png";
+import cornerSummary from "../assets/illustrations/corner-summary-right.png";
+import cornerActions from "../assets/illustrations/corner-actions-right.png";
+import cornerDecisions from "../assets/illustrations/corner-decisions-right.png";
+import cornerDiscussion from "../assets/illustrations/corner-discussion-right.png";
+import bgSummary from "../assets/illustrations/bg-summary.png";
+import bgActions from "../assets/illustrations/bg-actions.png";
+import bgDecisions from "../assets/illustrations/bg-decisions.png";
+import bgCream from "../assets/illustrations/bg-cream.png";
 
 const INTEGRATION_LABELS = {
   slack: "Slack",
@@ -250,7 +259,7 @@ function TranscriptView({ segments }) {
   );
 }
 
-// Sections that get avocado-inspired SVG accents.
+// Sections with a pastel card treatment (data-section styling).
 const FIG_SECTIONS = new Set([
   "Heads Up",
   "Executive Summary",
@@ -269,54 +278,33 @@ function figureSectionName(section) {
   return null;
 }
 
-function figClassName(section) {
-  return `card-fig card-fig-${section.toLowerCase().replace(/\s+/g, "-")}`;
-}
-
-function OrganicCardFigures({ section, children }) {
-  return (
-    <svg className={figClassName(section)} viewBox="0 0 420 320" preserveAspectRatio="xMaxYMid meet" aria-hidden="true" focusable="false">
-      {children}
-    </svg>
-  );
-}
-
-// Simple elegant leaf, drawn from a 20x20 base path. Mirror/rotate/scale for variety.
-function Leaf({ transform = "", opacity = 0.32, fill = "#6BA368" }) {
-  return (
-    <path
-      d="M0 20 C5 5 20 0 20 0 C20 0 20 15 15 20 C10 25 0 20 0 20Z"
-      transform={transform}
-      fill={fill}
-      opacity={opacity}
-    />
-  );
-}
-
-// Subtle leaf accents in the top-right and bottom-right corners of each card.
-// Color/opacity per section; pastel card backgrounds are untouched.
-const LEAF_FIGURES = {
-  "Heads Up": { fill: "#9A8C6A", opacity: 0.35 },
-  "Executive Summary": { fill: "#6BA368", opacity: 0.3 },
-  "Action Items": { fill: "#C4863A", opacity: 0.3 },
-  "Key Decisions": { fill: "#4A8FA8", opacity: 0.3 },
-  "Key Discussions": { fill: "#C4863A", opacity: 0.28 },
-  "Next Steps": { fill: "#6BA368", opacity: 0.28 },
+// Illustration bled off each card's right edge, behind the text,
+// with a soft watercolor wash glowing behind it.
+const CARD_ILLUSTRATIONS = {
+  "Heads Up": cornerHeadsUp,
+  "Executive Summary": cornerSummary,
+  "Action Items": cornerActions,
+  "Key Decisions": cornerDecisions,
+  "Key Discussions": cornerDiscussion,
+};
+// ponytail: no bg-discussion.png asset exists; bg-cream is the warm stand-in
+const CARD_WASHES = {
+  "Heads Up": bgSummary,
+  "Executive Summary": bgSummary,
+  "Action Items": bgActions,
+  "Key Decisions": bgDecisions,
+  "Key Discussions": bgCream,
 };
 
 function CardFigures({ section }) {
-  const figSection = figureSectionName(section);
-  if (!figSection) return null;
-  const { fill, opacity } = LEAF_FIGURES[figSection];
+  const name = figureSectionName(section);
+  const src = CARD_ILLUSTRATIONS[name];
+  if (!src) return null;
   return (
-    <OrganicCardFigures section={figSection}>
-      {/* top-right corner */}
-      <Leaf transform="translate(388 6) rotate(35) scale(1.2)" fill={fill} opacity={opacity} />
-      <Leaf transform="translate(360 18) rotate(70) scale(0.7)" fill={fill} opacity={opacity * 0.8} />
-      {/* bottom-right corner */}
-      <Leaf transform="translate(392 268) rotate(-130) scale(1.0)" fill={fill} opacity={opacity} />
-      <Leaf transform="translate(366 252) rotate(-95) scale(0.6)" fill={fill} opacity={opacity * 0.8} />
-    </OrganicCardFigures>
+    <>
+      <img className="card-fig-wash" src={CARD_WASHES[name]} alt="" aria-hidden="true" />
+      <img className="card-fig" src={src} alt="" aria-hidden="true" />
+    </>
   );
 }
 

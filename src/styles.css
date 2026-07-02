@@ -1457,6 +1457,10 @@ h3 {
   opacity: 0.45;
   cursor: default;
 }
+/* Assign / Copy / Complete in action rows: outline matching the record button green */
+.action-tools .tool-btn {
+  border: 1.5px solid var(--accent);
+}
 .assign-input {
   width: 86px;
   border: 1px solid var(--border);
@@ -1601,31 +1605,28 @@ h3 {
   color: #3D7040;
 }
 
-/* figure layer — sits above the card surface, below all card content */
-.card-fig {
+/* illustration layers — above the card surface, below card content (z-index 2 below).
+   Oversized on purpose: the card's overflow: hidden clips the top/bottom/right bleed. */
+.card-fig,
+.card-fig-wash {
   position: absolute;
   pointer-events: none;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  object-fit: contain;
+  object-position: right center;
+}
+.card-fig {
   z-index: 1;
-  top: -14px;
-  right: -18px;
-  width: min(54%, 340px);
-  height: calc(100% + 28px);
-  opacity: 1;
-  overflow: hidden;
+  width: min(60%, 300px);
+  height: 130%;
 }
-.card-fig-heads-up {
-  width: min(44%, 280px);
-}
-.card-fig-action-items {
-  width: min(52%, 330px);
-}
-.card-fig-key-decisions {
-  top: -18px;
-  width: min(50%, 310px);
-}
-.card-fig-key-discussions,
-.card-fig-next-steps {
-  width: min(46%, 300px);
+.card-fig-wash {
+  z-index: 0;
+  width: min(72%, 360px);
+  height: 150%;
+  opacity: 0.7;
 }
 .section-card[data-section="Key Decisions"] {
   min-height: 156px;
@@ -1633,12 +1634,12 @@ h3 {
 .section-card[data-section="Action Items"] {
   min-height: 148px;
 }
-.section-card[data-section="Heads Up"] > *:not(.card-fig),
-.section-card[data-section="Executive Summary"] > *:not(.card-fig),
-.section-card[data-section="Action Items"] > *:not(.card-fig),
-.section-card[data-section="Key Decisions"] > *:not(.card-fig),
-.section-card[data-section="Key Discussions"] > *:not(.card-fig),
-.section-card[data-section="Next Steps"] > *:not(.card-fig) {
+.section-card[data-section="Heads Up"] > *:not(.card-fig):not(.card-fig-wash),
+.section-card[data-section="Executive Summary"] > *:not(.card-fig):not(.card-fig-wash),
+.section-card[data-section="Action Items"] > *:not(.card-fig):not(.card-fig-wash),
+.section-card[data-section="Key Decisions"] > *:not(.card-fig):not(.card-fig-wash),
+.section-card[data-section="Key Discussions"] > *:not(.card-fig):not(.card-fig-wash),
+.section-card[data-section="Next Steps"] > *:not(.card-fig):not(.card-fig-wash) {
   position: relative;
   z-index: 2;
 }
