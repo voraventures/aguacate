@@ -1,11 +1,13 @@
-// Cross-meeting intelligence: list column + detail panel for
-// Actions / Decisions / Topics / People / Series / Conflicts.
+// Library: cross-meeting intelligence — Actions / Decisions / Topics /
+// People / Series / Conflicts as sub-sections of one destination.
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../api.js";
 import { useStore } from "../store.jsx";
 import { ArrowIcon, CheckIcon, ClockIcon, SearchIcon, WarnIcon } from "./icons.jsx";
-import { EMPTY_ART } from "./illustrations.jsx";
+import { Select } from "./ui.jsx";
+
+const SECTIONS = ["actions", "decisions", "topics", "people", "series", "conflicts"];
 
 const TREND = { rising: "↑", recurring: "→", fading: "↓" };
 
@@ -44,7 +46,8 @@ function nextExpected(sel) {
 
 export default function IntelligenceView() {
   const { t } = useTranslation();
-  const { nav, setNav, selectMeeting, showToast, refreshMyWork } = useStore();
+  const { setNav, selectMeeting, showToast, refreshMyWork } = useStore();
+  const [section, setSection] = useState("actions");
   const [items, setItems] = useState(null);
   const [selected, setSelected] = useState(null);
   const [actionFilter, setActionFilter] = useState("open"); // open | completed | all | mine
@@ -58,10 +61,10 @@ export default function IntelligenceView() {
 
   const load = () => {
     api
-      .get(`/api/intelligence/${nav}`)
+      .get(`/api/intelligence/${section}`)
       .then((data) => {
         setItems(data);
-        if (nav === "people" && pendingPerson) {
+        if (section === "people" && pendingPerson) {
           const o = pendingPerson.toLowerCase();
           const idx = data.findIndex((p) => {
             const n = (p.name || "").toLowerCase();
@@ -80,7 +83,7 @@ export default function IntelligenceView() {
     setItems(null);
     setSelected(null);
     load();
-  }, [nav]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [section]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // user_name for the "Mine" actions filter (Settings → General).
   useEffect(() => {
@@ -103,7 +106,7 @@ export default function IntelligenceView() {
 
   const goToPerson = (name) => {
     setPendingPerson(name);
-    setNav("people");
+    setSection("people");
   };
 
   const toggleDone = (item) => {
@@ -144,7 +147,7 @@ export default function IntelligenceView() {
   };
 
   let view = items;
-  if (view && nav === "actions") view = view.filter(passesActionFilter);
+  if (view && section === "actions") view = view.filter(passesActionFilter);
   if (view && query) view = view.filter((it) => haystack(it).includes(query));
   if (view && rangeDays) {
     const cutoff = Date.now() - rangeDays * 86400000;
@@ -158,15 +161,15 @@ export default function IntelligenceView() {
   // related decisions) only once something is selected.
   useEffect(() => {
     if (!sel) return;
-    if (nav === "series")
+    if (section === "series")
       api.get("/api/intelligence/actions").then(setSeriesActions).catch(() => setSeriesActions([]));
-    if (nav === "topics")
+    if (section === "topics")
       api.get("/api/intelligence/decisions").then(setTopicDecisions).catch(() => setTopicDecisions([]));
-  }, [nav, selKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [section, selKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Carry-over: open actions whose text recurs across 2+ meetings of the series.
   const carryOver = [];
-  if (nav === "series" && sel) {
+  if (section === "series" && sel) {
     const ids = new Set((sel.meetings || []).map((m) => m.id));
     const groups = {};
     seriesActions
@@ -180,89 +183,97 @@ export default function IntelligenceView() {
 
   // Related decisions: decisions from the meetings this topic was discussed in.
   const relatedDecisions =
-    nav === "topics" && sel
+    section === "topics" && sel
       ? topicDecisions.filter((d) =>
           new Set((sel.meetings || []).map((m) => m.id)).has(d.meeting_id)
         )
       : [];
 
-  const mineNoName = nav === "actions" && actionFilter === "mine" && !userName;
+  const mineNoName = section === "actions" && actionFilter === "mine" && !userName;
 
   return (
-    <>
-      <div className="list-panel">
-        <div className="intel-search" style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 14px 0" }}>
+    <div className="intel-split">
+      <div className="intel-listcol">
+        <div className="view-title" style={{ fontSize: 24, padding: "28px 10px 14px" }}>
+          {t("sidebar.nav.library")}
+        </div>
+        <div className="lib-tabs">
+          {SECTIONS.map((key) => (
+            <button
+              key={key}
+              className={`lib-tab${section === key ? " active" : ""}`}
+              onClick={() => {
+                setSection(key);
+                setSearchInput("");
+              }}
+            >
+              {t(`intel.title.${key}`)}
+            </button>
+          ))}
+        </div>
+        <div className="intel-search-row">
           <SearchIcon size={14} />
           <input
             className="intel-search-input"
-            placeholder={t("intel.searchPlaceholder", { section: t(`intel.title.${nav}`) })}
+            placeholder={t("intel.searchPlaceholder", { section: t(`intel.title.${section}`) })}
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
               setSelected(null);
             }}
-            style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 13 }}
           />
-          <select
+          <Select
+            ariaLabel={t("intel.range.all")}
             value={rangeDays}
-            onChange={(e) => {
-              setRangeDays(Number(e.target.value));
+            onChange={(v) => {
+              setRangeDays(v);
               setSelected(null);
             }}
-            style={{ fontSize: 12 }}
-          >
-            <option value={0}>{t("intel.range.all")}</option>
-            <option value={7}>{t("intel.range.d7")}</option>
-            <option value={30}>{t("intel.range.d30")}</option>
-            <option value={90}>{t("intel.range.d90")}</option>
-          </select>
+            options={[
+              { value: 0, label: t("intel.range.all") },
+              { value: 7, label: t("intel.range.d7") },
+              { value: 30, label: t("intel.range.d30") },
+              { value: 90, label: t("intel.range.d90") },
+            ]}
+          />
         </div>
-        <div className="list-header">
-          <div className="list-title serif">{t(`intel.title.${nav}`)}</div>
-          {nav === "actions" && (
-            <div className="segmented" style={{ marginTop: 10, maxWidth: 380 }}>
-              {["all", "open", "completed", "mine"].map((key) => (
-                <button
-                  key={key}
-                  className={actionFilter === key ? "active" : ""}
-                  onClick={() => {
-                    setActionFilter(key);
-                    setSelected(null);
-                  }}
-                >
-                  {t(`intel.filter.${key}`)}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {section === "actions" && (
+          <div className="segmented" style={{ margin: "0 10px 10px" }}>
+            {["all", "open", "completed", "mine"].map((key) => (
+              <button
+                key={key}
+                className={actionFilter === key ? "active" : ""}
+                onClick={() => {
+                  setActionFilter(key);
+                  setSelected(null);
+                }}
+              >
+                {t(`intel.filter.${key}`)}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="intel-list">
           {items === null && (
-            <div className="processing-state" style={{ padding: "40px 0" }}>
-              <div className="processing-ring" />
+            <div className="skeleton-rows" aria-hidden="true">
+              {[68, 52, 60, 44, 56].map((w, i) => (
+                <div key={i} className="skeleton" style={{ height: 40, width: `${w + 30}%` }} />
+              ))}
             </div>
           )}
           {view && view.length === 0 && (
             <div className="empty-state" style={{ padding: "40px 16px", height: "auto" }}>
-              <div className="empty-art">
-                {React.createElement(EMPTY_ART[nav] || EMPTY_ART.meetings, { size: 104 })}
-              </div>
               <div className="empty-title" style={{ fontSize: 16 }}>
                 {mineNoName
                   ? t("intel.filter.mineHint")
-                  : nav === "actions" && actionFilter === "completed"
+                  : section === "actions" && actionFilter === "completed"
                     ? t("intel.list.noCompleted")
-                    : t(`intel.empty.${nav}.head`)}
+                    : t(`intel.empty.${section}.head`)}
               </div>
               {!mineNoName && (
-                <>
-                  <div className="empty-sub" style={{ fontSize: 12, textAlign: "center", lineHeight: 1.5 }}>
-                    {t(`intel.empty.${nav}.sub`)}
-                  </div>
-                  <button className="empty-cta" onClick={() => setNav("meetings")}>
-                    {t("intel.list.goToMeetings")}
-                  </button>
-                </>
+                <div className="empty-sub" style={{ fontSize: 12, textAlign: "center", lineHeight: 1.5 }}>
+                  {t(`intel.empty.${section}.sub`)}
+                </div>
               )}
             </div>
           )}
@@ -272,15 +283,13 @@ export default function IntelligenceView() {
               className={`intel-row${selected === i ? " active" : ""}`}
               onClick={() => setSelected(i)}
             >
-              {nav === "actions" && (
+              {section === "actions" && (
                 <>
                   <span className={`owner-chip${!item.owner || item.owner === "TBD" ? " tbd" : ""}`}>
                     {item.owner || t("intel.list.tbd")}
                   </span>
                   <div className="intel-main">
-                    <div className={`intel-text${item.status === "done" ? " done" : ""}`}
-                      style={item.status === "done" ? { textDecoration: "line-through", opacity: 0.55 } : undefined}
-                    >
+                    <div className={`intel-text${item.status === "done" ? " struck" : ""}`}>
                       {item.action}
                     </div>
                     <div className="intel-sub">
@@ -293,12 +302,9 @@ export default function IntelligenceView() {
                   </div>
                 </>
               )}
-              {nav === "decisions" && (
+              {section === "decisions" && (
                 <div className="intel-main">
-                  <div
-                    className="intel-text"
-                    style={isSuperseded(item) ? { textDecoration: "line-through", opacity: 0.55 } : undefined}
-                  >
+                  <div className={`intel-text${isSuperseded(item) ? " struck" : ""}`}>
                     {item.text}
                   </div>
                   <div className="intel-sub">
@@ -307,7 +313,7 @@ export default function IntelligenceView() {
                   </div>
                 </div>
               )}
-              {nav === "topics" && (
+              {section === "topics" && (
                 <>
                   <div className="intel-main">
                     <div className="intel-text" style={{ fontWeight: 600 }}>
@@ -325,7 +331,7 @@ export default function IntelligenceView() {
                   <span className="count-badge">{item.mentions}</span>
                 </>
               )}
-              {nav === "series" && (
+              {section === "series" && (
                 <>
                   <div className="intel-main">
                     <div className="intel-text" style={{ fontWeight: 600 }}>
@@ -339,7 +345,7 @@ export default function IntelligenceView() {
                   <span className="count-badge">{item.count}</span>
                 </>
               )}
-              {nav === "conflicts" && (
+              {section === "conflicts" && (
                 <>
                   <span className="owner-chip tbd" style={{ display: "inline-flex", alignItems: "center" }}>
                     <WarnIcon size={12} />
@@ -352,7 +358,7 @@ export default function IntelligenceView() {
                   </div>
                 </>
               )}
-              {nav === "people" && (
+              {section === "people" && (
                 <>
                   <span className="avatar">{initials(item.name ?? "")}</span>
                   <div className="intel-main">
@@ -371,17 +377,14 @@ export default function IntelligenceView() {
         </div>
       </div>
 
-      <div className="detail-panel">
-        <div className="detail-inner">
+      <div className="intel-detailcol">
+        <div className="intel-detail-inner">
           {!sel ? (
             <div className="empty-state" style={{ paddingTop: 80 }}>
-              <div className="empty-art">
-                {React.createElement(EMPTY_ART[nav] || EMPTY_ART.meetings, { size: 120 })}
-              </div>
-              <div className="empty-title">{t(`intel.detail.select.${nav}`)}</div>
+              <div className="empty-title">{t(`intel.detail.select.${section}`)}</div>
               <div className="empty-sub">{t("intel.detail.selectPrompt")}</div>
             </div>
-          ) : nav === "actions" ? (
+          ) : section === "actions" ? (
             <>
               <div className="detail-head">
                 <div className="detail-kicker">{t("intel.detail.kicker.actions")}</div>
@@ -412,14 +415,11 @@ export default function IntelligenceView() {
                 </button>
               </div>
             </>
-          ) : nav === "decisions" ? (
+          ) : section === "decisions" ? (
             <>
               <div className="detail-head">
                 <div className="detail-kicker">{t("intel.detail.kicker.decisions")}</div>
-                <div
-                  className="detail-title"
-                  style={isSuperseded(sel) ? { textDecoration: "line-through", opacity: 0.55 } : undefined}
-                >
+                <div className={`detail-title${isSuperseded(sel) ? " struck" : ""}`}>
                   {sel.text}
                 </div>
               </div>
@@ -433,7 +433,7 @@ export default function IntelligenceView() {
                 {sel.meeting_title} <ArrowIcon size={13} />
               </button>
             </>
-          ) : nav === "topics" ? (
+          ) : section === "topics" ? (
             <>
               <div className="detail-head">
                 <div className="detail-kicker">{t("intel.detail.kicker.topics")}</div>
@@ -464,7 +464,7 @@ export default function IntelligenceView() {
                 </div>
               )}
             </>
-          ) : nav === "series" ? (
+          ) : section === "series" ? (
             <>
               <div className="detail-head">
                 <div className="detail-kicker">{t("intel.detail.kicker.series")}</div>
@@ -534,7 +534,7 @@ export default function IntelligenceView() {
                 ))}
               </div>
             </>
-          ) : nav === "conflicts" ? (
+          ) : section === "conflicts" ? (
             <>
               <div className="detail-head">
                 <div className="detail-kicker">{t("intel.detail.kicker.conflicts")}</div>
@@ -605,6 +605,6 @@ export default function IntelligenceView() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

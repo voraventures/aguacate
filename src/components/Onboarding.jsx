@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "../api.js";
 import { useStore } from "../store.jsx";
 import { MicIcon, SparkIcon, CheckIcon } from "./icons.jsx";
@@ -29,13 +30,15 @@ const DEMO_MEETING = {
     "## Executive Summary\nThe team aligned on Q2 priorities with a focus on mobile launch, enterprise expansion, and onboarding improvement.\n\n## Key Discussions\n**Mobile App Timeline**: iOS build on track for June 30 soft launch.\n**Enterprise Pricing**: $99/seat/month tier proposed, pilot with 3 customers first.\n**Onboarding**: Target under 3 minutes from current 14 minutes.\n\n## Decisions Made\n- June 30 iOS soft launch with 50 beta users\n- Enterprise pilot before public launch\n- Ship onboarding demo content\n\n## Action Items\n| Owner | Action | Due Date |\n|-------|--------|----------|\n| Sarah Chen | Finalize beta tester list | 2026-06-20 |\n| Marcus Rodriguez | Enterprise pricing one-pager | 2026-06-18 |\n| TBD | Reduce onboarding flow | 2026-06-25 |\n\n## Next Steps\n1. Sarah sends beta invites by June 20\n2. Marcus delivers pricing one-pager by June 18\n3. Team reviews onboarding metrics next week\n\n## Compliance Flags\nNone identified.",
 };
 
+// keys under onboarding.callouts.*
 const CALLOUTS = [
-  { Icon: MicIcon, title: "Local & Private", desc: "Your audio never leaves this Mac" },
-  { Icon: SparkIcon, title: "AI Intelligence", desc: "Actions, decisions, topics across all meetings" },
-  { Icon: CheckIcon, title: "Works Offline", desc: "Transcription runs 100% on device" },
+  { Icon: MicIcon, key: "local" },
+  { Icon: SparkIcon, key: "ai" },
+  { Icon: CheckIcon, key: "offline" },
 ];
 
 export default function Onboarding({ onDone }) {
+  const { t } = useTranslation();
   const { refreshMeetings, selectMeeting, showToast } = useStore();
   const [loading, setLoading] = useState(false);
 
@@ -65,24 +68,45 @@ export default function Onboarding({ onDone }) {
   return (
     <div className="detail-panel">
       <div className="onboarding">
-        <h1 className="onboarding-title">Welcome to Aguacate</h1>
-        <div className="onboarding-sub">AI meeting notes. No bot. No cloud.</div>
+        <svg className="onboarding-mark" width="120" height="140" viewBox="0 0 220 256" aria-hidden="true">
+          <path
+            d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z"
+            fill="var(--accent-softer)"
+            stroke="var(--logo-outline)"
+            strokeWidth="10"
+            strokeLinejoin="round"
+          />
+          <g fill="var(--wave)">
+            <rect x="50.5" y="141" width="11" height="38" rx="5.5" />
+            <rect x="68.5" y="130" width="11" height="60" rx="5.5" />
+            <rect x="86.5" y="118" width="11" height="84" rx="5.5" />
+            <rect x="104.5" y="108" width="11" height="104" rx="5.5" />
+            <rect x="122.5" y="118" width="11" height="84" rx="5.5" />
+            <rect x="140.5" y="130" width="11" height="60" rx="5.5" />
+            <rect x="158.5" y="141" width="11" height="38" rx="5.5" />
+          </g>
+        </svg>
+        <h1 className="onboarding-title">
+          {t("onboarding.titlePrefix")} <em>{t("onboarding.titleEmphasis")}</em>{" "}
+          {t("onboarding.titleSuffix")}
+        </h1>
+        <div className="onboarding-sub">{t("onboarding.sub")}</div>
         <button className="onboarding-cta" disabled={loading} onClick={loadDemo}>
-          {loading ? "Loading…" : "Load demo meeting"}
+          {loading ? t("onboarding.loading") : t("onboarding.loadDemo")}
         </button>
         <div className="onboarding-callouts">
-          {CALLOUTS.map(({ Icon, title, desc }) => (
-            <div className="onboarding-callout" key={title}>
+          {CALLOUTS.map(({ Icon, key }) => (
+            <div className="onboarding-callout" key={key}>
               <span className="onboarding-callout-icon">
                 <Icon size={18} />
               </span>
-              <div className="onboarding-callout-title">{title}</div>
-              <div className="onboarding-callout-desc">{desc}</div>
+              <div className="onboarding-callout-title">{t(`onboarding.callouts.${key}.title`)}</div>
+              <div className="onboarding-callout-desc">{t(`onboarding.callouts.${key}.desc`)}</div>
             </div>
           ))}
         </div>
         <button className="onboarding-skip" onClick={skip}>
-          Skip
+          {t("onboarding.skip")}
         </button>
       </div>
     </div>

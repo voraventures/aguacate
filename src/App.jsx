@@ -3,18 +3,23 @@ import { useTranslation } from "react-i18next";
 import { useStore, useLogo } from "./store.jsx";
 import i18n from "./i18n.js";
 import BriefPanel from "./components/BriefPanel.jsx";
+import CaptureFlow from "./components/CaptureFlow.jsx";
 import CoachPanel from "./components/CoachPanel.jsx";
 import IntelligenceView from "./components/IntelligenceView.jsx";
 import MeetingList from "./components/MeetingList.jsx";
 import NotesPanel from "./components/NotesPanel.jsx";
 import OnboardingTour from "./components/OnboardingTour.jsx";
+import PdfPrintRoot from "./components/PdfPrintRoot.jsx";
 import RecordPrompt from "./components/RecordPrompt.jsx";
 import Settings from "./components/Settings.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Titlebar from "./components/Titlebar.jsx";
+import UpcomingToast from "./components/UpcomingToast.jsx";
+import { DigestView, MeetingZeroView, SearchView, TodayView } from "./components/Views.jsx";
 
 const platform = window.aguacate?.platform || "darwin";
-const MIN_LIST = 240;
+const RAIL_WIDTH = 210;
+const MIN_LIST = 236;
 const MAX_LIST = 480;
 
 class ErrorBoundary extends React.Component {
@@ -54,15 +59,12 @@ class ErrorBoundary extends React.Component {
 
 export default function App() {
   const { t } = useTranslation();
-  const { ready, connectionFailed, nav, toast } = useStore();
+  const { ready, connectionFailed, nav, toasts, dismissToast } = useStore();
   const logoUrl = useLogo();
   const [listWidth, setListWidth] = useState(() => {
     const saved = Number(localStorage.getItem("aguacate_list_width"));
-    return saved >= MIN_LIST && saved <= MAX_LIST ? saved : 308;
+    return saved >= MIN_LIST && saved <= MAX_LIST ? saved : MIN_LIST;
   });
-  const [collapsed, setCollapsed] = useState(
-    () => localStorage.getItem("aguacate_list_collapsed") === "1"
-  );
   const [dragging, setDragging] = useState(false);
   const [tourActive, setTourActive] = useState(false);
   const dragRef = useRef(null);
@@ -110,22 +112,13 @@ export default function App() {
     [listWidth]
   );
 
-  const toggleCollapsed = useCallback(() => {
-    setCollapsed((c) => {
-      localStorage.setItem("aguacate_list_collapsed", c ? "0" : "1");
-      return !c;
-    });
-  }, []);
-
   if (connectionFailed) {
     return (
       <div className="boot">
         <div className="logo">
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> Aguacate
         </div>
-        <div className="boot-sub">
-          {t("app.engine.unreachable")}
-        </div>
+        <div className="boot-sub">{t("app.engine.unreachable")}</div>
       </div>
     );
   }
@@ -142,57 +135,61 @@ export default function App() {
     );
   }
 
-  const showList = nav === "meetings" && !collapsed;
-  const columns =
-    nav === "meetings"
-      ? collapsed
-        ? "240px 28px 1fr"
-        : `240px ${listWidth}px 1fr`
-      : `240px ${Math.max(listWidth, 320)}px 1fr`;
+  const columns = nav === "meetings" ? `${RAIL_WIDTH}px ${listWidth}px 1fr` : `${RAIL_WIDTH}px 1fr 1fr`;
 
   return (
     <ErrorBoundary logoUrl={logoUrl}>
       {platform === "win32" && <Titlebar />}
-      <div
-        className={`app ${platform}`}
-        style={{ gridTemplateColumns: columns }}
-      >
+      <div className={`app ${platform}`} style={{ gridTemplateColumns: columns }}>
         <Sidebar />
-        {nav === "meetings" ? (
+        {nav === "meetings" && (
           <>
-            {showList ? (
-              <MeetingList onCollapse={toggleCollapsed}>
-                <div
-                  className={`resize-handle${dragging ? " dragging" : ""}`}
-                  ref={dragRef}
-                  onMouseDown={onDragStart}
-                  title={t("app.dragResize")}
-                />
-              </MeetingList>
-            ) : (
-              <div className="expand-rail">
-                <button
-                  className="collapse-btn"
-                  title={t("app.expandList")}
-                  aria-label={t("app.expandMeetingList")}
-                  onClick={toggleCollapsed}
-                >
-                  ›
-                </button>
-              </div>
-            )}
+            <MeetingList>
+              <div
+                className={`resize-handle${dragging ? " dragging" : ""}`}
+                ref={dragRef}
+                onMouseDown={onDragStart}
+                title={t("app.dragResize")}
+              />
+            </MeetingList>
             <NotesPanel />
           </>
-        ) : (
-          <IntelligenceView />
         )}
+        {nav === "today" && <TodayView />}
+        {nav === "library" && <IntelligenceView />}
+        {nav === "search" && <SearchView />}
+        {nav === "zero" && <MeetingZeroView />}
+        {nav === "digest" && <DigestView />}
         <Settings />
         <RecordPrompt />
+        <UpcomingToast />
         <CoachPanel />
         <BriefPanel />
-        {toast && <div className={`toast ${toast.kind}`}>{toast.message}</div>}
+        {toasts.length > 0 && (
+          <div className="toast-stack">
+            {toasts.map((tst) => (
+              <div key={tst.id} className={`toast ${tst.kind}`}>
+                <span className="toast-message">{tst.message}</span>
+                {tst.action && (
+                  <button
+                    className="toast-action"
+                    onClick={() => {
+                      tst.action.onAction();
+                      dismissToast(tst.id);
+                    }}
+                  >
+                    {tst.action.label}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+      {/* The signature capture flow: idle → recording → processing → ready */}
+      <CaptureFlow />
       {tourActive && <OnboardingTour onComplete={() => setTourActive(false)} />}
+      <PdfPrintRoot />
     </ErrorBoundary>
   );
 }

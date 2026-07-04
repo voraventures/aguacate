@@ -1,16 +1,14 @@
 // Smart Follow-up Composer: Claude drafts, you edit, one click to send.
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api, openExternal } from "../api.js";
 import { useStore } from "../store.jsx";
 import { XIcon } from "./icons.jsx";
 
-const TONES = [
-  ["professional", "Professional"],
-  ["friendly", "Friendly"],
-  ["concise", "Concise"],
-];
+const TONES = ["professional", "friendly", "concise"];
 
 export default function FollowUp({ meeting, onClose }) {
+  const { t } = useTranslation();
   const { showToast, refreshDetail } = useStore();
   const [tone, setTone] = useState("professional");
   const [draft, setDraft] = useState(null);
@@ -42,7 +40,7 @@ export default function FollowUp({ meeting, onClose }) {
     const mailto = `mailto:?subject=${encodeURIComponent(draft.subject)}&body=${encodeURIComponent(draft.body)}`;
     openExternal(mailto);
     markSent();
-    showToast("Opened in your mail client");
+    showToast(t("followUp.openedMail"));
   };
 
   const copyAll = () => {
@@ -50,7 +48,7 @@ export default function FollowUp({ meeting, onClose }) {
       .writeText(`Subject: ${draft.subject}\n\n${draft.body}`)
       .then(() => {
         markSent();
-        showToast("Follow-up copied to clipboard");
+        showToast(t("followUp.copied"));
       });
   };
 
@@ -58,14 +56,14 @@ export default function FollowUp({ meeting, onClose }) {
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ width: 680 }}>
         <div className="modal-header">
-          <div className="modal-title">Follow-up email</div>
-          <button className="icon-btn" onClick={onClose}>
+          <div className="modal-title">{t("followUp.title")}</div>
+          <button className="icon-btn" onClick={onClose} aria-label={t("common.close")}>
             <XIcon size={15} />
           </button>
         </div>
         <div className="modal-body">
           <div className="tone-row">
-            {TONES.map(([key, label]) => (
+            {TONES.map((key) => (
               <button
                 key={key}
                 className={`tone-chip${tone === key ? " active" : ""}`}
@@ -74,32 +72,32 @@ export default function FollowUp({ meeting, onClose }) {
                   generate(key);
                 }}
               >
-                {label}
+                {t(`followUp.tone.${key}`)}
               </button>
             ))}
             {!draft && (
               <button className="btn" disabled={busy} onClick={() => generate(tone)}>
-                {busy ? "Drafting…" : "Draft with Claude"}
+                {busy ? t("followUp.drafting") : t("followUp.draftCta")}
               </button>
             )}
           </div>
 
-          {busy && draft && <div className="field-help">Redrafting…</div>}
+          {busy && draft && <div className="field-help">{t("followUp.redrafting")}</div>}
 
           {draft && (
             <>
               <div className="field" style={{ marginTop: 16 }}>
-                <label className="field-label">To</label>
+                <label className="field-label">{t("followUp.to")}</label>
                 <input
                   className="text-input"
                   value={recipients}
                   onChange={(e) => setRecipients(e.target.value)}
-                  placeholder="Recipients"
+                  placeholder={t("followUp.recipients")}
                   spellCheck={false}
                 />
               </div>
               <div className="field">
-                <label className="field-label">Subject</label>
+                <label className="field-label">{t("followUp.subject")}</label>
                 <input
                   className="text-input"
                   value={draft.subject}
@@ -107,7 +105,7 @@ export default function FollowUp({ meeting, onClose }) {
                 />
               </div>
               <div className="field">
-                <label className="field-label">Body</label>
+                <label className="field-label">{t("followUp.body")}</label>
                 <textarea
                   className="text-input"
                   style={{ minHeight: 220, resize: "vertical", lineHeight: 1.6 }}
@@ -117,10 +115,10 @@ export default function FollowUp({ meeting, onClose }) {
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button className="btn" onClick={openMail}>
-                  Open in Mail
+                  {t("followUp.openInMail")}
                 </button>
                 <button className="btn secondary" onClick={copyAll}>
-                  Copy
+                  {t("common.copy")}
                 </button>
               </div>
             </>

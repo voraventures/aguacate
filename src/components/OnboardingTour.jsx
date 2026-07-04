@@ -1,46 +1,16 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 import { useStore } from "../store.jsx";
 
 // Steps spotlight elements tagged with data-tour="..." across the app.
+// Titles/descriptions live under tour.steps.<key> in the locale files.
 const STEPS = [
-  {
-    sel: "record-btn",
-    place: "right",
-    title: "Record any meeting",
-    desc: "No bot joins your call. No audio leaves this Mac. Hit Record and Aguacate captures everything locally with Whisper AI.",
-  },
-  {
-    sel: "meeting-list",
-    place: "right",
-    title: "Your meetings, organized",
-    desc: "Every recording appears here automatically. Click any meeting to open its AI-generated notes, action items, and decisions.",
-  },
-  {
-    sel: "notes-panel",
-    place: "left",
-    title: "AI notes, instantly",
-    desc: "Claude reads your transcript and writes structured notes — executive summary, key discussions, decisions, and action items.",
-  },
-  {
-    sel: "action-items",
-    fallback: "notes-panel",
-    place: "left",
-    title: "Action items extracted",
-    desc: "Every action item is pulled out automatically with owner and due date. Mark them complete to track accountability.",
-  },
-  {
-    sel: "my-work",
-    place: "right",
-    title: "Your personal dashboard",
-    desc: "Open actions and decisions this week — pulled from all your meetings in one place. Click any row to dive in.",
-  },
-  {
-    sel: "nav-section",
-    place: "right",
-    title: "Cross-meeting intelligence",
-    desc: "Actions, Decisions, Topics, and People views surface patterns across all your meetings automatically.",
-  },
+  { sel: "record-btn", place: "right", key: "record" },
+  { sel: "meeting-list", place: "right", key: "list" },
+  { sel: "notes-panel", place: "left", key: "notes" },
+  { sel: "action-items", fallback: "notes-panel", place: "left", key: "actions" },
+  { sel: "nav-section", place: "right", key: "intel" },
 ];
 
 const PAD = 6;
@@ -54,6 +24,7 @@ function findTarget(s) {
 }
 
 export default function OnboardingTour({ onComplete }) {
+  const { t } = useTranslation();
   const { meetings, selectedId, selectMeeting } = useStore();
   const [step, setStep] = useState(0);
   const [rect, setRect] = useState(null);
@@ -175,21 +146,21 @@ export default function OnboardingTour({ onComplete }) {
       <div className="tour-tooltip" style={ttStyle} ref={ttRef}>
         {isFinal ? (
           <>
-            <div className="tour-title">You're all set</div>
-            <div className="tour-desc">
-              Explore your demo meeting or hit Record whenever you're ready to capture your first real meeting.
-            </div>
+            <div className="tour-title">{t("tour.final.title")}</div>
+            <div className="tour-desc">{t("tour.final.desc")}</div>
             <div className="tour-actions tour-actions-final">
               <button className="tour-next" onClick={finish}>
-                Got it, let's go
+                {t("tour.final.cta")}
               </button>
             </div>
           </>
         ) : (
           <>
-            <div className="tour-step-indicator">STEP {step + 1} OF {STEPS.length}</div>
-            <div className="tour-title">{STEPS[step].title}</div>
-            <div className="tour-desc">{STEPS[step].desc}</div>
+            <div className="tour-step-indicator">
+              {t("tour.stepIndicator", { step: step + 1, total: STEPS.length })}
+            </div>
+            <div className="tour-title">{t(`tour.steps.${STEPS[step].key}.title`)}</div>
+            <div className="tour-desc">{t(`tour.steps.${STEPS[step].key}.desc`)}</div>
             <div className="tour-actions">
               <div className="tour-dots">
                 {STEPS.map((_, i) => (
@@ -198,10 +169,10 @@ export default function OnboardingTour({ onComplete }) {
               </div>
               <div className="tour-buttons">
                 <button className="tour-skip" onClick={finish}>
-                  Skip
+                  {t("tour.skip")}
                 </button>
                 <button className="tour-next" onClick={advance}>
-                  {step === STEPS.length - 1 ? "Done" : "Next"}
+                  {step === STEPS.length - 1 ? t("tour.done") : t("tour.next")}
                 </button>
               </div>
             </div>

@@ -57,6 +57,15 @@ def pulse():
     return intelligence.action_pulse()
 
 
+@router.get("/digest")
+def digest(period: str = "week"):
+    """Auto-generated rollup for the Digest screen: real meetings, recurring
+    topics, and aggregated open actions/decisions in the period."""
+    if period not in ("day", "week"):
+        raise HTTPException(status_code=400, detail="period must be day or week")
+    return intelligence.digest_summary(period)
+
+
 class ConflictResolve(BaseModel):
     resolution: str = Field(pattern="^(superseded|reviewed)$")
 

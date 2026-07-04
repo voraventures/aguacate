@@ -194,6 +194,9 @@ def fetch_events(time_min_iso: str, time_max_iso: str) -> list[dict]:
                     for a in item.get("attendees", [])
                 ],
                 "cancelled": item.get("status") == "cancelled",
+                "native_link": item.get("hangoutLink"),
+                "location": item.get("location"),
+                "description": item.get("description"),
             }
         )
     return events

@@ -20,6 +20,11 @@ contextBridge.exposeInMainWorld("aguacate", {
     return ipcRenderer.invoke("aguacate:show-in-folder", filePath);
   },
 
+  exportPdf: (filename) => {
+    if (typeof filename !== "string") return Promise.resolve({ ok: false });
+    return ipcRenderer.invoke("aguacate:export-pdf", filename);
+  },
+
   windowControl: (action) => {
     if (!VALID_WINDOW_ACTIONS.has(action)) return Promise.resolve({ ok: false });
     return ipcRenderer.invoke("aguacate:window-control", action);

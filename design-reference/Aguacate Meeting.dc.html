@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <meta name="design_doc_mode" content="canvas">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { background: #E8E9EC; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes agPulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.35; transform:scale(.82); } }
+    @keyframes agRing { 0% { transform:scale(1); opacity:.55; } 100% { transform:scale(2.4); opacity:0; } }
+    @keyframes agShimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+    @keyframes agFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+    @keyframes agBar { 0%,100% { transform:scaleY(.28); } 50% { transform:scaleY(1); } }
+    @keyframes agCaret { 0%,100% { opacity:1; } 50% { opacity:0; } }
+    @keyframes agBlob { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(14px,-10px) scale(1.06); } }
+    @keyframes agSpin { to { transform:rotate(360deg); } }
+    @keyframes agPop { 0% { transform:scale(1); } 45% { transform:scale(1.32); } 100% { transform:scale(1); } }
+  </style>
+</helmet>
+
+<section style="padding:72px 72px 40px;display:flex;flex-direction:column;gap:28px;align-items:flex-start;min-width:max-content;">
+  <div style="display:flex;flex-direction:column;gap:12px;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="26" height="30" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="50.5" y="141" width="11" height="38" rx="5.5"></rect><rect x="68.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="140.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="158.5" y="141" width="11" height="38" rx="5.5"></rect></g></svg>
+      <span style="font-size:26px;font-weight:500;letter-spacing:-.01em;color:#232320;font-family:'Newsreader',serif;">Aguacate — Meeting Workspace</span>
+    </div>
+    <div style="display:flex;gap:12px;font-size:13px;color:#8A8A82;align-items:center;flex-wrap:wrap;">
+      <span>Jump to:</span>
+      <a href="#5g" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5g Capture flow</a>
+      <a href="#6a" style="color:#5F9E2B;text-decoration:none;font-weight:600;">6 Auto-record</a>
+      <a href="#5a" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5a Overview</a>
+      <a href="#5h" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5h Overview v2</a>
+      <a href="#5i" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5i Overview v3</a>
+      <a href="#5c" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5c Timeline</a>
+      <a href="#5d" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5d Transcript</a>
+      <a href="#5e" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5e Ask</a>
+      <a href="#5f" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5f Home</a>
+      <a href="#5j" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5j Digest</a>
+      <a href="#5k" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5k Settings</a>
+      <a href="#5b" style="color:#5F9E2B;text-decoration:none;font-weight:600;">5b Moments</a>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#16180F;letter-spacing:.02em;">Turn 6 — Calendar auto-record: upcoming/scheduled row + 5-min toast (see SPEC-calendar-autorecord.md)</span>
+  </div>
+
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+
+    <!-- 6a: countdown dot -->
+    <div id="6a" style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:4px 9px;border-radius:6px;">6a</span><span style="font-size:15px;font-weight:600;color:#16180F;font-family:'Newsreader',serif;">Quiet countdown</span></div>
+      <div style="width:260px;background:#FDFCF8;border:1px solid #EFEBE2;border-radius:16px;padding:16px 14px;font-family:'Hanken Grotesk',-apple-system,sans-serif;">
+        <div style="font-size:15px;font-weight:600;color:#232320;padding:0 2px 12px;">Today</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="padding:10px 10px;border-radius:10px;background:#F3F7EA;border:1px dashed #CFE0B4;display:flex;align-items:center;gap:10px;">
+            <span style="position:relative;width:8px;height:8px;flex:none;"><span style="position:absolute;inset:0;border-radius:50%;background:#6FA83C;animation:agPulse 1.8s ease-in-out infinite;"></span></span>
+            <div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:600;color:#232320;">Q2 Product Planning</div><div style="font-size:11.5px;color:#5F9E2B;margin-top:2px;">Starts in 12m · will auto-transcribe</div></div>
+          </div>
+          <div style="padding:9px 10px;"><div style="font-size:13.5px;color:#3C3C38;">UX Research Review</div><div style="font-size:12px;color:#A8A89E;margin-top:2px;">32m</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6b: calendar badge becomes a countdown ring -->
+    <div id="6b" style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:4px 9px;border-radius:6px;">6b</span><span style="font-size:15px;font-weight:600;color:#16180F;font-family:'Newsreader',serif;">Countdown badge</span></div>
+      <div style="width:260px;background:#FDFCF8;border:1px solid #EFEBE2;border-radius:16px;padding:16px 14px;font-family:'Hanken Grotesk',-apple-system,sans-serif;">
+        <div style="font-size:15px;font-weight:600;color:#232320;padding:0 2px 12px;">Today</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="padding:9px 10px;border-radius:11px;background:#F3F7EA;border:1px dashed #CFE0B4;display:flex;align-items:center;gap:11px;">
+            <div style="width:36px;height:36px;flex:none;border-radius:50%;background:#fff;border:1.5px solid #CFE0B4;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;">
+              <span style="font-size:12px;font-weight:700;color:#5F9E2B;">12</span><span style="font-family:'JetBrains Mono',monospace;font-size:6.5px;color:#7EA855;letter-spacing:.04em;">MIN</span>
+            </div>
+            <div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:600;color:#232320;">Q2 Product Planning</div><div style="font-size:11.5px;color:#5F9E2B;margin-top:2px;">Zoom · auto-transcribe on</div></div>
+          </div>
+          <div style="padding:9px 10px;"><div style="font-size:13.5px;color:#3C3C38;">UX Research Review</div><div style="font-size:12px;color:#A8A89E;margin-top:2px;">32m</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6c: banner-first, plain row -->
+    <div id="6c" style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:4px 9px;border-radius:6px;">6c</span><span style="font-size:15px;font-weight:600;color:#16180F;font-family:'Newsreader',serif;">Plain row, banner does the work</span></div>
+      <div style="width:260px;background:#FDFCF8;border:1px solid #EFEBE2;border-radius:16px;padding:16px 14px;font-family:'Hanken Grotesk',-apple-system,sans-serif;">
+        <div style="font-size:15px;font-weight:600;color:#232320;padding:0 2px 12px;">Today</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="padding:9px 10px;border-radius:10px;display:flex;align-items:center;gap:10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A9488" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+            <div style="flex:1;min-width:0;"><div style="font-size:13.5px;color:#3C3C38;">Q2 Product Planning</div><div style="font-size:11.5px;color:#A8A89E;margin-top:2px;">10:45 AM</div></div>
+          </div>
+          <div style="padding:9px 10px;"><div style="font-size:13.5px;color:#3C3C38;">UX Research Review</div><div style="font-size:12px;color:#A8A89E;margin-top:2px;">32m</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6d: the 5-minute toast (shared across options) -->
+    <div id="6d" style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#232320;padding:4px 9px;border-radius:6px;">6d</span><span style="font-size:15px;font-weight:600;color:#16180F;font-family:'Newsreader',serif;">5-minute toast</span></div>
+      <div style="width:380px;background:#FBFAF8;border:1px solid #EAE6DD;border-radius:16px;padding:22px;font-family:'Hanken Grotesk',-apple-system,sans-serif;">
+        <div style="display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #E2EAD2;border-radius:14px;padding:14px 16px;box-shadow:0 10px 26px -16px rgba(95,158,43,.35),0 1px 2px rgba(30,34,20,.04);">
+          <span style="width:28px;height:28px;flex:none;border-radius:8px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;"><svg width="16" height="18" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke="#7DBE3A" stroke-width="20" stroke-linejoin="round"></path><g fill="#111111"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg></span>
+          <div style="flex:1;"><div style="font-size:13.5px;font-weight:600;color:#232320;">Q2 Product Planning starts in 5 min</div><div style="font-size:12.5px;color:#8A857C;margin-top:3px;line-height:1.5;">Aguacate will auto-transcribe once you join the call.</div></div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0AA9E" stroke-width="1.75" stroke-linecap="round" style="flex:none;margin-top:3px;cursor:pointer;"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="5j" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#5F9E2B;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5j</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Digest</span>
+      <span style="font-size:13px;color:#8A8D80;">Auto-generated rollup across all meetings — zero manual labor</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FBFAF8;box-shadow:0 40px 90px -34px rgba(40,36,26,.3),0 8px 24px -14px rgba(40,36,26,.13);border:1px solid #EAE6DD;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #EFEBE2;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FBFAF8;overflow:hidden;">
+          <div style="padding:30px 48px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div>
+                <h1 style="margin:0;font-size:34px;font-weight:500;letter-spacing:-.015em;color:#22201A;font-family:'Newsreader',serif;">Digest</h1>
+                <div style="font-size:13.5px;color:#8A857C;margin-top:9px;">Week of Jun 23 – 28 · 6 meetings · 4h 12m recorded</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E4DFD4;border-radius:10px;padding:6px 8px;">
+                <span style="font-size:13px;font-weight:600;color:#22201A;background:#F1EEE6;border-radius:7px;padding:6px 12px;">Weekly</span>
+                <span style="font-size:13px;color:#9A9488;padding:6px 12px;">Daily</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:26px 48px 34px;display:flex;flex-direction:column;">
+            <!-- hero: week in review -->
+            <div style="position:relative;background:linear-gradient(135deg,#F3F7EA,#FAF9F1);border:1px solid #E2EAD2;border-radius:18px;padding:24px 26px;overflow:hidden;box-shadow:0 1px 2px rgba(40,36,26,.04),0 14px 34px -22px rgba(95,158,43,.4);">
+              <svg width="150" height="174" viewBox="0 0 220 256" style="position:absolute;right:-14px;top:-20px;opacity:.06;"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke="#2A2A26" stroke-width="14" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg>
+              <div style="position:relative;display:flex;align-items:center;gap:9px;margin-bottom:12px;"><svg width="26" height="30" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"></path><g fill="#111111"><rect x="50.5" y="141" width="11" height="38" rx="5.5"></rect><rect x="68.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="140.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="158.5" y="141" width="11" height="38" rx="5.5"></rect></g></svg><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5F9E2B;font-weight:600;">Digest by Aguacate</span></div>
+              <p style="position:relative;margin:0;font-family:'Newsreader',serif;font-size:22px;line-height:1.5;color:#2A2A26;max-width:760px;">Your team spent most of this week on <em style="font-style:italic;color:#5F9E2B;">product strategy and onboarding</em> — mid-market expansion and the analytics beta were the biggest recurring threads, with 9 open actions still outstanding.</p>
+            </div>
+
+            <div style="display:flex;gap:48px;margin-top:30px;flex:1;min-height:0;">
+              <!-- left: meetings this week -->
+              <div style="flex:1.5;display:flex;flex-direction:column;min-width:0;">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;">Meetings</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6FA83C;">06</span></div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Product Strategy Sync</span><span style="font-size:12.5px;color:#8A857C;">48m</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">FRI</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">UX Research Review</span><span style="font-size:12.5px;color:#8A857C;">32m</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">THU</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Q2 Planning</span><span style="font-size:12.5px;color:#8A857C;">1h 15m</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">THU</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Design Critique</span><span style="font-size:12.5px;color:#8A857C;">45m</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">WED</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Engineering All Hands</span><span style="font-size:12.5px;color:#8A857C;">1h</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">MON</span></div>
+                </div>
+
+                <div style="display:flex;align-items:baseline;gap:10px;margin:34px 0 6px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;">Recurring topics</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Product roadmap · 3</span>
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Onboarding · 2</span>
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Pricing · 2</span>
+                </div>
+              </div>
+
+              <!-- right: open actions + decisions -->
+              <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-left:1px solid #ECE8DF;padding-left:44px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;margin-bottom:6px;">Open actions <span style="color:#6FA83C;">09</span></div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #EDE9E0;"><span style="width:15px;height:15px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;"></span><span style="font-size:14px;color:#2A2A26;flex:1;">Define pricing experiments</span><span style="font-size:12px;color:#8A857C;">Alex R.</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #EDE9E0;"><span style="width:15px;height:15px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;"></span><span style="font-size:14px;color:#2A2A26;flex:1;">Build onboarding flow v2</span><span style="font-size:12px;color:#8A857C;">Maya L.</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:12px 0;"><span style="width:15px;height:15px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;"></span><span style="font-size:14px;color:#2A2A26;flex:1;">Create enterprise one-pager</span><span style="font-size:12px;color:#8A857C;">Daniel K.</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9488;margin-top:12px;">+ 6 more</div>
+
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;margin:30px 0 6px;">Decisions <span style="color:#6FA83C;">04</span></div>
+                <div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:11px 0;border-bottom:1px solid #EDE9E0;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:14px;color:#2A2A26;line-height:1.5;">Focus on mid-market expansion</span></div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:11px 0;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:14px;color:#2A2A26;line-height:1.5;">Launch analytics beta in July</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5k" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#5F9E2B;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5k</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Settings</span>
+      <span style="font-size:13px;color:#8A8D80;">Profile · calendar connections (auto-record) · recording · notifications</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FBFAF8;box-shadow:0 40px 90px -34px rgba(40,36,26,.3),0 8px 24px -14px rgba(40,36,26,.13);border:1px solid #EAE6DD;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #EFEBE2;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FBFAF8;overflow:hidden;">
+          <div style="padding:26px 30px 22px 48px;border-bottom:1px solid #EFEBE2;display:flex;align-items:center;justify-content:space-between;">
+            <h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-.01em;color:#22201A;font-family:'Newsreader',serif;">Settings</h1>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#9A9488" stroke-width="1.75"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+          </div>
+
+          <div style="flex:1;overflow:hidden;display:flex;">
+            <!-- settings nav -->
+            <div style="width:200px;flex:none;padding:26px 20px;border-right:1px solid #EFEBE2;display:flex;flex-direction:column;gap:2px;">
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">General</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Appearance</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Recording</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Templates</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">AI</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;font-weight:600;color:#22201A;background:#EFEFEA;">Calendars</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Integrations</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Privacy</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Export</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">Workspace</div>
+              <div style="padding:9px 11px;border-radius:9px;font-size:14px;color:#6A6A62;">License</div>
+            </div>
+
+            <!-- content -->
+            <div style="flex:1;overflow:hidden;padding:28px 48px;display:flex;flex-direction:column;gap:20px;max-width:720px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;">Calendars</div>
+              <p style="margin:-8px 0 0;font-size:13.5px;color:#8A857C;line-height:1.6;max-width:520px;">Connect a calendar so Aguacate can auto-transcribe meetings the moment you join — no need to hit record.</p>
+
+              <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #E7E2D6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,36,26,.04);">
+                <span style="width:36px;height:36px;flex:none;border-radius:9px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#5F9E2B" stroke-width="1.75"><rect x="3" y="4.5" width="18" height="16" rx="2.5"></rect><path d="M3 9h18M8 2.5v4M16 2.5v4"></path></svg></span>
+                <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#22201A;">Google Calendar</div><div style="font-size:12.5px;color:#8A857C;margin-top:2px;">Connected · daniel@acme.com</div></div>
+                <span style="font-size:13px;font-weight:600;color:#5F9E2B;">Connected</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #E7E2D6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,36,26,.04);">
+                <span style="width:36px;height:36px;flex:none;border-radius:9px;background:#F1EEE6;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#5B5648" stroke-width="1.75"><rect x="3" y="4.5" width="18" height="16" rx="2.5"></rect><path d="M3 9h18M8 2.5v4M16 2.5v4"></path></svg></span>
+                <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#22201A;">Apple Calendar</div><div style="font-size:12.5px;color:#9A9488;margin-top:2px;">Not connected</div></div>
+                <button style="border:1px solid #E4DFD4;background:#fff;color:#3C3830;font-size:13px;font-weight:500;padding:7px 15px;border-radius:9px;cursor:pointer;font-family:inherit;">Connect</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #E7E2D6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,36,26,.04);">
+                <span style="width:36px;height:36px;flex:none;border-radius:9px;background:#F1EEE6;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#5B5648" stroke-width="1.75"><rect x="3" y="4.5" width="18" height="16" rx="2.5"></rect><path d="M3 9h18M8 2.5v4M16 2.5v4"></path></svg></span>
+                <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#22201A;">Outlook</div><div style="font-size:12.5px;color:#9A9488;margin-top:2px;">Not connected</div></div>
+                <button style="border:1px solid #E4DFD4;background:#fff;color:#3C3830;font-size:13px;font-weight:500;padding:7px 15px;border-radius:9px;cursor:pointer;font-family:inherit;">Connect</button>
+              </div>
+
+              <div style="height:1px;background:#EDE9E0;margin:8px 0 2px;"></div>
+
+              <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #E7E2D6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,36,26,.04);">
+                <span style="width:36px;height:36px;flex:none;border-radius:9px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#5F9E2B" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+                <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#22201A;">Auto-transcribe calendar meetings</div><div style="font-size:12.5px;color:#8A857C;margin-top:2px;">Joins Zoom, Meet, and Teams automatically — no confirmation needed.</div></div>
+                <span style="width:38px;height:22px;border-radius:20px;background:#6FA83C;position:relative;flex:none;"><span style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff;"></span></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #E7E2D6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,36,26,.04);">
+                <span style="width:36px;height:36px;flex:none;border-radius:9px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#5F9E2B" stroke-width="1.75"><path d="M12 22s7-4.5 7-11V5l-7-3-7 3v6c0 6.5 7 11 7 11z"></path></svg></span>
+                <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#22201A;">Notify 5 minutes before</div><div style="font-size:12.5px;color:#8A857C;margin-top:2px;">In-app banner heads-up before an auto-recorded meeting starts.</div></div>
+                <span style="width:38px;height:22px;border-radius:20px;background:#6FA83C;position:relative;flex:none;"><span style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff;"></span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5g" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#232320;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5g</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Signature moment — capture → grow → ready</span>
+      <span style="font-size:13px;color:#8A8D80;">Live prototype · the mark listens, then blooms into knowledge. Plays on load; hit Replay.</span>
+    </div>
+    <dc-import name="CaptureFlow" hint-size="560px,640px" style="width:560px;height:640px;"></dc-import>
+  </div>
+
+  <div id="5a" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5a</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Meeting Overview — main UI</span>
+      <span style="font-size:13px;color:#8A8D80;">Calm, white, green-only accent · editorial serif titles · soft-tinted section cards</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FFFFFF;box-shadow:0 40px 90px -34px rgba(30,34,20,.28),0 8px 24px -14px rgba(30,34,20,.12);border:1px solid #E9E9E4;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <!-- titlebar -->
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #F0F0EC;">
+        <div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div>
+      </div>
+
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+
+        <!-- col3 main detail -->
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#fff;">
+          <div style="padding:28px 32px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;"><h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-.01em;color:#1D1D1B;font-family:'Newsreader',serif;">Product Strategy Sync</h1><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#C4C4BA" stroke-width="1.75"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.9 6.6 20l1-6.1L3.2 9.5l6.1-.9z"></path></svg></div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:11px;font-size:13.5px;color:#8A8A82;">
+                  <span>Today, 10:30 AM</span>
+                  <span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>48m</span>
+                  <span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path><circle cx="17" cy="8.5" r="2.6"></circle><path d="M16 19a6 6 0 0 0-2-4.5"></path></svg>6 people</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex:none;">
+                <div style="display:flex;"><span style="width:30px;height:30px;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;">MA</span><span style="width:30px;height:30px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">DA</span><span style="width:30px;height:30px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">AL</span></div>
+                <button style="border:1px solid #E4E4DE;background:#fff;color:#3C3C38;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Share</button>
+                <button style="width:36px;height:36px;border:1px solid #E4E4DE;background:#fff;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#8A8A82"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:28px;margin-top:22px;border-bottom:1px solid #EDEDE8;">
+              <div style="padding-bottom:13px;font-size:14.5px;font-weight:600;color:#1D1D1B;border-bottom:2px solid #6FA83C;margin-bottom:-1px;">Overview</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Timeline</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Transcript</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Ask</div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:22px 32px 28px;display:flex;flex-direction:column;gap:16px;">
+            <!-- overview -->
+            <div style="border:1px solid #ECECE6;border-radius:16px;padding:22px 24px;">
+              <div style="font-size:15px;font-weight:600;color:#232320;margin-bottom:11px;">Overview</div>
+              <p style="margin:0;font-size:14.5px;line-height:1.7;color:#54544C;">We aligned on the next phase of the product strategy, discussed key customer insights, and identified priorities for the upcoming quarter.</p>
+            </div>
+            <!-- actions + decisions -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div style="background:#FAF4EB;border:1px solid #F1E8D8;border-radius:16px;padding:20px 22px;">
+                <div style="font-size:15px;font-weight:600;color:#232320;margin-bottom:14px;">Actions</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:10px;"><span style="width:15px;height:15px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;"></span><span style="font-size:14px;color:#3C3C38;flex:1;">Define pricing experiments</span><span style="font-size:12.5px;color:#A8A89E;">Alex R.</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;"><span style="width:15px;height:15px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;"></span><span style="font-size:14px;color:#3C3C38;flex:1;">Build onboarding flow v2</span><span style="font-size:12.5px;color:#A8A89E;">Maya L.</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;"><span style="width:15px;height:15px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;"></span><span style="font-size:14px;color:#3C3C38;flex:1;">Create enterprise one-pager</span><span style="font-size:12.5px;color:#A8A89E;">Daniel K.</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9A90;margin-top:14px;">+ 2 more</div>
+              </div>
+              <div style="background:#EEF2F8;border:1px solid #DFE7F1;border-radius:16px;padding:20px 22px;">
+                <div style="font-size:15px;font-weight:600;color:#232320;margin-bottom:14px;">Decisions</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">Focus on mid-market expansion</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">Launch analytics beta in July</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">Deprioritize legacy reporting</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9A90;margin-top:14px;">+ 1 more</div>
+              </div>
+            </div>
+            <!-- topics + questions -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div style="background:#FAF4EB;border:1px solid #F1E8D8;border-radius:16px;padding:20px 22px;">
+                <div style="font-size:15px;font-weight:600;color:#232320;margin-bottom:14px;">Topics</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">Product roadmap</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">User research insights</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">Pricing strategy</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">Go-to-market plan</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9A90;margin-top:14px;">+ 2 more</div>
+              </div>
+              <div style="background:#FBF6E7;border:1px solid #F1E9CF;border-radius:16px;padding:20px 22px;">
+                <div style="font-size:15px;font-weight:600;color:#232320;margin-bottom:14px;">Questions</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">What's our win metric for Q3?</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;"><span style="width:6px;height:6px;flex:none;border-radius:50%;background:#6FA83C;"></span><span style="font-size:14px;color:#3C3C38;">How will we measure activation?</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9A90;margin-top:14px;">+ 1 more</div>
+              </div>
+            </div>
+            <!-- highlights -->
+            <div style="border:1px solid #ECECE6;border-radius:16px;padding:20px 24px;">
+              <div style="font-size:15px;font-weight:600;color:#232320;margin-bottom:14px;">Highlights</div>
+              <div style="display:flex;align-items:center;gap:11px;"><span style="width:26px;height:26px;flex:none;border-radius:50%;background:#C58B3E;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><span style="font-size:14px;color:#3C3C38;flex:1;">Maya shared insights from user interviews</span><span style="font-size:12.5px;color:#A8A89E;">04:12</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5h" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#232320;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5h</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Overview — refined hierarchy</span>
+      <span style="font-size:13px;color:#8A8D80;">No tints · serif summary hero · mono section labels · hairline rows</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FFFFFF;box-shadow:0 40px 90px -34px rgba(30,34,20,.28),0 8px 24px -14px rgba(30,34,20,.12);border:1px solid #E9E9E4;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #F0F0EC;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#fff;">
+          <div style="padding:30px 48px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;"><h1 style="margin:0;font-size:34px;font-weight:500;letter-spacing:-.015em;color:#1D1D1B;font-family:'Newsreader',serif;">Product Strategy Sync</h1><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#C4C4BA" stroke-width="1.75"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.9 6.6 20l1-6.1L3.2 9.5l6.1-.9z"></path></svg></div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:11px;font-size:13.5px;color:#8A8A82;"><span>Today, 10:30 AM</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>48m</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path><circle cx="17" cy="8.5" r="2.6"></circle><path d="M16 19a6 6 0 0 0-2-4.5"></path></svg>6 people</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex:none;">
+                <div style="display:flex;"><span style="width:30px;height:30px;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;">MA</span><span style="width:30px;height:30px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">DA</span><span style="width:30px;height:30px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">AL</span></div>
+                <button style="border:1px solid #E4E4DE;background:#fff;color:#3C3C38;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Share</button>
+                <button style="width:36px;height:36px;border:1px solid #E4E4DE;background:#fff;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#8A8A82"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:28px;margin-top:22px;border-bottom:1px solid #EDEDE8;">
+              <div style="padding-bottom:13px;font-size:14.5px;font-weight:600;color:#1D1D1B;border-bottom:2px solid #6FA83C;margin-bottom:-1px;">Overview</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Timeline</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Transcript</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Ask</div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:30px 48px 34px;display:flex;flex-direction:column;">
+            <!-- hero summary -->
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#A8A89E;font-weight:500;">Summary</div>
+            <p style="margin:14px 0 0;font-family:'Newsreader',serif;font-size:23px;line-height:1.5;color:#2A2A26;max-width:760px;">We aligned on the next phase of the product strategy — prioritizing <em style="font-style:italic;color:#5F9E2B;">mid-market expansion</em>, a July analytics beta, and a faster onboarding flow — and deprioritized legacy reporting to keep the quarter focused.</p>
+
+            <div style="height:1px;background:#EDEDE8;margin:32px 0;"></div>
+
+            <!-- two columns -->
+            <div style="flex:1;display:flex;gap:48px;min-height:0;">
+              <!-- left -->
+              <div style="flex:1.5;display:flex;flex-direction:column;min-width:0;">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8A8A82;font-weight:600;">Actions</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6FA83C;">05</span></div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #F1F1EC;"><span onClick="{{ toggleCheck }}" data-on="0" style="width:17px;height:17px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;cursor:pointer;transition:background .15s,border-color .15s;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Define pricing experiments</span><span style="font-size:12.5px;color:#8A8A82;">Alex R.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;width:38px;text-align:right;">FRI</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #F1F1EC;"><span onClick="{{ toggleCheck }}" data-on="0" style="width:17px;height:17px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;cursor:pointer;transition:background .15s,border-color .15s;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Build onboarding flow v2</span><span style="font-size:12.5px;color:#8A8A82;">Maya L.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;width:38px;text-align:right;">THU</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #F1F1EC;"><span onClick="{{ toggleCheck }}" data-on="0" style="width:17px;height:17px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;cursor:pointer;transition:background .15s,border-color .15s;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Create enterprise one-pager</span><span style="font-size:12.5px;color:#8A8A82;">Daniel K.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;width:38px;text-align:right;">MON</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #F1F1EC;"><span style="width:17px;height:17px;flex:none;border-radius:50%;background:#6FA83C;display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="3.5"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="font-size:15px;color:#9A9A90;flex:1;text-decoration:line-through;">Set up analytics beta cohort</span><span style="font-size:12.5px;color:#A8A89E;">Daniel K.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#B6B6AC;width:38px;text-align:right;">DONE</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9A90;margin-top:14px;cursor:pointer;">Show 1 more</div>
+
+                <div style="display:flex;align-items:baseline;gap:10px;margin:34px 0 6px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8A8A82;font-weight:600;">Decisions</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6FA83C;">03</span></div>
+                <div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid #F1F1EC;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:15px;color:#2A2A26;line-height:1.5;">Focus on mid-market expansion</span></div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid #F1F1EC;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:15px;color:#2A2A26;line-height:1.5;">Launch analytics beta in July</span></div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:13px 0;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:15px;color:#2A2A26;line-height:1.5;">Deprioritize legacy reporting</span></div>
+                </div>
+              </div>
+
+              <!-- right -->
+              <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-left:1px solid #EDEDE8;padding-left:44px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8A8A82;font-weight:600;margin-bottom:14px;">Topics</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <span style="font-size:13px;color:#3C3C38;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">Product roadmap</span>
+                  <span style="font-size:13px;color:#3C3C38;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">User research</span>
+                  <span style="font-size:13px;color:#3C3C38;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">Pricing strategy</span>
+                  <span style="font-size:13px;color:#3C3C38;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">Go-to-market</span>
+                  <span style="font-size:13px;color:#3C3C38;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">Activation</span>
+                </div>
+
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8A8A82;font-weight:600;margin:32px 0 8px;">Open questions <span style="color:#6FA83C;">02</span></div>
+                <div>
+                  <div style="display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #F1F1EC;"><span style="font-family:'Newsreader',serif;font-size:16px;color:#C4C4BA;line-height:1.2;">?</span><span style="font-size:14.5px;color:#3C3C38;line-height:1.5;">What's our win metric for Q3?</span></div>
+                  <div style="display:flex;gap:11px;padding:12px 0;"><span style="font-family:'Newsreader',serif;font-size:16px;color:#C4C4BA;line-height:1.2;">?</span><span style="font-size:14.5px;color:#3C3C38;line-height:1.5;">How will we measure activation?</span></div>
+                </div>
+
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8A8A82;font-weight:600;margin:32px 0 12px;">Highlight</div>
+                <div style="display:flex;align-items:center;gap:11px;"><span style="width:28px;height:28px;flex:none;border-radius:50%;background:#C58B3E;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><span style="font-size:14px;color:#3C3C38;flex:1;line-height:1.45;">Maya shared insights from user interviews</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;">04:12</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5i" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#5F9E2B;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5i</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Overview — warm &amp; considered</span>
+      <span style="font-size:13px;color:#8A8D80;">Paper-warm base · summary as hero · one deliberate green moment · quiet depth</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FBFAF8;box-shadow:0 40px 90px -34px rgba(40,36,26,.3),0 8px 24px -14px rgba(40,36,26,.13);border:1px solid #EAE6DD;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #EFEBE2;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FBFAF8;" data-tabs-root>
+          <div style="padding:30px 48px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;"><h1 style="margin:0;font-size:34px;font-weight:500;letter-spacing:-.015em;color:#22201A;font-family:'Newsreader',serif;">Product Strategy Sync</h1><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#C7C1B4" stroke-width="1.75"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.9 6.6 20l1-6.1L3.2 9.5l6.1-.9z"></path></svg></div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:11px;font-size:13.5px;color:#8A857C;"><span>Today, 10:30 AM</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A296" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>48m</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A296" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path><circle cx="17" cy="8.5" r="2.6"></circle><path d="M16 19a6 6 0 0 0-2-4.5"></path></svg>6 people</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex:none;">
+                <div style="display:flex;"><span style="width:30px;height:30px;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #FBFAF8;">MA</span><span style="width:30px;height:30px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #FBFAF8;margin-left:-8px;">DA</span><span style="width:30px;height:30px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #FBFAF8;margin-left:-8px;">AL</span></div>
+                <button style="border:1px solid #E4DFD4;background:#fff;color:#3C3830;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Share</button>
+                <button style="width:36px;height:36px;border:1px solid #E4DFD4;background:#fff;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#8A857C"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:28px;margin-top:22px;border-bottom:1px solid #ECE8DF;">
+              <div onClick="{{ switchTab }}" data-tab="overview" style="padding-bottom:13px;font-size:14.5px;font-weight:600;color:#22201A;border-bottom:2px solid #6FA83C;margin-bottom:-1px;cursor:pointer;transition:color .2s,border-color .2s;">Overview</div>
+              <div onClick="{{ switchTab }}" data-tab="timeline" style="padding-bottom:13px;font-size:14.5px;color:#9A9488;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:color .2s,border-color .2s;">Timeline</div>
+              <div onClick="{{ switchTab }}" data-tab="transcript" style="padding-bottom:13px;font-size:14.5px;color:#9A9488;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:color .2s,border-color .2s;">Transcript</div>
+              <div onClick="{{ switchTab }}" data-tab="ask" style="padding-bottom:13px;font-size:14.5px;color:#9A9488;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:color .2s,border-color .2s;">Ask</div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:26px 48px 34px;display:flex;flex-direction:column;transition:opacity .2s ease;" data-panels><div data-panel="overview" style="display:flex;flex-direction:column;flex:1;min-height:0;">
+            <!-- hero summary — the one green moment -->
+            <div data-rise="0" style="position:relative;background:linear-gradient(135deg,#F3F7EA,#FAF9F1);border:1px solid #E2EAD2;border-radius:18px;padding:24px 26px;overflow:hidden;box-shadow:0 1px 2px rgba(40,36,26,.04),0 14px 34px -22px rgba(95,158,43,.4);">
+              <svg width="150" height="174" viewBox="0 0 220 256" style="position:absolute;right:-14px;top:-20px;opacity:.06;"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#2A2A26" stroke-width="14" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg>
+              <div style="position:relative;display:flex;align-items:center;gap:9px;margin-bottom:12px;"><svg width="26" height="30" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"></path><g fill="#111111"><rect x="50.5" y="141" width="11" height="38" rx="5.5"></rect><rect x="68.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="140.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="158.5" y="141" width="11" height="38" rx="5.5"></rect></g></svg><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5F9E2B;font-weight:600;">Summary by Aguacate</span></div>
+              <p style="position:relative;margin:0;font-family:'Newsreader',serif;font-size:22px;line-height:1.5;color:#2A2A26;max-width:760px;">We aligned on the next phase of the product strategy — prioritizing <em style="font-style:italic;color:#5F9E2B;">mid-market expansion</em>, a July analytics beta, and a faster onboarding flow — and deprioritized legacy reporting to keep the quarter focused.</p>
+            </div>
+
+            <!-- two columns -->
+            <div data-rise="150" style="flex:1;display:flex;gap:48px;min-height:0;margin-top:30px;">
+              <!-- left -->
+              <div style="flex:1.5;display:flex;flex-direction:column;min-width:0;">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;">Actions</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6FA83C;">05</span></div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span onClick="{{ toggleCheck }}" data-on="0" style="width:17px;height:17px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;cursor:pointer;transition:background .15s,border-color .15s;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Define pricing experiments</span><span style="font-size:12.5px;color:#8A857C;">Alex R.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">FRI</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span onClick="{{ toggleCheck }}" data-on="0" style="width:17px;height:17px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;cursor:pointer;transition:background .15s,border-color .15s;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Build onboarding flow v2</span><span style="font-size:12.5px;color:#8A857C;">Maya L.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">THU</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span onClick="{{ toggleCheck }}" data-on="0" style="width:17px;height:17px;flex:none;border:1.6px solid #B8C89E;border-radius:50%;cursor:pointer;transition:background .15s,border-color .15s;"></span><span style="font-size:15px;color:#2A2A26;flex:1;">Create enterprise one-pager</span><span style="font-size:12.5px;color:#8A857C;">Daniel K.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;width:38px;text-align:right;">MON</span></div>
+                  <div style="display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #EDE9E0;"><span style="width:17px;height:17px;flex:none;border-radius:50%;background:#6FA83C;display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="3.5"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="font-size:15px;color:#9A9488;flex:1;text-decoration:line-through;">Set up analytics beta cohort</span><span style="font-size:12.5px;color:#A8A296;">Daniel K.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#B8B2A6;width:38px;text-align:right;">DONE</span></div>
+                </div>
+                <div style="font-size:13px;color:#9A9488;margin-top:14px;cursor:pointer;">Show 1 more</div>
+
+                <div style="display:flex;align-items:baseline;gap:10px;margin:34px 0 4px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;">Decisions</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6FA83C;">03</span></div>
+                <div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid #EDE9E0;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:15px;color:#2A2A26;line-height:1.5;">Focus on mid-market expansion</span></div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid #EDE9E0;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:15px;color:#2A2A26;line-height:1.5;">Launch analytics beta in July</span></div>
+                  <div style="display:flex;align-items:flex-start;gap:13px;padding:13px 0;"><span style="width:7px;height:7px;flex:none;border-radius:50%;background:#6FA83C;margin-top:7px;"></span><span style="font-size:15px;color:#2A2A26;line-height:1.5;">Deprioritize legacy reporting</span></div>
+                </div>
+              </div>
+
+              <!-- right -->
+              <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-left:1px solid #ECE8DF;padding-left:44px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;margin-bottom:14px;">Topics</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Product roadmap</span>
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">User research</span>
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Pricing strategy</span>
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Go-to-market</span>
+                  <span style="font-size:13px;color:#3C3830;background:#F4F2EA;border:1px solid #E7E2D6;border-radius:20px;padding:6px 13px;">Activation</span>
+                </div>
+
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;margin:32px 0 6px;">Open questions <span style="color:#6FA83C;">02</span></div>
+                <div>
+                  <div style="display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #EDE9E0;"><span style="font-family:'Newsreader',serif;font-size:17px;color:#C7C1B4;line-height:1.1;">?</span><span style="font-size:14.5px;color:#3C3830;line-height:1.5;">What's our win metric for Q3?</span></div>
+                  <div style="display:flex;gap:11px;padding:12px 0;"><span style="font-family:'Newsreader',serif;font-size:17px;color:#C7C1B4;line-height:1.1;">?</span><span style="font-size:14.5px;color:#3C3830;line-height:1.5;">How will we measure activation?</span></div>
+                </div>
+
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9A9488;font-weight:600;margin:32px 0 12px;">Highlight</div>
+                <div style="display:flex;align-items:center;gap:11px;background:#F6F4EC;border:1px solid #EAE5D9;border-radius:13px;padding:13px 15px;"><span style="width:28px;height:28px;flex:none;border-radius:50%;background:#C58B3E;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><span style="font-size:14px;color:#3C3830;flex:1;line-height:1.45;">Maya shared insights from user interviews</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A296;">04:12</span></div>
+              </div>
+            </div>
+            </div>
+<div data-panel="timeline" style="display:none;flex:1;overflow:hidden;padding-top:4px;">
+              <div style="max-width:640px;position:relative;"><div style="position:absolute;left:52px;top:8px;bottom:8px;width:1.5px;background:#EAE6DD;"></div>
+                <div style="display:flex;flex-direction:column;gap:18px;">
+                  <div style="display:flex;gap:16px;align-items:flex-start;position:relative;"><span style="width:40px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A296;text-align:right;padding-top:14px;">04:12</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:14px;box-shadow:0 0 0 4px #FBFAF8;"></span><div style="flex:1;border:1px solid #ECE8DF;border-radius:14px;padding:15px 17px;"><div style="font-size:11px;font-weight:600;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:2px 9px;display:inline-block;margin-bottom:6px;">TOPIC</div><div style="font-size:15px;font-weight:600;color:#22201A;">User research insights</div></div></div>
+                  <div style="display:flex;gap:16px;align-items:flex-start;position:relative;"><span style="width:40px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A296;text-align:right;padding-top:14px;">18:33</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:14px;box-shadow:0 0 0 4px #FBFAF8;"></span><div style="flex:1;background:#F3F7EC;border:1px solid #E1EBCD;border-radius:14px;padding:15px 17px;"><div style="font-size:11px;font-weight:600;color:#fff;background:#6FA83C;border-radius:20px;padding:2px 9px;display:inline-block;margin-bottom:6px;">DECISION</div><div style="font-size:15px;font-weight:600;color:#22201A;">Focus on mid-market expansion</div></div></div>
+                  <div style="display:flex;gap:16px;align-items:flex-start;position:relative;"><span style="width:40px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A296;text-align:right;padding-top:14px;">34:22</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:14px;box-shadow:0 0 0 4px #FBFAF8;"></span><div style="flex:1;border:1px solid #ECE8DF;border-radius:14px;padding:15px 17px;"><div style="font-size:11px;font-weight:600;color:#B67C22;background:#FBF1DC;border-radius:20px;padding:2px 9px;display:inline-block;margin-bottom:6px;">ACTIONS</div><div style="font-size:15px;font-weight:600;color:#22201A;">Action items reviewed</div></div></div>
+                </div>
+              </div>
+            </div>
+            <div data-panel="transcript" style="display:none;flex:1;overflow:hidden;padding-top:4px;">
+              <div style="display:flex;flex-direction:column;gap:20px;max-width:660px;">
+                <div style="display:flex;gap:14px;"><span style="width:32px;height:32px;flex:none;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;"><span style="font-size:14.5px;font-weight:600;color:#22201A;">Maya</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#B8B2A6;">04:12</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#54544C;">From our user interviews, the biggest friction point is onboarding. Users need faster time-to-value.</p></div></div>
+                <div style="display:flex;gap:14px;"><span style="width:32px;height:32px;flex:none;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;">AL</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;"><span style="font-size:14.5px;font-weight:600;color:#22201A;">Alex</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#B8B2A6;">04:35</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#54544C;">I propose we build an onboarding flow that gets users to their first <span style="background:#EFF4E6;border-radius:4px;padding:1px 4px;">"aha" moment in under 5 minutes</span>.</p></div></div>
+              </div>
+            </div>
+            <div data-panel="ask" style="display:none;flex:1;overflow:hidden;padding-top:4px;">
+              <div style="display:flex;flex-direction:column;gap:18px;max-width:640px;">
+                <div style="display:flex;justify-content:flex-end;"><div style="background:#EFF4E6;border:1px solid #E1EBCD;border-radius:16px 16px 5px 16px;padding:12px 16px;font-size:14.5px;color:#3C3830;">What did we decide about the roadmap?</div></div>
+                <div style="display:flex;gap:12px;"><span style="width:30px;height:30px;flex:none;border-radius:9px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;"><svg width="17" height="20" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="20" stroke-linejoin="round"></path><g fill="#111111"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg></span><div style="background:#fff;border:1px solid #ECE8DF;border-radius:16px;padding:15px 17px;font-size:14.5px;line-height:1.65;color:#3C3830;">We decided to focus on <strong style="font-weight:600;">mid-market expansion</strong> and launch the analytics beta in July, deprioritizing legacy reporting.</div></div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5c" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5c</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Timeline tab</span>
+      <span style="font-size:13px;color:#8A8D80;">The conversation as it unfolded, with moments and decisions</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FBFAF8;box-shadow:0 40px 90px -34px rgba(40,36,26,.3),0 8px 24px -14px rgba(40,36,26,.13);border:1px solid #EAE6DD;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #EFEBE2;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FBFAF8;">
+          <div style="padding:28px 40px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;"><h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-.01em;color:#1D1D1B;font-family:'Newsreader',serif;">Product Strategy Sync</h1><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#C4C4BA" stroke-width="1.75"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.9 6.6 20l1-6.1L3.2 9.5l6.1-.9z"></path></svg></div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:11px;font-size:13.5px;color:#8A8A82;"><span>Today, 10:30 AM</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>48m</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path><circle cx="17" cy="8.5" r="2.6"></circle><path d="M16 19a6 6 0 0 0-2-4.5"></path></svg>6 people</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex:none;">
+                <div style="display:flex;"><span style="width:30px;height:30px;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;">MA</span><span style="width:30px;height:30px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">DA</span><span style="width:30px;height:30px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">AL</span></div>
+                <button style="border:1px solid #E4E4DE;background:#fff;color:#3C3C38;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Share</button>
+                <button style="width:36px;height:36px;border:1px solid #E4E4DE;background:#fff;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#8A8A82"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:28px;margin-top:22px;border-bottom:1px solid #ECE8DF;">
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Overview</div>
+              <div style="padding-bottom:13px;font-size:14.5px;font-weight:600;color:#1D1D1B;border-bottom:2px solid #6FA83C;margin-bottom:-1px;">Timeline</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Transcript</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Ask</div>
+            </div>
+          </div>
+          <div style="flex:1;overflow:hidden;padding:28px 40px;">
+            <div style="max-width:820px;position:relative;">
+              <div style="position:absolute;left:63px;top:10px;bottom:10px;width:1.5px;background:#EAEAE4;"></div>
+              <div style="display:flex;flex-direction:column;gap:20px;">
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:5px;">00:00</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#fff;border:2.5px solid #C4C4BA;margin-top:5px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;padding-top:1px;"><div style="font-size:15px;font-weight:600;color:#232320;">Meeting started</div></div></div>
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:16px;">04:12</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:16px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;border:1px solid #ECE8DF;border-radius:14px;padding:16px 18px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:2px 9px;">TOPIC</span><span style="font-size:15px;font-weight:600;color:#232320;">User research insights</span></div><p style="margin:0;font-size:14px;line-height:1.6;color:#54544C;">The biggest friction point is onboarding — users need faster time-to-value.</p><div style="display:flex;align-items:center;gap:7px;margin-top:11px;"><span style="width:20px;height:20px;border-radius:50%;background:#C58B3E;color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><span style="font-size:12.5px;color:#8A8A82;">Maya</span></div></div></div>
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:16px;">12:45</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:16px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;border:1px solid #ECE8DF;border-radius:14px;padding:16px 18px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:2px 9px;">TOPIC</span><span style="font-size:15px;font-weight:600;color:#232320;">Pricing strategy discussion</span></div><p style="margin:0;font-size:14px;line-height:1.6;color:#54544C;">Debated pricing experiments and where to run them first.</p><div style="display:flex;align-items:center;gap:7px;margin-top:11px;"><span style="width:20px;height:20px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;">AL</span><span style="font-size:12.5px;color:#8A8A82;">Alex</span></div></div></div>
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:16px;">18:33</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:16px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;background:#F3F7EC;border:1px solid #E1EBCD;border-radius:14px;padding:16px 18px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#fff;background:#6FA83C;border-radius:20px;padding:2px 9px;">DECISION</span><span style="font-size:15px;font-weight:600;color:#232320;">Focus on mid-market expansion</span></div><p style="margin:0;font-size:14px;line-height:1.6;color:#54544C;">Agreed to prioritize mid-market over enterprise for the next two quarters.</p></div></div>
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:16px;">28:10</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:16px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;border:1px solid #ECE8DF;border-radius:14px;padding:16px 18px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:2px 9px;">TOPIC</span><span style="font-size:15px;font-weight:600;color:#232320;">Analytics beta timeline</span></div><p style="margin:0;font-size:14px;line-height:1.6;color:#54544C;">Targeting a July launch for the analytics beta.</p><div style="display:flex;align-items:center;gap:7px;margin-top:11px;"><span style="width:20px;height:20px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;">DA</span><span style="font-size:12.5px;color:#8A8A82;">Daniel</span></div></div></div>
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:16px;">34:22</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#6FA83C;margin-top:16px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;border:1px solid #ECE8DF;border-radius:14px;padding:16px 18px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#B67C22;background:#FBF1DC;border-radius:20px;padding:2px 9px;">ACTIONS</span><span style="font-size:15px;font-weight:600;color:#232320;">Action items reviewed</span></div><p style="margin:0;font-size:14px;line-height:1.6;color:#54544C;">Assigned owners for pricing experiments, onboarding v2, and the enterprise one-pager.</p></div></div>
+                <div style="display:flex;gap:18px;align-items:flex-start;position:relative;"><span style="width:48px;flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#A8A89E;text-align:right;padding-top:5px;">48:15</span><span style="width:11px;height:11px;flex:none;border-radius:50%;background:#fff;border:2.5px solid #C4C4BA;margin-top:5px;box-shadow:0 0 0 4px #fff;"></span><div style="flex:1;padding-top:1px;"><div style="font-size:15px;font-weight:600;color:#232320;">Meeting wrap-up</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5d" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5d</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Transcript tab</span>
+      <span style="font-size:13px;color:#8A8D80;">Full transcript synced to playback, with searchable chapters</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FBFAF8;box-shadow:0 40px 90px -34px rgba(40,36,26,.3),0 8px 24px -14px rgba(40,36,26,.13);border:1px solid #EAE6DD;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #EFEBE2;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FBFAF8;">
+          <div style="padding:28px 32px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;"><h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-.01em;color:#1D1D1B;font-family:'Newsreader',serif;">Product Strategy Sync</h1><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#C4C4BA" stroke-width="1.75"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.9 6.6 20l1-6.1L3.2 9.5l6.1-.9z"></path></svg></div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:11px;font-size:13.5px;color:#8A8A82;"><span>Today, 10:30 AM</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>48m</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path><circle cx="17" cy="8.5" r="2.6"></circle><path d="M16 19a6 6 0 0 0-2-4.5"></path></svg>6 people</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex:none;">
+                <div style="display:flex;"><span style="width:30px;height:30px;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;">MA</span><span style="width:30px;height:30px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">DA</span><span style="width:30px;height:30px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">AL</span></div>
+                <button style="border:1px solid #E4E4DE;background:#fff;color:#3C3C38;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Share</button>
+                <button style="width:36px;height:36px;border:1px solid #E4E4DE;background:#fff;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#8A8A82"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:28px;margin-top:22px;border-bottom:1px solid #ECE8DF;">
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Overview</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Timeline</div>
+              <div style="padding-bottom:13px;font-size:14.5px;font-weight:600;color:#1D1D1B;border-bottom:2px solid #6FA83C;margin-bottom:-1px;">Transcript</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Ask</div>
+            </div>
+          </div>
+
+          <!-- player -->
+          <div style="margin:20px 32px 0;background:#FBFAF8;border:1px solid #ECE8DF;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;">
+            <button style="width:40px;height:40px;flex:none;border-radius:50%;background:#232320;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"></path></svg></button>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A82;flex:none;">04:35</span>
+            <div style="flex:1;height:5px;background:#EAEAE4;border-radius:3px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:9.5%;background:#6FA83C;border-radius:3px;"></div><span style="position:absolute;left:9.5%;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:#6FA83C;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></span></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A82;flex:none;">48:15</span>
+            <span style="font-size:12px;font-weight:600;color:#54544C;border:1px solid #E4E4DE;border-radius:7px;padding:4px 9px;flex:none;">1x</span>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:22px 32px 28px;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;gap:14px;opacity:.5;"><span style="width:34px;height:34px;flex:none;border-radius:50%;background:#C58B3E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:5px;"><span style="font-size:14.5px;font-weight:600;color:#232320;">Maya</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#B6B6AC;">04:12</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#54544C;max-width:640px;">From our user interviews, the biggest friction point is onboarding. Users need faster time-to-value.</p></div></div>
+            <div style="display:flex;gap:14px;opacity:.5;"><span style="width:34px;height:34px;flex:none;border-radius:50%;background:#8B6FC5;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;">DA</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:5px;"><span style="font-size:14.5px;font-weight:600;color:#232320;">Daniel</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#B6B6AC;">04:28</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#54544C;max-width:640px;">That aligns with the data we're seeing.</p></div></div>
+            <div style="display:flex;gap:14px;position:relative;"><span style="position:absolute;left:-32px;top:5px;bottom:5px;width:3px;border-radius:3px;background:#6FA83C;"></span><span style="width:34px;height:34px;flex:none;border-radius:50%;background:#4A9BB5;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;">AL</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:5px;"><span style="font-size:14.5px;font-weight:600;color:#232320;">Alex</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6FA83C;">04:35 · now playing</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#2A2A26;max-width:640px;">I propose we build an onboarding flow that gets users to their first <span style="background:#EFF4E6;border-radius:4px;padding:1px 4px;">"aha" moment in under 5 minutes</span>. If we nail that, activation follows.</p></div></div>
+            <div style="display:flex;gap:14px;"><span style="width:34px;height:34px;flex:none;border-radius:50%;background:#C58B3E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;">MA</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:5px;"><span style="font-size:14.5px;font-weight:600;color:#232320;">Maya</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#B6B6AC;">05:02</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#54544C;max-width:640px;">Agreed. Let's make the first session the whole onboarding — no separate tour.</p></div></div>
+            <div style="display:flex;gap:14px;"><span style="width:34px;height:34px;flex:none;border-radius:50%;background:#4A9BB5;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;">AL</span><div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:5px;"><span style="font-size:14.5px;font-weight:600;color:#232320;">Alex</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#B6B6AC;">05:19</span></div><p style="margin:0;font-size:15px;line-height:1.7;color:#54544C;max-width:640px;">I'll draft pricing experiments to run alongside so we learn on both fronts.</p></div></div>
+          </div>
+        </div>
+
+        <!-- right rail: chapters -->
+        <div style="width:272px;flex:none;background:#FBFAF8;border-left:1px solid #EFEBE2;display:flex;flex-direction:column;padding:24px 20px;">
+          <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E6E6E0;border-radius:11px;padding:9px 12px;margin-bottom:20px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg><span style="font-size:13px;color:#A8A89E;">Search transcript</span></div>
+          <div style="font-size:13px;font-weight:600;color:#9A9A90;margin-bottom:14px;">Chapters</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;gap:11px;padding:9px 10px;border-radius:9px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;padding-top:1px;">00:00</span><span style="font-size:13.5px;color:#3C3C38;">Intro &amp; agenda</span></div>
+            <div style="display:flex;gap:11px;padding:9px 10px;border-radius:9px;background:#EFF4E6;"><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#6FA83C;padding-top:1px;">04:12</span><span style="font-size:13.5px;font-weight:600;color:#232320;">User research insights</span></div>
+            <div style="display:flex;gap:11px;padding:9px 10px;border-radius:9px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;padding-top:1px;">12:45</span><span style="font-size:13.5px;color:#3C3C38;">Pricing strategy</span></div>
+            <div style="display:flex;gap:11px;padding:9px 10px;border-radius:9px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;padding-top:1px;">18:33</span><span style="font-size:13.5px;color:#3C3C38;">Mid-market decision</span></div>
+            <div style="display:flex;gap:11px;padding:9px 10px;border-radius:9px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;padding-top:1px;">28:10</span><span style="font-size:13.5px;color:#3C3C38;">Analytics beta</span></div>
+            <div style="display:flex;gap:11px;padding:9px 10px;border-radius:9px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#A8A89E;padding-top:1px;">34:22</span><span style="font-size:13.5px;color:#3C3C38;">Action items</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5e" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5e</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Ask tab</span>
+      <span style="font-size:13px;color:#8A8D80;">Ask anything about the meeting — grounded, cited answers</span>
+    </div>
+
+    <div style="width:1520px;height:940px;border-radius:16px;overflow:hidden;background:#FBFAF8;box-shadow:0 40px 90px -34px rgba(40,36,26,.3),0 8px 24px -14px rgba(40,36,26,.13);border:1px solid #EAE6DD;display:flex;flex-direction:column;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="height:42px;flex:none;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid #EFEBE2;"><div style="display:flex;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:#F0655A;"></span><span style="width:12px;height:12px;border-radius:50%;background:#F5BE4F;"></span><span style="width:12px;height:12px;border-radius:50%;background:#61C554;"></span></div></div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <dc-import name="AguacateChrome" hint-size="447px,100%" style="height:100%;flex:none;"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FBFAF8;">
+          <div style="padding:28px 40px 0;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;"><h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-.01em;color:#1D1D1B;font-family:'Newsreader',serif;">Product Strategy Sync</h1><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#C4C4BA" stroke-width="1.75"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.9 6.6 20l1-6.1L3.2 9.5l6.1-.9z"></path></svg></div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:11px;font-size:13.5px;color:#8A8A82;"><span>Today, 10:30 AM</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>48m</span><span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A8A89E" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path><circle cx="17" cy="8.5" r="2.6"></circle><path d="M16 19a6 6 0 0 0-2-4.5"></path></svg>6 people</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex:none;">
+                <div style="display:flex;"><span style="width:30px;height:30px;border-radius:50%;background:#C58B3E;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;">MA</span><span style="width:30px;height:30px;border-radius:50%;background:#8B6FC5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">DA</span><span style="width:30px;height:30px;border-radius:50%;background:#4A9BB5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #fff;margin-left:-8px;">AL</span></div>
+                <button style="border:1px solid #E4E4DE;background:#fff;color:#3C3C38;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;">Share</button>
+                <button style="width:36px;height:36px;border:1px solid #E4E4DE;background:#fff;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#8A8A82"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:28px;margin-top:22px;border-bottom:1px solid #ECE8DF;">
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Overview</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Timeline</div>
+              <div style="padding-bottom:13px;font-size:14.5px;color:#9A9A90;">Transcript</div>
+              <div style="padding-bottom:13px;font-size:14.5px;font-weight:600;color:#1D1D1B;border-bottom:2px solid #6FA83C;margin-bottom:-1px;">Ask</div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:26px 40px 0;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;justify-content:flex-end;"><div style="max-width:60%;background:#EFF4E6;border:1px solid #E1EBCD;border-radius:16px 16px 5px 16px;padding:13px 17px;font-size:14.5px;line-height:1.55;color:#3C3C38;">What did we decide about the product roadmap?</div></div>
+            <div style="display:flex;gap:13px;max-width:70%;">
+              <span style="width:32px;height:32px;flex:none;border-radius:9px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(125,190,58,.3);"><svg width="18" height="21" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#6FA83C" stroke-width="20" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg></span>
+              <div style="flex:1;">
+                <div style="background:#FBFAF8;border:1px solid #ECE8DF;border-radius:16px;padding:16px 18px;">
+                  <p style="margin:0;font-size:14.5px;line-height:1.65;color:#3C3C38;">We decided to focus on <strong style="font-weight:600;">mid-market expansion</strong> and launch the analytics beta in July. We also deprioritized legacy reporting to protect roadmap focus.</p>
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid #F0F0EA;">
+                    <span style="font-size:12.5px;color:#9A9A90;">Sources</span>
+                    <span style="font-size:11.5px;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:3px 10px;">18:33 Decision</span>
+                    <span style="font-size:11.5px;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:3px 10px;">28:10 Analytics</span>
+                    <div style="flex:1;"></div>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#B0B0A6" stroke-width="1.75"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 16.8 20H7"></path></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#B0B0A6" stroke-width="1.75"><path d="M17 13V4h3v9zM17 13l-4 8a2 2 0 0 1-2-2v-4H6a2 2 0 0 1-2-2.3l1.2-6A2 2 0 0 1 7.2 4H17"></path></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;"><div style="max-width:60%;background:#EFF4E6;border:1px solid #E1EBCD;border-radius:16px 16px 5px 16px;padding:13px 17px;font-size:14.5px;line-height:1.55;color:#3C3C38;">Who owns the onboarding work?</div></div>
+            <div style="display:flex;gap:13px;max-width:70%;">
+              <span style="width:32px;height:32px;flex:none;border-radius:9px;background:#EFF4E6;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(125,190,58,.3);"><svg width="18" height="21" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#6FA83C" stroke-width="20" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg></span>
+              <div style="flex:1;"><div style="background:#FBFAF8;border:1px solid #ECE8DF;border-radius:16px;padding:16px 18px;"><p style="margin:0;font-size:14.5px;line-height:1.65;color:#3C3C38;"><strong style="font-weight:600;">Maya L.</strong> owns building onboarding flow v2, due next week. Alex R. is running the supporting pricing experiments.</p><div style="display:flex;align-items:center;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid #F0F0EA;"><span style="font-size:12.5px;color:#9A9A90;">Sources</span><span style="font-size:11.5px;color:#6FA83C;background:#EFF4E6;border-radius:20px;padding:3px 10px;">34:22 Actions</span></div></div></div>
+            </div>
+          </div>
+
+          <div style="padding:18px 40px 26px;">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+              <span style="font-size:12.5px;color:#54544C;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">What are the risks?</span>
+              <span style="font-size:12.5px;color:#54544C;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">Summarize the pricing discussion</span>
+              <span style="font-size:12.5px;color:#54544C;border:1px solid #E4E4DE;border-radius:20px;padding:6px 13px;">What's still unresolved?</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E0E0DA;border-radius:14px;padding:13px 16px;box-shadow:0 2px 10px -6px rgba(30,34,20,.12);">
+              <span style="font-size:14.5px;color:#A8A89E;flex:1;">Ask a question about this meeting…</span>
+              <button style="width:34px;height:34px;border-radius:10px;background:#232320;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="1.75"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5f" style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5f</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Home — brand / marketing panel</span>
+      <span style="font-size:13px;color:#8A8D80;">The story: capture → grow → knowledge</span>
+    </div>
+
+    <div style="width:620px;background:#FBFAF8;border:1px solid #EAE6DD;border-radius:24px;padding:52px 48px;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="30" height="35" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="50.5" y="141" width="11" height="38" rx="5.5"></rect><rect x="68.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="140.5" y="130" width="11" height="60" rx="5.5"></rect><rect x="158.5" y="141" width="11" height="38" rx="5.5"></rect></g></svg>
+        <span style="font-size:24px;font-weight:500;letter-spacing:-.01em;color:#232320;font-family:'Newsreader',serif;">Aguacate</span>
+      </div>
+
+      <h1 style="margin:34px 0 0;font-size:48px;line-height:1.12;font-weight:500;letter-spacing:-.02em;color:#1D1D1B;font-family:'Newsreader',serif;">Every conversation <em style="font-style:italic;color:#6FA83C;">grows</em> into knowledge.</h1>
+      <p style="margin:20px 0 0;font-size:17px;line-height:1.6;color:#7A7A72;max-width:400px;">A calm, intelligent workspace for your meetings.</p>
+
+      <div style="display:flex;justify-content:center;padding:38px 0;">
+        <svg width="180" height="210" viewBox="0 0 220 256"><path d="M110 22 C 90 22 72 40 64 72 C 53 108 26 132 26 170 C 26 212 64 240 110 240 C 156 240 194 212 194 170 C 194 132 167 108 156 72 C 148 40 130 22 110 22 Z" fill="#F3F8EC" stroke="#7DBE3A" stroke-width="9" stroke-linejoin="round"></path><g fill="#2A2A26"><rect x="50.5" y="141" width="11" height="38" rx="5.5"></rect><rect x="68.5" y="128" width="11" height="64" rx="5.5"></rect><rect x="86.5" y="114" width="11" height="92" rx="5.5"></rect><rect x="104.5" y="104" width="11" height="112" rx="5.5"></rect><rect x="122.5" y="114" width="11" height="92" rx="5.5"></rect><rect x="140.5" y="128" width="11" height="64" rx="5.5"></rect><rect x="158.5" y="141" width="11" height="38" rx="5.5"></rect></g></svg>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;letter-spacing:.02em;color:#232320;margin-bottom:14px;">Signature Moments</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #ECE8DF;border-radius:16px;padding:16px 20px;">
+          <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#232320;">1 · Recording</div><div style="font-size:13px;color:#8A8A82;margin-top:3px;">We listen. You focus.</div></div>
+          <div style="width:120px;height:26px;display:flex;align-items:center;gap:2px;">
+            <sc-for list="{{ waveNote }}" as="b" hint-placeholder-count="58"><div style="{{ b.style }}"></div></sc-for>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #ECE8DF;border-radius:16px;padding:16px 20px;">
+          <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#232320;">2 · Processing</div><div style="font-size:13px;color:#8A8A82;margin-top:3px;">We grow your conversation.</div></div>
+          <div style="width:56px;height:56px;position:relative;display:flex;align-items:center;justify-content:center;">
+            <svg width="56" height="56" viewBox="0 0 56 56" style="position:absolute;animation:agSpin 12s linear infinite;"><circle cx="28" cy="28" r="25" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#CFE6AE" stroke-width="1.5" stroke-dasharray="1.5 8" stroke-linecap="round"></circle></svg>
+            <svg width="30" height="35" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round"></path><g fill="#111111"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #ECE8DF;border-radius:16px;padding:16px 20px;">
+          <div style="flex:1;"><div style="font-size:14.5px;font-weight:600;color:#232320;">3 · Ready</div><div style="font-size:13px;color:#8A8A82;margin-top:3px;">Your conversation has grown.</div></div>
+          <div style="width:170px;background:#FBFAF8;border:1px solid #E7E2D6;border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#232320;">Product Strategy Sync</div><div style="font-size:10.5px;color:#9A9A90;margin-top:2px;">Today · 10:30 AM</div></div>
+            <span style="width:15px;height:15px;flex:none;border-radius:50%;background:#6FA83C;display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="3.5"><path d="M20 6L9 17l-5-5"></path></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:38px;padding-top:26px;border-top:1px solid #EAEAE4;">
+        <p style="margin:0;font-size:21px;line-height:1.5;font-style:italic;color:#3C3C38;font-family:'Newsreader',serif;">"This is the home for our most important conversations."</p>
+        <div style="font-size:13px;color:#9A9A90;margin-top:12px;">— Product Team</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="5b" style="display:flex;flex-direction:column;gap:18px;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff;background:#6FA83C;padding:5px 10px;border-radius:6px;letter-spacing:.05em;">5b</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#16180F;font-family:'Newsreader',serif;">Signature moments — feature states</span>
+      <span style="font-size:13px;color:#8A8D80;">Recording · Processing · Transcript with playback · Ask</span>
+    </div>
+
+    <div style="display:flex;gap:22px;align-items:stretch;">
+
+      <!-- Recording -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <span style="font-size:13px;color:#8A8A82;">Recording</span>
+        <div style="width:340px;height:430px;background:#fff;border:1px solid #EAE6DD;border-radius:20px;display:flex;flex-direction:column;align-items:center;padding:30px 24px;box-shadow:0 20px 50px -30px rgba(30,34,20,.2);">
+          <div style="text-align:center;"><div style="font-size:15px;font-weight:600;color:#232320;">Product Strategy Sync</div><div style="font-size:13px;color:#9A9A90;margin-top:3px;">10:30 AM</div></div>
+          <div style="flex:1;display:flex;align-items:center;">
+            <svg width="118" height="138" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="12" stroke-linejoin="round"></path><g fill="#111111"><rect x="52.5" y="141" width="10" height="38" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out 0s infinite;"></rect><rect x="70.5" y="126" width="10" height="68" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out .16s infinite;"></rect><rect x="88.5" y="112" width="10" height="96" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out .3s infinite;"></rect><rect x="106.5" y="104" width="10" height="112" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out .44s infinite;"></rect><rect x="124.5" y="112" width="10" height="96" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out .3s infinite;"></rect><rect x="142.5" y="126" width="10" height="68" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out .16s infinite;"></rect><rect x="160.5" y="141" width="10" height="38" rx="5" style="transform-box:fill-box;transform-origin:center;animation:agBar 0.9s ease-in-out 0s infinite;"></rect></g></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:18px;">
+            <button style="width:44px;height:44px;border-radius:50%;background:#F4F4F1;border:1px solid #EAE6DD;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#54544C" stroke-width="1.75"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+            <button style="width:44px;height:44px;border-radius:50%;background:#F4F4F1;border:1px solid #EAE6DD;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#54544C"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+            <button style="width:52px;height:52px;border-radius:50%;background:#EF5A4E;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -6px rgba(239,90,78,.55);"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="6" width="12" height="12" rx="2.5"></rect></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processing -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <span style="font-size:13px;color:#8A8A82;">Processing</span>
+        <div style="width:340px;height:430px;background:#fff;border:1px solid #EAE6DD;border-radius:20px;display:flex;flex-direction:column;align-items:center;padding:30px 24px;box-shadow:0 20px 50px -30px rgba(30,34,20,.2);">
+          <div style="text-align:center;"><div style="font-size:15px;font-weight:600;color:#232320;">Product Strategy Sync</div><div style="font-size:13px;color:#9A9A90;margin-top:3px;">10:30 AM</div></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;position:relative;">
+            <svg width="188" height="188" viewBox="0 0 188 188" style="position:absolute;animation:agSpin 14s linear infinite;"><circle cx="94" cy="94" r="86" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#CFE6AE" stroke-width="1.75" stroke-dasharray="2 12" stroke-linecap="round"></circle></svg>
+            <svg width="150" height="150" viewBox="0 0 150 150" style="position:absolute;animation:agSpin 10s linear infinite reverse;"><circle cx="75" cy="75" r="68" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#DDECC6" stroke-width="1.75" stroke-dasharray="2 16" stroke-linecap="round"></circle></svg>
+            <svg width="86" height="100" viewBox="0 0 220 256" style="position:relative;"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="14" stroke-linejoin="round"></path><g fill="#111111"><rect x="70.5" y="126" width="10" height="68" rx="5"></rect><rect x="88.5" y="112" width="10" height="96" rx="5"></rect><rect x="106.5" y="104" width="10" height="112" rx="5"></rect><rect x="124.5" y="112" width="10" height="96" rx="5"></rect><rect x="142.5" y="126" width="10" height="68" rx="5"></rect></g></svg>
+          </div>
+          <div style="text-align:center;margin-bottom:14px;"><div style="font-size:16px;font-weight:500;color:#232320;font-family:'Newsreader',serif;">Growing your meeting…</div><div style="font-size:12.5px;color:#A8A89E;margin-top:6px;">This usually takes about 30 seconds.</div></div>
+        </div>
+      </div>
+
+      <!-- Transcript with Playback -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <span style="font-size:13px;color:#8A8A82;">Transcript with Playback</span>
+        <div style="width:380px;height:430px;background:#fff;border:1px solid #EAE6DD;border-radius:20px;display:flex;flex-direction:column;padding:20px 22px;box-shadow:0 20px 50px -30px rgba(30,34,20,.2);overflow:hidden;">
+          <div style="display:flex;gap:20px;font-size:13px;border-bottom:1px solid #ECE8DF;padding-bottom:12px;"><span style="color:#9A9A90;">Overview</span><span style="color:#9A9A90;">Timeline</span><span style="color:#1D1D1B;font-weight:600;border-bottom:2px solid #6FA83C;padding-bottom:12px;margin-bottom:-13px;">Transcript</span><span style="color:#9A9A90;">Ask</span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:16px 0;border-bottom:1px solid #F2F2ED;">
+            <button style="width:34px;height:34px;flex:none;border-radius:50%;background:#232320;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"></path></svg></button>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8A8A82;">04:12</span>
+            <div style="flex:1;height:4px;background:#EEEEE9;border-radius:2px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:22%;background:#6FA83C;border-radius:2px;"></div><span style="position:absolute;left:22%;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:#6FA83C;border:2px solid #fff;"></span></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8A8A82;">48:15</span>
+            <span style="font-size:11.5px;font-weight:600;color:#54544C;border:1px solid #E4E4DE;border-radius:6px;padding:3px 7px;">1x</span>
+          </div>
+          <div style="flex:1;overflow:hidden;padding-top:16px;display:flex;flex-direction:column;gap:15px;">
+            <div style="display:flex;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A8A89E;width:34px;flex:none;padding-top:2px;">04:12</span><div><div style="font-size:13px;font-weight:600;color:#232320;">Maya</div><p style="margin:3px 0 0;font-size:13px;line-height:1.55;color:#54544C;">From our user interviews, the biggest friction point is onboarding. Users need faster time-to-value.</p></div></div>
+            <div style="display:flex;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A8A89E;width:34px;flex:none;padding-top:2px;">04:28</span><div><div style="font-size:13px;font-weight:600;color:#232320;">Daniel</div><p style="margin:3px 0 0;font-size:13px;line-height:1.55;color:#54544C;">That aligns with the data we're seeing.</p></div></div>
+            <div style="display:flex;gap:10px;"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A8A89E;width:34px;flex:none;padding-top:2px;">04:35</span><div><div style="font-size:13px;font-weight:600;color:#232320;">Alex</div><p style="margin:3px 0 0;font-size:13px;line-height:1.55;color:#54544C;">I propose we build an onboarding flow that gets users to their first "aha" moment in under 5 minutes.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ask -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <span style="font-size:13px;color:#8A8A82;">Ask about this meeting</span>
+        <div style="width:360px;height:430px;background:#fff;border:1px solid #EAE6DD;border-radius:20px;display:flex;flex-direction:column;padding:20px 22px;box-shadow:0 20px 50px -30px rgba(30,34,20,.2);overflow:hidden;">
+          <div style="display:flex;gap:20px;font-size:13px;border-bottom:1px solid #ECE8DF;padding-bottom:12px;"><span style="color:#9A9A90;">Overview</span><span style="color:#9A9A90;">Timeline</span><span style="color:#9A9A90;">Transcript</span><span style="color:#1D1D1B;font-weight:600;border-bottom:2px solid #6FA83C;padding-bottom:12px;margin-bottom:-13px;">Ask</span></div>
+          <div style="flex:1;overflow:hidden;padding-top:16px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;justify-content:flex-end;"><div style="max-width:78%;background:#EFF4E6;border:1px solid #E1EBCD;border-radius:14px 14px 4px 14px;padding:11px 14px;font-size:13px;line-height:1.5;color:#3C3C38;">What did we decide about the product roadmap?</div></div>
+            <div style="background:#FBFAF8;border:1px solid #ECE8DF;border-radius:14px;padding:14px;">
+              <p style="margin:0;font-size:13px;line-height:1.6;color:#3C3C38;">We decided to focus on mid-market expansion and launch the analytics beta in July. We also deprioritized legacy reporting.</p>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid #F0F0EA;">
+                <span style="font-size:12px;color:#9A9A90;">Sources</span><span style="width:20px;height:20px;border-radius:6px;background:#EFF4E6;color:#6FA83C;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;">2</span>
+                <div style="flex:1;"></div>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#B0B0A6" stroke-width="1.75"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 16.8 20H7"></path></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#B0B0A6" stroke-width="1.75"><path d="M17 13V4h3v9zM17 13l-4 8a2 2 0 0 1-2-2v-4H6a2 2 0 0 1-2-2.3l1.2-6A2 2 0 0 1 7.2 4H17"></path></svg>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E4E4DE;border-radius:12px;padding:10px 13px;">
+            <span style="font-size:13px;color:#A8A89E;flex:1;">Ask a question…</span>
+            <button style="width:28px;height:28px;border-radius:8px;background:#232320;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="1.75"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    setTimeout(() => {
+      const els = [...document.querySelectorAll('[data-rise]')];
+      els.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(16px)';
+        el.style.transition = 'opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1)';
+        el.style.transitionDelay = (el.getAttribute('data-rise') || 0) + 'ms';
+        el._shown = false;
+      });
+      const hide = el => { el._shown = false; el.style.opacity = '0'; el.style.transform = 'translateY(24px)'; };
+      const show = el => { el._shown = true; el.style.opacity = '1'; el.style.transform = 'none'; };
+      const check = () => {
+        const vh = window.innerHeight || 800;
+        els.forEach(el => {
+          const r = el.getBoundingClientRect();
+          const inView = r.top < vh * 0.85 && r.bottom > vh * 0.06;
+          if (inView && !el._shown) show(el);
+          else if (!inView && el._shown && (r.bottom < 0 || r.top > vh)) hide(el);
+        });
+        requestAnimationFrame(check);
+      };
+      els.forEach(el => { el.style.transform = 'translateY(24px)'; });
+      requestAnimationFrame(check);
+    }, 80);
+  }
+  buildWave(playedColor, mutedColor, playedFrac) {
+    const n = 46, arr = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / n;
+      const env = Math.sin(t * Math.PI);
+      const noise = Math.sin(i * 1.7) + Math.sin(i * 0.6) * 0.7 + Math.sin(i * 3.1) * 0.45;
+      let h = 22 + env * 52 + noise * 12;
+      h = Math.max(10, Math.min(98, h));
+      const played = t < playedFrac;
+      arr.push({ style: { flex: '1 1 0', minWidth: '2px', height: h + '%', borderRadius: '2px', background: played ? playedColor : mutedColor, alignSelf: 'center' } });
+    }
+    return arr;
+  }
+  buildWaveGlow(playedFrac) {
+    const n = 58, arr = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / n;
+      const env = Math.sin(t * Math.PI);
+      const noise = Math.sin(i * 1.7) + Math.sin(i * 0.6) * 0.7 + Math.sin(i * 3.1) * 0.45 + Math.sin(i * 5.3) * 0.3;
+      let h = 16 + env * 56 + noise * 11;
+      h = Math.max(7, Math.min(100, h));
+      const played = t < playedFrac;
+      arr.push({ style: {
+        flex: '1 1 0', minWidth: '2px', height: h + '%', borderRadius: '3px', alignSelf: 'center',
+        background: played ? 'linear-gradient(180deg,#CDFA82,#8FD93F)' : 'rgba(255,255,255,.10)',
+        boxShadow: played ? '0 0 9px rgba(166,232,90,.65)' : 'none',
+      } });
+    }
+    return arr;
+  }
+  toggleCheck(e) {
+    const box = e.currentTarget;
+    const label = box.parentElement.querySelector('span[style*="flex:1"]');
+    if (box.getAttribute('data-on') !== '1') {
+      box.setAttribute('data-on', '1');
+      box.style.background = '#6FA83C'; box.style.borderColor = '#6FA83C';
+      box.style.display = 'flex'; box.style.alignItems = 'center'; box.style.justifyContent = 'center';
+      box.style.animation = 'agPop .4s cubic-bezier(.34,1.56,.64,1)';
+      box.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="3.5"><path d="M20 6L9 17l-5-5"></path></svg>';
+      if (label) { label.style.color = '#9A9488'; label.style.textDecoration = 'line-through'; }
+    } else {
+      box.setAttribute('data-on', '0');
+      box.style.background = 'transparent'; box.style.borderColor = '#B8C89E';
+      box.style.animation = ''; box.innerHTML = '';
+      if (label) { label.style.color = '#2A2A26'; label.style.textDecoration = 'none'; }
+    }
+  }
+  switchTab(e) {
+    const t = e.currentTarget;
+    const tab = t.getAttribute('data-tab');
+    const root = t.closest('[data-tabs-root]');
+    if (!root) return;
+    root.querySelectorAll('[data-tab]').forEach(x => {
+      const on = x === t;
+      x.style.color = on ? '#22201A' : '#9A9488';
+      x.style.fontWeight = on ? '600' : '400';
+      x.style.borderBottom = on ? '2px solid #6FA83C' : '2px solid transparent';
+    });
+    const panels = root.querySelector('[data-panels]');
+    panels.style.opacity = '0';
+    clearTimeout(this._pt);
+    this._pt = setTimeout(() => {
+      panels.querySelectorAll('[data-panel]').forEach(p => { p.style.display = p.getAttribute('data-panel') === tab ? '' : 'none'; });
+      panels.style.opacity = '1';
+    }, 200);
+  }
+  renderVals() {
+    return {
+      switchTab: (e) => this.switchTab(e),
+      toggleCheck: (e) => this.toggleCheck(e),
+      waveA: this.buildWave('#5F9E2B', '#DAD8CE', 0.36),
+      waveB: this.buildWave('#A6E85A', '#2A2D24', 0.36),
+      waveC: this.buildWave('#14161A', '#D6D9DE', 0.36),
+      waveHero: this.buildWaveGlow(0.42),
+      waveHeroLight: this.buildWaveGlowLight(0.42),
+      waveNote: this.buildWaveGlowLight(0.28),
+      liveBars: this.buildLiveBars(),
+      chartBars: this.buildChart(),
+    };
+  }
+  buildLiveBars() {
+    const n = 46, arr = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const env = Math.sin(t * Math.PI);
+      const noise = Math.sin(i * 1.6) + Math.sin(i * 0.7) * 0.6 + Math.sin(i * 3.3) * 0.4;
+      let h = 22 + env * 58 + noise * 12;
+      h = Math.max(12, Math.min(100, h));
+      const dur = (0.7 + (Math.sin(i * 2.1) + 1) * 0.35).toFixed(2);
+      const delay = (i * 0.045).toFixed(2);
+      arr.push({ style: {
+        flex: '1 1 0', minWidth: '3px', height: h + '%', borderRadius: '5px', alignSelf: 'center',
+        background: 'linear-gradient(180deg,#8FD93F,#2FB4A6)',
+        transformOrigin: 'center',
+        animation: `agBar ${dur}s ease-in-out ${delay}s infinite`,
+      } });
+    }
+    return arr;
+  }
+  buildChart() {
+    const heights = [34, 48, 40, 62, 55, 78, 70, 88, 74, 96, 90, 82];
+    const cols = ['#6FB63C', '#2FB4A6', '#4C86E8', '#8B6FC5', '#EF7C8E', '#E5A94E'];
+    return heights.map((h, i) => ({
+      h,
+      style: {
+        flex: '1 1 0', height: h + '%', borderRadius: '7px 7px 3px 3px', alignSelf: 'flex-end',
+        background: `linear-gradient(180deg,${cols[i % cols.length]},${cols[(i + 1) % cols.length]})`,
+      },
+    }));
+  }
+  buildWaveGlowLight(playedFrac) {
+    const n = 58, arr = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / n;
+      const env = Math.sin(t * Math.PI);
+      const noise = Math.sin(i * 1.7) + Math.sin(i * 0.6) * 0.7 + Math.sin(i * 3.1) * 0.45 + Math.sin(i * 5.3) * 0.3;
+      let h = 16 + env * 56 + noise * 11;
+      h = Math.max(7, Math.min(100, h));
+      const played = t < playedFrac;
+      arr.push({ style: {
+        flex: '1 1 0', minWidth: '2px', height: h + '%', borderRadius: '3px', alignSelf: 'center',
+        background: played ? 'linear-gradient(180deg,#8FD93F,#5F9E2B)' : 'rgba(20,24,12,.13)',
+        boxShadow: played ? '0 0 7px rgba(125,190,58,.5)' : 'none',
+      } });
+    }
+    return arr;
+  }
+}
+</script>
+</body>
+</html>

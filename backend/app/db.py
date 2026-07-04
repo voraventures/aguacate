@@ -134,10 +134,16 @@ _MIGRATIONS = {
         ("coach", "TEXT"),                    # JSON coaching summary
         ("markers", "TEXT NOT NULL DEFAULT '[]'"),  # JSON [seconds,...]
         ("workspace_id", "TEXT"),             # NULL = personal, set = shared to workspace
+        ("starred", "INTEGER NOT NULL DEFAULT 0"),
     ],
     "transcripts": [("segments", "TEXT NOT NULL DEFAULT '[]'")],
     "decisions": [("status", "TEXT NOT NULL DEFAULT 'active'")],
-    "calendar_events": [("briefed", "INTEGER NOT NULL DEFAULT 0")],
+    "calendar_events": [
+        ("briefed", "INTEGER NOT NULL DEFAULT 0"),
+        ("join_url", "TEXT"),
+        ("platform", "TEXT"),
+        ("warned_5min", "INTEGER NOT NULL DEFAULT 0"),
+    ],
     "action_items": [("completed_at", "TEXT")],
 }
 

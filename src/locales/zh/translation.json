@@ -7,56 +7,34 @@
       "topics": "主题",
       "people": "人员",
       "series": "系列",
-      "conflicts": "冲突"
-    },
-    "status": {
-      "recording": "录制中",
-      "ready": "就绪",
-      "online": "在线",
-      "starting": "启动中"
-    },
-    "time": {
+      "conflicts": "冲突",
       "today": "今天",
-      "tomorrow": "明天",
-      "now": "现在",
-      "inHM": "{{h}}小时{{m}}分钟后",
-      "inM": "{{m}}分钟后"
+      "library": "资料库",
+      "search": "搜索",
+      "zero": "Meeting Zero",
+      "digest": "摘要"
     },
     "brand": {
       "pro": "Pro"
     },
-    "templateSelectTitle": "下次录制使用的笔记模板",
     "record": "录制",
     "stop": "停止",
-    "meetingCard": {
-      "next": "下一个会议",
-      "none": "未检测到即将进行的会议"
-    },
     "call": {
       "prompt": "检测到 {{app}} — 录制这次通话吗？",
       "title": "{{app}} 通话",
       "record": "立即录制",
       "dismiss": "忽略"
     },
-    "free": {
-      "planLabel": "免费方案",
-      "usage": "已使用 {{limit}} 次免费会议中的 {{used}} 次",
-      "unlock": "升级 Pro 解锁：",
-      "unlimited": "无限会议",
-      "crossMeeting": "跨会议智能分析",
-      "allIntegrations": "全部集成",
-      "upgrade": "升级到 Pro — $20/mo"
-    },
-    "myWork": {
-      "title": "我的工作",
-      "refresh": "刷新计数",
-      "openActions": "待办行动项",
-      "decisionsWeek": "本周决策",
-      "meetingsProcessed": "已处理会议"
-    },
-    "navigate": "导航",
     "toggleTheme": "切换浅色/深色",
-    "settings": "设置"
+    "settings": "设置",
+    "account": {
+      "you": "我",
+      "upgrade": "升级到 Pro"
+    },
+    "autoRecord": {
+      "min": "分钟",
+      "platformOn": "{{platform}} · 自动转录已开启"
+    }
   },
   "app": {
     "error": {
@@ -68,9 +46,7 @@
       "unreachable": "无法连接到本地引擎 — 请重启应用",
       "starting": "正在启动本地引擎…"
     },
-    "dragResize": "拖动以调整大小",
-    "expandList": "展开列表",
-    "expandMeetingList": "展开会议列表"
+    "dragResize": "拖动以调整大小"
   },
   "intel": {
     "title": {
@@ -231,11 +207,7 @@
       "themeDesc": "设置整个应用的配色方案。",
       "themes": {
         "default": "默认",
-        "dark": "深色",
-        "rose": "玫瑰色",
-        "navy": "海军蓝",
-        "warm": "暖色",
-        "neon": "霓虹"
+        "dark": "深色"
       },
       "fontSize": "字体大小",
       "fontSizeDesc": "调整整个应用的文字大小。默认为中。",
@@ -308,7 +280,12 @@
       "accessDenied": "日历访问被拒绝。请在系统设置 → 隐私与安全性 → 日历中授予访问权限。",
       "disable": "禁用",
       "enable": "启用",
-      "pollNote": "Aguacate 每 30 秒轮询一次已连接的日历，并自动合并跨日历的重复事件。首次启用 Apple Calendar 时，macOS 会请求日历权限。"
+      "pollNote": "Aguacate 每 30 秒轮询一次已连接的日历，并自动合并跨日历的重复事件。首次启用 Apple Calendar 时，macOS 会请求日历权限。",
+      "intro": "连接日历后，Aguacate 会在你加入会议的那一刻自动转录——无需手动点击录制。",
+      "autoTranscribe": "自动转录日历会议",
+      "autoTranscribeDesc": "自动加入 Zoom、Meet 和 Teams，无需确认。",
+      "notify5min": "提前 5 分钟提醒",
+      "notify5minDesc": "在自动录制的会议开始前，应用内会显示提醒横幅。"
     },
     "integrations": {
       "connected": "已连接",
@@ -480,14 +457,6 @@
       "selectMeeting": "选择一个会议",
       "selectMeetingSub": "从列表中选择一个会议以查看其笔记"
     },
-    "processing": {
-      "recording": "正在录制…",
-      "transcribingPct": "正在本地转录 — {{pct}}%",
-      "transcribing": "正在使用 Whisper 本地转录…",
-      "writing": "Claude 正在撰写你的笔记…",
-      "processing": "处理中…",
-      "audioLocal": "音频绝不离开这台 Mac。"
-    },
     "action": {
       "tbd": "待定",
       "owner": "负责人",
@@ -501,23 +470,15 @@
       "myItems": "我的事项",
       "download": "下载",
       "setNameFilter": "在设置 → 通用中设置你的名字以筛选你的事项",
-      "noneAssigned": "本次会议中没有指派给你的行动项。"
+      "noneAssigned": "本次会议中没有指派给你的行动项。",
+      "none": "这场会议没有行动项。",
+      "showMore_other": "显示还有 {{count}} 项"
     },
     "conflict": {
       "detected": "检测到冲突",
       "new": "新",
       "supersedes": "新决策取代",
       "markReviewed": "标记为已审阅"
-    },
-    "coach": {
-      "speakingDensity": "发言密度",
-      "questions": "提问",
-      "fillers": "口头禅",
-      "longSilences": "长时间沉默"
-    },
-    "transcript": {
-      "none": "没有可用的转录。",
-      "full": "完整转录"
     },
     "confirm": {
       "delete": "删除这次会议？此操作无法撤销。"
@@ -532,7 +493,8 @@
       "exportedActions": "已导出你的行动项",
       "sendingTo": "正在发送到 {{label}}…",
       "regenerating": "正在重新生成笔记…",
-      "sharedTeam": "已共享到团队工作区"
+      "sharedTeam": "已共享到团队工作区",
+      "pdfDesktopOnly": "PDF 导出仅在桌面应用中可用。"
     },
     "header": {
       "recorded": "已录制",
@@ -542,7 +504,12 @@
       "moreOptions": "更多选项",
       "shareMeeting": "共享会议",
       "shareTeam": "共享给团队",
-      "deleteMeeting": "删除会议"
+      "deleteMeeting": "删除会议",
+      "share": "分享",
+      "star": "收藏会议",
+      "unstar": "取消收藏",
+      "titleAria": "会议标题",
+      "today": "今天"
     },
     "error": {
       "processingFailed": "处理失败",
@@ -551,9 +518,10 @@
       "noNotes": "这次会议还没有笔记。"
     },
     "tab": {
-      "notes": "笔记",
       "transcript": "转录",
-      "shared": "已共享"
+      "overview": "概览",
+      "timeline": "时间线",
+      "ask": "提问"
     },
     "bar": {
       "actions": "行动项",
@@ -565,7 +533,19 @@
     "section": {
       "actionItems": "行动项",
       "keyDecisions": "关键决策",
-      "relatedMeetings": "相关会议"
+      "relatedMeetings": "相关会议",
+      "overview": "概览",
+      "actions": "行动项",
+      "decisions": "决定",
+      "questions": "待解问题",
+      "topics": "主题",
+      "discussions": "重点讨论",
+      "nextSteps": "后续步骤",
+      "compliance": "合规提示",
+      "summaryBy": "由 Aguacate 生成的摘要",
+      "noSummary": "暂无摘要。",
+      "highlight": "亮点",
+      "flaggedMoment": "已标记时刻"
     },
     "toolbar": {
       "followup": "后续跟进",
@@ -580,6 +560,9 @@
       "copyLink": "复制链接",
       "expires": "链接将在 30 天后过期。任何拥有此链接的人都可以查看这次会议的只读摘要。",
       "close": "关闭"
+    },
+    "decisions": {
+      "none": "这场会议没有记录任何决定。"
     }
   },
   "store": {
@@ -601,13 +584,310 @@
       "pulseBody_other": "{{count}} 个停滞的行动项需要关注。",
       "conflictTitle": "检测到冲突",
       "conflictBody": "一个新决策与较早的决策相矛盾。",
-      "transcriptionDoneTitle": "转录完成",
-      "transcriptionDoneBody": "Claude 正在撰写你的笔记。",
+      "transcriptionDoneTitle": "快好了",
+      "transcriptionDoneBody": "你的对话正在成形。",
       "notesReadyTitle": "笔记已就绪",
       "notesReadyBody": "你的会议笔记和行动项已可供审阅。",
       "meetingDetectedTitle": "检测到会议",
       "meetingDetectedBody": "{{title}} 即将开始。",
       "fallbackMeeting": "一个会议"
     }
+  },
+  "common": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "copy": "复制",
+    "close": "关闭",
+    "undo": "撤销",
+    "meetingDeleted": "会议已删除",
+    "loading": "加载中…"
+  },
+  "list": {
+    "title": "会议",
+    "searchPlaceholder": "搜索会议",
+    "noMatch": "没有会议匹配“{{query}}”。试试搜索人名、主题或行动项。",
+    "empty": {
+      "allHead": "还没有会议",
+      "allSub": "录制你的第一场会议开始使用"
+    },
+    "startRecording": "开始录制",
+    "menu": {
+      "more": "更多选项",
+      "options": "会议选项",
+      "delete": "删除会议"
+    },
+    "deleteTitle": "删除这场会议？",
+    "deleteBody": "“{{title}}” — 录音、转写和笔记将被移除。删除后几秒内可以撤销。",
+    "group": {
+      "today": "今天",
+      "yesterday": "昨天",
+      "week": "本周",
+      "month": "本月",
+      "earlier": "更早",
+      "upcoming": "即将开始"
+    },
+    "status": {
+      "growing": "生成中…",
+      "failed": "失败 — 打开查看详情"
+    },
+    "scopeToday": "今天",
+    "upcoming": {
+      "startingNow": "即将开始",
+      "inMinutes_other": "{{count}} 分钟后",
+      "autoTranscribe": "将自动转录"
+    }
+  },
+  "followUp": {
+    "title": "跟进邮件",
+    "tone": {
+      "professional": "正式",
+      "friendly": "亲切",
+      "concise": "简洁"
+    },
+    "draftCta": "用 Claude 起草",
+    "drafting": "起草中…",
+    "redrafting": "重新起草中…",
+    "to": "收件人",
+    "recipients": "收件人",
+    "subject": "主题",
+    "body": "正文",
+    "openInMail": "在邮件中打开",
+    "openedMail": "已在邮件客户端中打开",
+    "copied": "跟进邮件已复制到剪贴板"
+  },
+  "coach": {
+    "title": "会议教练",
+    "collapse": "收起教练",
+    "expand": "展开教练",
+    "listening": "聆听中…",
+    "speakingDensity": "发言密度",
+    "denseHint": "发言过于密集 — 给别人留些空间。",
+    "questions": "提问",
+    "fillers": "口头语",
+    "silences": "超过5秒的沉默",
+    "elapsed": "已进行",
+    "minutes": "{{count}} 分钟",
+    "noQuestionsHint": "还没有提问 — 考虑抛出一个问题。",
+    "coverage": "模板覆盖",
+    "muteTitle": "静音期间录制的是静音而非音频",
+    "muted": "已静音",
+    "muteZone": "静音区",
+    "flagMoment": "标记时刻"
+  },
+  "brief": {
+    "kicker": "会议简报",
+    "startsIn": "{{count}} 分钟后开始",
+    "talkingPoints": "建议的谈话要点",
+    "openActions": "与该小组的待办行动项",
+    "standingDecisions": "现行决定",
+    "previousMeetings": "以往会议"
+  },
+  "onboarding": {
+    "title": "欢迎使用 Aguacate",
+    "sub": "AI 会议笔记。无机器人。无云端。",
+    "loadDemo": "加载演示会议",
+    "loading": "加载中…",
+    "skip": "跳过",
+    "callouts": {
+      "local": {
+        "title": "本地且私密",
+        "desc": "你的音频绝不离开这台 Mac"
+      },
+      "ai": {
+        "title": "AI 智能",
+        "desc": "跨所有会议的行动项、决定与主题"
+      },
+      "offline": {
+        "title": "离线可用",
+        "desc": "转写 100% 在设备上运行"
+      }
+    },
+    "titlePrefix": "每一次对话都会",
+    "titleEmphasis": "成长",
+    "titleSuffix": "为知识。"
+  },
+  "tour": {
+    "stepIndicator": "第 {{step}} 步，共 {{total}} 步",
+    "skip": "跳过",
+    "next": "下一步",
+    "done": "完成",
+    "final": {
+      "title": "一切就绪",
+      "desc": "浏览演示会议，或在准备好记录第一场真实会议时点击录制。",
+      "cta": "明白了，开始吧"
+    },
+    "steps": {
+      "record": {
+        "title": "录制任何会议",
+        "desc": "没有机器人加入通话。音频不会离开这台 Mac。点击录制，Aguacate 用 Whisper AI 在本地捕获一切。"
+      },
+      "list": {
+        "title": "井然有序的会议",
+        "desc": "每段录音都会自动出现在这里。点击任意会议即可打开 AI 生成的笔记、行动项和决定。"
+      },
+      "notes": {
+        "title": "即时生成的 AI 笔记",
+        "desc": "Claude 阅读转写内容并撰写结构化笔记 — 执行摘要、关键讨论、决定和行动项。"
+      },
+      "actions": {
+        "title": "自动提取行动项",
+        "desc": "每个行动项都会自动提取，附带负责人和截止日期。标记完成以跟踪落实。"
+      },
+      "intel": {
+        "title": "跨会议智能",
+        "desc": "行动项、决定、主题和人员视图自动揭示所有会议中的规律。"
+      }
+    }
+  },
+  "prompt": {
+    "autoStarts": "倒计时结束后自动开始录制",
+    "startingSoon": "即将开始 — 录制这场会议吗？",
+    "attendees": "{{count}} 位参会者",
+    "skip": "跳过",
+    "recordNow": "立即录制"
+  },
+  "processing": {
+    "growing": "你的会议正在生长…",
+    "takesAbout": "通常大约需要 30 秒。",
+    "aria": "处理中"
+  },
+  "recording": {
+    "untitled": "未命名会议",
+    "listening": "录音中",
+    "paused": "已暂停",
+    "muted": "已静音",
+    "aria": "录音",
+    "mute": "静音麦克风",
+    "unmute": "取消静音",
+    "micLabel": "麦克风",
+    "mutedLabel": "已静音",
+    "pause": "暂停录音",
+    "resume": "继续录音",
+    "pauseLabel": "暂停",
+    "resumeLabel": "继续",
+    "stop": "停止录音",
+    "stopLabel": "停止"
+  },
+  "timeline": {
+    "emptyHead": "还没有时间线",
+    "emptySub": "会议有转录后，对话时间线会显示在这里。",
+    "flagged": "标记时刻",
+    "speakerFallback": "发言人 1",
+    "started": "会议开始",
+    "wrapUp": "会议结束",
+    "flaggedPill": "已标记"
+  },
+  "transcript": {
+    "emptyHead": "还没有转录",
+    "emptySub": "会议处理完成后，转录会显示在这里。",
+    "play": "播放",
+    "pause": "暂停",
+    "scrub": "跳转",
+    "nowPlaying": "正在播放",
+    "searchPlaceholder": "搜索转录内容",
+    "matchCount_other": "{{count}} 条匹配",
+    "moments": "重要时刻",
+    "noMoments": "这场会议没有标记的时刻。"
+  },
+  "ask": {
+    "emptyHead": "向这场会议提问",
+    "emptySub": "回答仅基于这场会议的笔记和转录。",
+    "placeholder": "向这场会议提问…",
+    "send": "发送",
+    "sourceCount_other": "{{count}} 个来源",
+    "helpful": "有帮助",
+    "notHelpful": "没帮助",
+    "thinking": "思考中…",
+    "sources": "来源",
+    "suggestion": {
+      "risks": "有哪些风险？",
+      "pricing": "总结定价讨论",
+      "unresolved": "还有什么没解决？"
+    }
+  },
+  "today": {
+    "title": "今天",
+    "emptyHead": "今天没有安排",
+    "emptySub": "今天的会议和日历会显示在这里。",
+    "onCalendar": "日历安排",
+    "captured": "今日记录",
+    "attendeeCount_other": "{{count}} 位参与者",
+    "openNotes": "打开笔记",
+    "record": "录制",
+    "openActions_other": "{{count}} 个待办行动"
+  },
+  "search": {
+    "title": "搜索",
+    "sub": "搜索所有会议，或直接提问。",
+    "placeholder": "搜索或提问…",
+    "fromMeetings": "来自你的会议",
+    "noAnswer": "在你的会议中没有找到答案",
+    "matches_other": "{{count}} 条结果",
+    "askCta": "向 Aguacate 询问“{{query}}”",
+    "hint": "输入以搜索标题、笔记、转录和行动项。"
+  },
+  "zero": {
+    "title": "Meeting Zero",
+    "sub": "在下一场会议前做好准备。",
+    "emptyHead": "没有即将开始的会议",
+    "emptySub": "日历上有会议时，准备内容会显示在这里。",
+    "noHistory": "与这组人还没有历史记录。"
+  },
+  "digest": {
+    "title": "摘要",
+    "sub": "自动生成的所有会议汇总——无需手动操作",
+    "emptyHead": "本周期暂无内容",
+    "emptySub": "你录制的会议会自动汇总到这里。",
+    "meetingToday": "今天要见的人",
+    "stale": "已搁置一段时间",
+    "rangeLabel": "{{range}} · {{count}} 场会议 · 已录制 {{minutes}} 分钟",
+    "weekly": "每周",
+    "daily": "每日",
+    "summaryBy": "Aguacate 摘要",
+    "heroSentence": "团队{{periodWord}}主要聚焦于 {{topic}}，还有 {{count}} 项行动未完成。",
+    "heroSentenceNoTopic": "本期还有 {{count}} 项行动未完成。",
+    "meetings": "会议",
+    "recurringTopics": "常见主题",
+    "topicCount": "{{name}} · {{count}}",
+    "openActions": "待办行动",
+    "periodWord_week": "本周",
+    "periodWord_day": "今天"
+  },
+  "capture": {
+    "idleTitle": "准备好开始记录",
+    "idleSubtitle": "开始录音，Aguacate 会倾听。",
+    "recordingTitle": "新录音",
+    "recordingSubtitle": "Aguacate 正在倾听 · {{time}}",
+    "rec": "录制",
+    "startRecording": "开始录音",
+    "viewMeeting": "查看会议",
+    "replay": "重播",
+    "chip": {
+      "actions_other": "{{count}} 项行动",
+      "decisions_other": "{{count}} 项决定",
+      "topics_other": "{{count}} 个主题"
+    }
+  },
+  "upcomingToast": {
+    "startsIn": "{{title}} 将在 {{minutes}} 分钟后开始",
+    "willTranscribe": "加入通话后 Aguacate 会自动转录。",
+    "dismiss": "关闭"
+  },
+  "pdf": {
+    "eyebrow": "Aguacate — 会议纪要",
+    "execSummary": "执行摘要",
+    "keyDiscussions": "主要讨论",
+    "decisionsMade": "已做决定",
+    "actionItems": "行动项",
+    "owner": "负责人",
+    "action": "行动",
+    "due": "截止日期",
+    "done": "已完成",
+    "nextSteps": "后续步骤",
+    "complianceFlags": "合规提醒",
+    "noneIdentified": "未发现问题",
+    "generatedBy": "由 Aguacate 生成",
+    "participantCount_other": "{{count}} 位参与者"
   }
 }

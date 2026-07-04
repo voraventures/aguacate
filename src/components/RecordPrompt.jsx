@@ -1,11 +1,13 @@
 // Auto-record prompt: countdown ring 30s before a calendar meeting starts.
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "../store.jsx";
 
 const RING_R = 38;
 const CIRC = 2 * Math.PI * RING_R;
 
 export default function RecordPrompt() {
+  const { t } = useTranslation();
   const { prompt, setPrompt, startRecording } = useStore();
   const [remaining, setRemaining] = useState(0);
   const timerRef = useRef(null);
@@ -71,19 +73,17 @@ export default function RecordPrompt() {
         </div>
         <div className="prompt-title">{prompt.title}</div>
         <div className="prompt-sub">
-          {prompt.auto
-            ? "Recording starts automatically when the countdown ends"
-            : "Starting soon — record this meeting?"}
+          {prompt.auto ? t("prompt.autoStarts") : t("prompt.startingSoon")}
           {prompt.attendees?.length
-            ? ` · ${prompt.attendees.length} attendee${prompt.attendees.length !== 1 ? "s" : ""}`
+            ? ` · ${t("prompt.attendees", { count: prompt.attendees.length })}`
             : ""}
         </div>
         <div className="prompt-actions">
           <button className="btn secondary" onClick={dismiss}>
-            Skip
+            {t("prompt.skip")}
           </button>
           <button className="btn" onClick={confirm}>
-            Record now
+            {t("prompt.recordNow")}
           </button>
         </div>
       </div>

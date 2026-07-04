@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    @keyframes cfSpin { to { transform: rotate(360deg); } }
+    @keyframes cfPulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.35; transform:scale(.8); } }
+    @keyframes cfDots { 0%,80%,100% { opacity:.25; transform:translateY(0); } 40% { opacity:1; transform:translateY(-4px); } }
+    @keyframes cfPop { 0% { transform:scale(0); } 60% { transform:scale(1.18); } 100% { transform:scale(1); } }
+    @keyframes cfRise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+    @keyframes cfCaret { 0%,100% { opacity:1; } 50% { opacity:0; } }
+  </style>
+</helmet>
+
+<div style="width:560px;height:640px;background:#FFFFFF;border:1px solid #E9E9E4;border-radius:24px;box-shadow:0 40px 90px -34px rgba(30,34,20,.28),0 8px 24px -14px rgba(30,34,20,.12);display:flex;flex-direction:column;overflow:hidden;font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;position:relative;">
+  <!-- header -->
+  <div style="height:56px;flex:none;display:flex;align-items:center;gap:9px;padding:0 22px;border-bottom:1px solid #F0F0EC;">
+    <svg width="22" height="26" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round"></path><g fill="#111111"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg>
+    <span style="font-size:17px;font-weight:500;letter-spacing:-.01em;color:#232320;font-family:'Newsreader',serif;">Aguacate</span>
+    <div style="flex:1;"></div>
+    <sc-if value="{{ isRec }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:7px;background:#FCEBEA;border:1px solid #F4CFCC;border-radius:20px;padding:5px 11px 5px 10px;"><span style="width:8px;height:8px;border-radius:50%;background:#EF5A4E;animation:cfPulse 1.3s ease-in-out infinite;"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#D8453A;letter-spacing:.05em;">REC</span></div>
+    </sc-if>
+  </div>
+
+  <!-- stage -->
+  <div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;">
+    <!-- processing rings -->
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:{{ ringsOpacity }};transition:opacity .55s ease;">
+      <svg width="300" height="300" viewBox="0 0 300 300" style="position:absolute;animation:cfSpin 16s linear infinite;"><circle cx="150" cy="150" r="140" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#D6E9BE" stroke-width="1.75" stroke-dasharray="2 14" stroke-linecap="round"></circle></svg>
+      <svg width="238" height="238" viewBox="0 0 238 238" style="position:absolute;animation:cfSpin 11s linear infinite reverse;"><circle cx="119" cy="119" r="110" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#E4F0D2" stroke-width="1.75" stroke-dasharray="2 18" stroke-linecap="round"></circle></svg>
+    </div>
+
+    <!-- avocado (reactive) -->
+    <div style="position:relative;transform:{{ avoScale }};transition:transform .6s cubic-bezier(.22,1,.36,1);">
+      <svg width="168" height="196" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="#F5F9EC" stroke="#7DBE3A" stroke-width="10" stroke-linejoin="round"></path><g fill="#111111"><sc-for list="{{ logoBars }}" as="bar" hint-placeholder-count="7"><rect x="{{ bar.x }}" y="{{ bar.y }}" width="11" height="{{ bar.h }}" rx="5.5"></rect></sc-for></g></svg>
+      <!-- ready check -->
+      <span style="position:absolute;right:6px;bottom:14px;width:40px;height:40px;border-radius:50%;background:#6FA83C;border:3px solid #fff;display:flex;align-items:center;justify-content:center;opacity:{{ readyOpacity }};transform:{{ checkScale }};transition:opacity .3s ease;box-shadow:0 6px 16px -6px rgba(111,168,60,.6);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="3.2"><path d="M20 6L9 17l-5-5"></path></svg></span>
+    </div>
+  </div>
+
+  <!-- caption -->
+  <div style="flex:none;text-align:center;padding:0 40px;">
+    <div style="font-size:23px;font-weight:500;letter-spacing:-.01em;color:#1D1D1B;font-family:'Newsreader',serif;">{{ title }}</div>
+    <div style="font-size:13.5px;color:#8A8A82;margin-top:7px;min-height:19px;">{{ subtitle }}<span style="display:inline-block;width:2px;height:13px;background:#6FA83C;margin-left:2px;vertical-align:-2px;opacity:{{ caretOn }};animation:cfCaret 1s step-end infinite;"></span></div>
+  </div>
+
+  <!-- ready summary chips -->
+  <sc-if value="{{ isReady }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:none;display:flex;justify-content:center;gap:8px;margin-top:16px;">
+    <span style="font-size:12.5px;color:#4C7E22;background:#EFF4E6;border:1px solid #E1EBCD;border-radius:20px;padding:5px 12px;animation:cfRise .55s cubic-bezier(.22,1,.36,1) .5s both;">3 actions</span>
+    <span style="font-size:12.5px;color:#4C7E22;background:#EFF4E6;border:1px solid #E1EBCD;border-radius:20px;padding:5px 12px;animation:cfRise .55s cubic-bezier(.22,1,.36,1) .64s both;">2 decisions</span>
+    <span style="font-size:12.5px;color:#4C7E22;background:#EFF4E6;border:1px solid #E1EBCD;border-radius:20px;padding:5px 12px;animation:cfRise .55s cubic-bezier(.22,1,.36,1) .78s both;">4 topics</span>
+  </div>
+  </sc-if>
+
+  <!-- controls -->
+  <div style="flex:none;padding:26px 40px 30px;display:flex;align-items:center;justify-content:center;gap:16px;min-height:96px;">
+    <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ start }}" style="display:flex;align-items:center;gap:10px;background:#232320;border:none;color:#fff;font-size:15px;font-weight:500;padding:15px 26px;border-radius:16px;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px -8px rgba(35,35,32,.55);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#A6E85A" stroke-width="1.75"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>Start recording</button>
+    </sc-if>
+    <sc-if value="{{ isRec }}" hint-placeholder-val="{{ true }}">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#54544C;width:64px;text-align:right;">{{ timer }}</span>
+      <button style="width:52px;height:52px;border-radius:50%;background:#F4F4F1;border:1px solid #E9E9E4;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="#54544C"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+      <button onClick="{{ stop }}" style="width:56px;height:56px;border-radius:50%;background:#EF5A4E;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -6px rgba(239,90,78,.55);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="6" width="12" height="12" rx="2.5"></rect></svg></button>
+    </sc-if>
+    <sc-if value="{{ isProc }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;background:#6FA83C;animation:cfDots 1.2s ease-in-out infinite;"></span><span style="width:7px;height:7px;border-radius:50%;background:#6FA83C;animation:cfDots 1.2s ease-in-out .2s infinite;"></span><span style="width:7px;height:7px;border-radius:50%;background:#6FA83C;animation:cfDots 1.2s ease-in-out .4s infinite;"></span></div>
+    </sc-if>
+    <sc-if value="{{ isReady }}" hint-placeholder-val="{{ true }}">
+      <button style="background:#232320;border:none;color:#fff;font-size:14.5px;font-weight:500;padding:13px 22px;border-radius:14px;cursor:pointer;font-family:inherit;">View meeting</button>
+      <button onClick="{{ reset }}" style="background:#fff;border:1px solid #E4E4DE;color:#3C3C38;font-size:14.5px;font-weight:500;padding:13px 22px;border-radius:14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#6A6A62" stroke-width="1.75"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>Replay</button>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:560,&quot;height&quot;:640}}">
+class Component extends DCLogic {
+  SUMMARY = 'Mid-market focus, a July analytics beta, and faster onboarding.';
+  state = { phase: 'idle', elapsed: 0, typed: '', amp: new Array(40).fill(0.28) };
+  base = [42, 74, 104, 120, 104, 74, 42];
+  xs = [52.5, 70.5, 88.5, 106.5, 124.5, 142.5, 160.5];
+  sample = [4, 10, 16, 20, 24, 30, 36];
+
+  componentDidMount() { this.timers = []; this.timers.push(setTimeout(() => this.start(), 900)); }
+  componentWillUnmount() { this.clearAll(); }
+  clearAll() { if (this._i) { clearInterval(this._i); this._i = null; } if (this._ty) { clearInterval(this._ty); this._ty = null; } (this.timers || []).forEach(clearTimeout); this.timers = []; }
+  startType() { this._p = 0; this._ty = setInterval(() => { this._p++; this.setState({ typed: this.SUMMARY.slice(0, this._p) }); if (this._p >= this.SUMMARY.length) { clearInterval(this._ty); this._ty = null; } }, 30); }
+
+  next(amp) { return amp.map(v => { const t = 0.18 + Math.random() * 0.82; return v * 0.4 + t * 0.6; }); }
+
+  start() {
+    this.clearAll();
+    this.setState({ phase: 'recording', elapsed: 0 });
+    this._i = setInterval(() => this.setState(s => ({ elapsed: s.elapsed + 0.1, amp: this.next(s.amp) })), 100);
+    this.timers.push(setTimeout(() => this.stop(), 4600));
+  }
+  stop() {
+    this.clearAll();
+    this.setState({ phase: 'processing' });
+    this.timers.push(setTimeout(() => { this.setState({ phase: 'ready' }); this.startType(); }, 2800));
+  }
+  reset() {
+    this.clearAll();
+    this.setState({ phase: 'idle', elapsed: 0, typed: '', amp: new Array(40).fill(0.28) });
+    this.timers.push(setTimeout(() => this.start(), 750));
+  }
+
+  renderVals() {
+    const { phase, elapsed, amp } = this.state;
+    const cy = 150;
+    const logoBars = this.base.map((b, i) => {
+      const lvl = phase === 'recording' ? amp[this.sample[i]] : (phase === 'idle' ? 0.32 : 0.44);
+      const h = Math.round(b * (0.42 + lvl * 0.82));
+      return { x: this.xs[i], y: Math.round(cy - h / 2), h };
+    });
+    const wave = amp.map(a => ({ style: {
+      flex: '1 1 0', minWidth: '2px', height: (7 + a * 92) + '%', borderRadius: '3px',
+      background: 'linear-gradient(180deg,#8FD93F,#5F9E2B)', alignSelf: 'center', transition: 'height .09s linear',
+    } }));
+    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const ss = String(Math.floor(elapsed % 60)).padStart(2, '0');
+    return {
+      isIdle: phase === 'idle', isRec: phase === 'recording', isProc: phase === 'processing', isReady: phase === 'ready',
+      logoBars, wave, timer: mm + ':' + ss,
+      avoScale: phase === 'ready' ? 'translateY(-14px) scale(.82)' : phase === 'processing' ? 'scale(.92)' : 'scale(1)',
+      ringsOpacity: phase === 'processing' ? 1 : 0,
+      waveOpacity: phase === 'recording' ? 1 : 0,
+      readyOpacity: phase === 'ready' ? 1 : 0,
+      checkScale: phase === 'ready' ? 'scale(1)' : 'scale(0)',
+      readyShift: phase === 'ready' ? 'translateY(0)' : 'translateY(14px)',
+      title: phase === 'idle' ? 'Ready to capture' : phase === 'recording' ? 'New recording' : phase === 'processing' ? 'Growing your meeting…' : 'Product Strategy Sync',
+      subtitle: phase === 'idle' ? 'Start a recording and Aguacate will listen.' : phase === 'recording' ? 'Aguacate is listening · 10:30 AM' : phase === 'processing' ? 'This usually takes about 30 seconds.' : this.state.typed,
+      caretOn: (phase === 'ready' && this.state.typed.length < this.SUMMARY.length) ? 1 : 0,
+      start: () => this.start(), stop: () => this.stop(), reset: () => this.reset(),
+    };
+  }
+}
+</script>
+</body>
+</html>

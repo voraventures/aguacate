@@ -42,7 +42,10 @@ function run(argv) {
       start: ObjC.unwrap(fmt.stringFromDate(ev.startDate)),
       end: ObjC.unwrap(fmt.stringFromDate(ev.endDate)),
       attendees: attendees,
-      cancelled: ev.status === $.EKEventStatusCanceled
+      cancelled: ev.status === $.EKEventStatusCanceled,
+      location: ev.location.isNil() ? '' : ObjC.unwrap(ev.location),
+      url: ev.URL.isNil() ? '' : ObjC.unwrap(ev.URL.absoluteString),
+      notes: ev.notes.isNil() ? '' : ObjC.unwrap(ev.notes)
     });
   }
   return JSON.stringify({error: null, events: out});
@@ -124,6 +127,9 @@ def fetch_events(hours_ahead: int = 18) -> list[dict]:
                     "end": ev.get("end"),
                     "attendees": ev.get("attendees", []),
                     "cancelled": bool(ev.get("cancelled")),
+                    "native_link": ev.get("url"),
+                    "location": ev.get("location"),
+                    "description": ev.get("notes"),
                 }
             )
         return events

@@ -14,7 +14,8 @@ import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
 
 const StoreContext = createContext(null);
 
-export const THEMES = ["default", "dark", "rose", "warm"];
+// Light is the default material system; dark is its own, not an inversion (HIG 21).
+export const THEMES = ["default", "dark"];
 
 // Themes with a dark --bg; the in-app logo uses white waveform bars on these
 // (green seed outline stays identical across every theme).
@@ -24,9 +25,11 @@ export function StoreProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [connectionFailed, setConnectionFailed] = useState(false);
   const [health, setHealth] = useState({});
-  const [theme, setThemeState] = useState(
-    () => localStorage.getItem("aguacate_theme") || "default"
-  );
+  const [theme, setThemeState] = useState(() => {
+    // migrate stored values for removed themes (sky/warm etc.) to default
+    const stored = localStorage.getItem("aguacate_theme");
+    return THEMES.includes(stored) ? stored : "default";
+  });
   const [nav, setNav] = useState("meetings"); // meetings|actions|decisions|topics|people
   const [meetings, setMeetings] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -38,16 +41,28 @@ export function StoreProvider({ children }) {
   const [calendarStatus, setCalendarStatus] = useState({});
   const [upcoming, setUpcoming] = useState([]);
   const [prompt, setPrompt] = useState(null); // auto-record prompt payload
+  const [upcomingWarning, setUpcomingWarning] = useState(null); // 5-min heads-up toast payload
   const [settings, setSettings] = useState({});
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [progress, setProgress] = useState({}); // meeting_id -> {stage, pct}
-  const [toast, setToast] = useState(null);
+  const [toasts, setToasts] = useState([]); // [{id, message, kind, action}]
+  const toastSeq = useRef(0);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("builtin-default");
   const [coachData, setCoachData] = useState(null);
   const [coachOpen, setCoachOpen] = useState(true);
   const [brief, setBrief] = useState(null); // pre-meeting intelligence payload
   const [muted, setMuted] = useState(false);
+  const [paused, setPaused] = useState(false);
+  // Meeting whose growth takeover is on screen (set when a recording stops,
+  // cleared when its notes are ready or fail).
+  const [processingId, setProcessingId] = useState(null);
+  // Meeting that just finished processing — drives the capture flow's "ready"
+  // phase (title + summary + chips) until the user views it or replays.
+  const [readyMeetingId, setReadyMeetingId] = useState(null);
+  // Capture-flow card opened in "idle" phase from the sidebar's Record entry,
+  // before the user has actually started the microphone.
+  const [captureOpen, setCaptureOpen] = useState(false);
   const [markerCount, setMarkerCount] = useState(0);
   const [liveTranscriptChunks, setLiveTranscriptChunks] = useState([]);
   const [activeCall, setActiveCall] = useState(null); // { app, process, detected_at }
@@ -62,9 +77,19 @@ export function StoreProvider({ children }) {
     window.aguacate?.notify?.(title, body || "");
   }, []);
 
-  const showToast = useCallback((message, kind = "info") => {
-    setToast({ message, kind, at: Date.now() });
-    setTimeout(() => setToast((t) => (t && Date.now() - t.at >= 3800 ? null : t)), 4000);
+  // opts.action: { label, onAction } renders a button inside the toast (e.g. Undo).
+  const showToast = useCallback((message, kind = "info", opts = {}) => {
+    const id = ++toastSeq.current;
+    setToasts((prev) => [...prev.slice(-2), { id, message, kind, action: opts.action }]);
+    setTimeout(
+      () => setToasts((prev) => prev.filter((t) => t.id !== id)),
+      opts.duration || 4000
+    );
+    return id;
+  }, []);
+
+  const dismissToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const setTheme = useCallback((name) => {
@@ -122,16 +147,38 @@ export function StoreProvider({ children }) {
     if (id) api.get(`/api/meetings/${id}`).then(setMeetingDetail).catch(() => {});
   }, []);
 
+  // Optimistic delete with a 6s Undo window: the meeting leaves the list
+  // immediately, the API call fires only after the toast expires.
+  // ponytail: quitting the app inside the window cancels the delete (safe side).
+  const pendingDeletes = useRef(new Map()); // id -> timeout
   const deleteMeeting = useCallback(
-    (id) =>
-      api
-        .delete(`/api/meetings/${id}`)
-        .then(() => {
-          if (selectedIdRef.current === id) selectMeeting(null);
-          return refreshMeetings();
-        })
-        .catch((err) => showToast(err.message, "error")),
-    [refreshMeetings, selectMeeting, showToast]
+    (id) => {
+      setMeetings((prev) => prev.filter((m) => m.id !== id));
+      if (selectedIdRef.current === id) selectMeeting(null);
+      const timer = setTimeout(() => {
+        pendingDeletes.current.delete(id);
+        api
+          .delete(`/api/meetings/${id}`)
+          .then(() => refreshMyWork())
+          .catch((err) => {
+            showToast(err.message, "error");
+            refreshMeetings();
+          });
+      }, 6000);
+      pendingDeletes.current.set(id, timer);
+      showToast(i18n.t("common.meetingDeleted"), "info", {
+        duration: 6000,
+        action: {
+          label: i18n.t("common.undo"),
+          onAction: () => {
+            clearTimeout(timer);
+            pendingDeletes.current.delete(id);
+            refreshMeetings();
+          },
+        },
+      });
+    },
+    [refreshMeetings, refreshMyWork, selectMeeting, showToast]
   );
 
   // ---------- boot ----------
@@ -174,8 +221,10 @@ export function StoreProvider({ children }) {
         switch (event) {
           case "recording_started":
             setRecording({ active: true, meetingId: data.meeting_id });
+            setCaptureOpen(false);
             setCoachData(null);
             setMuted(false);
+            setPaused(false);
             setMarkerCount(0);
             setLiveTranscriptChunks([]);
             refreshMeetings();
@@ -194,6 +243,9 @@ export function StoreProvider({ children }) {
             break;
           case "recording_muted":
             setMuted(!!data.muted);
+            break;
+          case "recording_paused":
+            setPaused(!!data.paused);
             break;
           case "marker_added":
             setMarkerCount(data.count || 0);
@@ -228,8 +280,12 @@ export function StoreProvider({ children }) {
             );
             break;
           case "recording_stopped":
-            setRecording({ active: false, meetingId: null });
+            setRecording((prev) => {
+              if (prev.meetingId) setProcessingId(prev.meetingId);
+              return { active: false, meetingId: null };
+            });
             setRecordingLevel(0);
+            setPaused(false);
             setLiveTranscriptChunks([]);
             break;
           case "recording_level":
@@ -242,6 +298,11 @@ export function StoreProvider({ children }) {
             }));
             refreshMeetings();
             if (data.status === "ready" || data.status === "error") {
+              setProcessingId((cur) => {
+                if (cur !== data.meeting_id) return cur;
+                if (data.status === "ready") setReadyMeetingId(data.meeting_id);
+                return null;
+              });
               refreshMyWork();
               refreshLicense();
               if (selectedIdRef.current === data.meeting_id) refreshDetail();
@@ -268,6 +329,9 @@ export function StoreProvider({ children }) {
                 title: data.title || i18n.t("store.notify.fallbackMeeting"),
               })
             );
+            break;
+          case "auto_record_upcoming":
+            setUpcomingWarning(data);
             break;
           case "calendar_synced":
             api.get("/api/calendar/upcoming").then(setUpcoming).catch(() => {});
@@ -457,6 +521,15 @@ export function StoreProvider({ children }) {
     }
   }, [muted, showToast]);
 
+  const togglePause = useCallback(async () => {
+    try {
+      const r = await api.post("/api/recording/pause", { paused: !paused });
+      setPaused(r.paused);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }, [paused, showToast]);
+
   const dropMarker = useCallback(async () => {
     try {
       await api.post("/api/recording/marker");
@@ -495,13 +568,16 @@ export function StoreProvider({ children }) {
     upcoming,
     prompt,
     setPrompt,
+    upcomingWarning,
+    setUpcomingWarning,
     settings,
     setSettings,
     settingsOpen,
     setSettingsOpen,
     progress,
-    toast,
+    toasts,
     showToast,
+    dismissToast,
     templates,
     refreshTemplates,
     selectedTemplate,
@@ -513,6 +589,14 @@ export function StoreProvider({ children }) {
     setBrief,
     muted,
     toggleMute,
+    paused,
+    togglePause,
+    processingId,
+    setProcessingId,
+    readyMeetingId,
+    setReadyMeetingId,
+    captureOpen,
+    setCaptureOpen,
     markerCount,
     dropMarker,
     liveTranscriptChunks,

@@ -4,6 +4,7 @@ import i18n, { setLanguage } from "../i18n.js";
 import { api, openExternal } from "../api.js";
 import { THEMES, useStore } from "../store.jsx";
 import { UsersIcon, XIcon } from "./icons.jsx";
+import { Select } from "./ui.jsx";
 import { BRAND_LOGOS } from "./brandLogos.jsx";
 
 // Template glyphs (14px, stroke-based) — scoped to Settings only.
@@ -247,14 +248,23 @@ const CalendarIcon = (p) => (
     <line x1="3" y1="10" x2="21" y2="10" />
   </TI>
 );
+function ToggleSwitch({ checked, onChange, label }) {
+  return (
+    <button
+      className={`set-toggle${checked ? " on" : ""}`}
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+    >
+      <span className="set-toggle-thumb" />
+    </button>
+  );
+}
 
 const THEME_PREVIEW = {
-  default: ["#fbfaf6", "#3f8b45", "#1e281d"],
-  dark: ["#131711", "#6fbf74", "#e8ecdf"],
-  rose: ["#fff8f9", "#c2185b", "#880e4f"],
-  navy: ["#101726", "#5e9bdc", "#dde6f5"],
-  warm: ["#fdf8f1", "#c0662b", "#38291a"],
-  neon: ["#0a0e12", "#2fe08c", "#d8ffe9"],
+  default: ["#fcfbf8", "#6ba368", "#1d1d1f"],
+  dark: ["#1a1a18", "#82ae7f", "#edece6"],
 };
 
 const SECRET_FIELDS = [
@@ -444,7 +454,6 @@ export default function Settings() {
   const [editingTemplate, setEditingTemplate] = useState(null); // {id?,name,description,body}
   const [vaultPassword, setVaultPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tabFade, setTabFade] = useState({ left: false, right: false });
   const [openIntegration, setOpenIntegration] = useState(null);
   const [setupModal, setSetupModal] = useState(null); // "google" | "microsoft" | null
   // Workspace state
@@ -454,33 +463,7 @@ export default function Settings() {
   const [wsSharePath, setWsSharePath] = useState("");
   // Mobile state
   const [mobileSessions, setMobileSessions] = useState([]);
-  const tabsRef = useRef(null);
   const isWin = (window.aguacate?.platform || "darwin") === "win32";
-
-  const updateTabFade = () => {
-    const el = tabsRef.current;
-    if (!el) return;
-    setTabFade({
-      left: el.scrollLeft > 4,
-      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
-    });
-  };
-
-  const scrollTabs = (dir) => {
-    tabsRef.current?.scrollBy({ left: dir * 180, behavior: "smooth" });
-  };
-
-  // keep the active tab fully visible
-  useEffect(() => {
-    if (!settingsOpen) return;
-    const t = setTimeout(() => {
-      tabsRef.current
-        ?.querySelector(`[data-tab="${tab}"]`)
-        ?.scrollIntoView({ inline: "nearest", block: "nearest" });
-      updateTabFade();
-    }, 30);
-    return () => clearTimeout(t);
-  }, [settingsOpen, tab]);
 
   const loadSecrets = () =>
     api.get("/api/integrations/status").then((r) => setSecrets(r.secrets)).catch(() => {});
@@ -605,38 +588,26 @@ export default function Settings() {
 
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setSettingsOpen(false)}>
-      <div className="modal" style={{ width: 760 }}>
+      <div className="modal settings-modal">
         <div className="modal-header">
           <div className="modal-title">{t('settings.title')}</div>
           <button className="icon-btn" onClick={() => setSettingsOpen(false)}>
             <XIcon size={15} />
           </button>
         </div>
-        <div className={`settings-tabs-wrap${tabFade.left ? " fade-left" : ""}${tabFade.right ? " fade-right" : ""}`}>
-          {tabFade.left && (
-            <button className="tab-arrow left" aria-label={t('settings.scrollLeft')} onClick={() => scrollTabs(-1)}>
-              ‹
-            </button>
-          )}
-          <div className="settings-tabs" ref={tabsRef} onScroll={updateTabFade}>
-            {TABS.map(([key, label]) => (
+        <div className="settings-layout">
+          <nav className="settings-nav" aria-label={t('settings.title')}>
+            {TABS.map(([key]) => (
               <button
                 key={key}
-                data-tab={key}
-                className={`settings-tab${tab === key ? " active" : ""}`}
+                className={`settings-nav-item${tab === key ? " active" : ""}`}
                 onClick={() => setTab(key)}
               >
                 {t('settings.tabs.' + key)}
               </button>
             ))}
-          </div>
-          {tabFade.right && (
-            <button className="tab-arrow right" aria-label={t('settings.scrollRight')} onClick={() => scrollTabs(1)}>
-              ›
-            </button>
-          )}
-        </div>
-        <div className="modal-body">
+          </nav>
+          <div className="modal-body">
           {tab === "general" && (
             <>
               <div className="set-section-label first">{t('settings.general.label')}</div>
@@ -668,18 +639,18 @@ export default function Settings() {
                   <div className="set-card-name">{t('settings.general.language')}</div>
                 </div>
                 <div className="set-card-control">
-                  <select
-                    className="select-input"
+                  <Select
                     value={i18n.language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="pt">Português</option>
-                    <option value="fr">Français</option>
-                    <option value="zh">中文</option>
-                    <option value="ko">한국어</option>
-                  </select>
+                    onChange={setLanguage}
+                    options={[
+                      { value: "en", label: "English" },
+                      { value: "es", label: "Español" },
+                      { value: "pt", label: "Português" },
+                      { value: "fr", label: "Français" },
+                      { value: "zh", label: "中文" },
+                      { value: "ko", label: "한국어" },
+                    ]}
+                  />
                 </div>
               </div>
             </>
@@ -735,7 +706,7 @@ export default function Settings() {
                             bottom: 3,
                             left: `calc(${currentIndex} * (100% / 3) + 3px)`,
                             width: "calc(100% / 3 - 6px)",
-                            background: "var(--panel-solid)",
+                            background: "var(--panel)",
                             borderRadius: 6,
                             boxShadow: "var(--shadow-sm)",
                             transition: "left 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -753,7 +724,7 @@ export default function Settings() {
                               borderRadius: 6,
                               fontSize: 11.5,
                               fontWeight: 600,
-                              color: currentIndex === i ? "var(--accent-text)" : "var(--muted)",
+                              color: currentIndex === i ? "var(--accent-ink)" : "var(--muted)",
                               background: "transparent",
                               border: "none",
                               cursor: "pointer",
@@ -827,16 +798,16 @@ export default function Settings() {
                   <div className="set-card-desc">{t('settings.recording.autoModeDesc')}</div>
                 </div>
                 <div className="set-card-control">
-                  <select
-                    className="select-input"
+                  <Select
                     value={settings.recording_mode || "confirm_30s"}
-                    onChange={(e) => saveSetting("recording_mode", e.target.value)}
-                  >
-                    <option value="all">{t('settings.recording.modeAll')}</option>
-                    <option value="confirm_30s">{t('settings.recording.mode30')}</option>
-                    <option value="manual">{t('settings.recording.modeManual')}</option>
-                    <option value="off">{t('settings.recording.modeOff')}</option>
-                  </select>
+                    onChange={(v) => saveSetting("recording_mode", v)}
+                    options={[
+                      { value: "all", label: t('settings.recording.modeAll') },
+                      { value: "confirm_30s", label: t('settings.recording.mode30') },
+                      { value: "manual", label: t('settings.recording.modeManual') },
+                      { value: "off", label: t('settings.recording.modeOff') },
+                    ]}
+                  />
                 </div>
               </div>
               <div className="set-card">
@@ -846,18 +817,14 @@ export default function Settings() {
                   <div className="set-card-desc">{t('settings.recording.micDesc')}</div>
                 </div>
                 <div className="set-card-control">
-                  <select
-                    className="select-input"
-                    value={settings.mic_device ?? ""}
-                    onChange={(e) =>
-                      saveSetting("mic_device", e.target.value === "" ? null : Number(e.target.value))
-                    }
-                  >
-                    <option value="">{t('settings.recording.systemDefault')}</option>
-                    {devices.devices.map((d) => (
-                      <option key={d.index} value={d.index}>{d.name}</option>
-                    ))}
-                  </select>
+                  <Select
+                    value={settings.mic_device ?? null}
+                    onChange={(v) => saveSetting("mic_device", v)}
+                    options={[
+                      { value: null, label: t('settings.recording.systemDefault') },
+                      ...devices.devices.map((d) => ({ value: d.index, label: d.name })),
+                    ]}
+                  />
                 </div>
               </div>
               <div className="set-card stack">
@@ -871,20 +838,17 @@ export default function Settings() {
                   </div>
                 </div>
                 <div className="set-card-control">
-                  <select
-                    className="select-input"
-                    value={settings.system_device ?? ""}
-                    onChange={(e) =>
-                      saveSetting("system_device", e.target.value === "" ? null : Number(e.target.value))
-                    }
-                  >
-                    <option value="">{t('settings.recording.none')}</option>
-                    {devices.devices.map((d) => (
-                      <option key={d.index} value={d.index}>
-                        {d.name}{d.is_loopback_like ? t('settings.recording.loopbackSuffix') : ""}
-                      </option>
-                    ))}
-                  </select>
+                  <Select
+                    value={settings.system_device ?? null}
+                    onChange={(v) => saveSetting("system_device", v)}
+                    options={[
+                      { value: null, label: t('settings.recording.none') },
+                      ...devices.devices.map((d) => ({
+                        value: d.index,
+                        label: `${d.name}${d.is_loopback_like ? t('settings.recording.loopbackSuffix') : ""}`,
+                      })),
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -896,16 +860,16 @@ export default function Settings() {
                   <div className="set-card-desc">{t('settings.recording.whisperDesc')}</div>
                 </div>
                 <div className="set-card-control">
-                  <select
-                    className="select-input"
+                  <Select
                     value={settings.whisper_model || "base"}
-                    onChange={(e) => saveSetting("whisper_model", e.target.value)}
-                  >
-                    <option value="tiny">{t('settings.recording.modelTiny')}</option>
-                    <option value="base">{t('settings.recording.modelBase')}</option>
-                    <option value="small">{t('settings.recording.modelSmall')}</option>
-                    <option value="medium">{t('settings.recording.modelMedium')}</option>
-                  </select>
+                    onChange={(v) => saveSetting("whisper_model", v)}
+                    options={[
+                      { value: "tiny", label: t('settings.recording.modelTiny') },
+                      { value: "base", label: t('settings.recording.modelBase') },
+                      { value: "small", label: t('settings.recording.modelSmall') },
+                      { value: "medium", label: t('settings.recording.modelMedium') },
+                    ]}
+                  />
                 </div>
               </div>
             </>
@@ -972,16 +936,15 @@ export default function Settings() {
                     <div className="set-card-desc">{t('settings.ai.modelDesc', { name: active.name })}</div>
                   </div>
                   <div className="set-card-control">
-                    <select
-                      className="select-input"
+                    <Select
                       value={selectedModel}
-                      onChange={(e) => saveSetting(active.modelKey, e.target.value)}
-                    >
-                      {providerModels.length === 0 && <option value="">{t('settings.ai.loading')}</option>}
-                      {providerModels.map((m) => (
-                        <option key={m.id} value={m.id}>{m.name}</option>
-                      ))}
-                    </select>
+                      onChange={(v) => saveSetting(active.modelKey, v)}
+                      options={
+                        providerModels.length === 0
+                          ? [{ value: "", label: t('settings.ai.loading') }]
+                          : providerModels.map((m) => ({ value: m.id, label: m.name }))
+                      }
+                    />
                   </div>
                 </div>
               </>
@@ -990,7 +953,8 @@ export default function Settings() {
 
           {tab === "calendars" && (
             <>
-              <div className="set-section-label first">{t('settings.calendars.connected')}</div>
+              <p className="set-intro">{t('settings.calendars.intro')}</p>
+              <div className="set-section-label">{t('settings.calendars.connected')}</div>
               <div className="set-card">
                 <div className="set-card-icon cal-google" style={{ background: "rgba(66,133,244,0.08)" }}><div style={{ width: 14, height: 14, borderRadius: 3, background: "#4285F4", color: "white", fontSize: 8, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>G</div></div>
                 <div className="set-card-main">
@@ -1099,6 +1063,36 @@ export default function Settings() {
               )}
               <div className="field-help" style={{ marginTop: 10 }}>
                 {t('settings.calendars.pollNote')}
+              </div>
+
+              <div className="set-divider" />
+              <div className="set-card">
+                <div className="set-card-icon"><CalendarClockIcon size={17} /></div>
+                <div className="set-card-main">
+                  <div className="set-card-name">{t('settings.calendars.autoTranscribe')}</div>
+                  <div className="set-card-desc">{t('settings.calendars.autoTranscribeDesc')}</div>
+                </div>
+                <div className="set-card-control">
+                  <ToggleSwitch
+                    checked={(settings.recording_mode || "confirm_30s") === "all"}
+                    onChange={(on) => saveSetting("recording_mode", on ? "all" : "confirm_30s")}
+                    label={t('settings.calendars.autoTranscribe')}
+                  />
+                </div>
+              </div>
+              <div className="set-card">
+                <div className="set-card-icon"><ShieldIcon size={17} /></div>
+                <div className="set-card-main">
+                  <div className="set-card-name">{t('settings.calendars.notify5min')}</div>
+                  <div className="set-card-desc">{t('settings.calendars.notify5minDesc')}</div>
+                </div>
+                <div className="set-card-control">
+                  <ToggleSwitch
+                    checked={settings.notify_5min !== false}
+                    onChange={(on) => saveSetting("notify_5min", on)}
+                    label={t('settings.calendars.notify5min')}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -1386,17 +1380,17 @@ export default function Settings() {
                   <div className="set-card-desc">{t('settings.privacy.autoDeleteDesc')}</div>
                 </div>
                 <div className="set-card-control">
-                  <select
-                    className="select-input"
+                  <Select
                     value={settings.retention_days || 0}
-                    onChange={(e) => saveSetting("retention_days", Number(e.target.value))}
-                  >
-                    <option value={0}>{t('settings.privacy.retentionNever')}</option>
-                    <option value={30}>{t('settings.privacy.d30')}</option>
-                    <option value={90}>{t('settings.privacy.d90')}</option>
-                    <option value={180}>{t('settings.privacy.d180')}</option>
-                    <option value={365}>{t('settings.privacy.y1')}</option>
-                  </select>
+                    onChange={(v) => saveSetting("retention_days", v)}
+                    options={[
+                      { value: 0, label: t('settings.privacy.retentionNever') },
+                      { value: 30, label: t('settings.privacy.d30') },
+                      { value: 90, label: t('settings.privacy.d90') },
+                      { value: 180, label: t('settings.privacy.d180') },
+                      { value: 365, label: t('settings.privacy.y1') },
+                    ]}
+                  />
                 </div>
               </div>
               <div className="field-help">
@@ -1766,6 +1760,7 @@ export default function Settings() {
               )}
             </>
           )}
+          </div>
         </div>
       </div>
       {setupModal && (

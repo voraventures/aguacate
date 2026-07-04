@@ -7,56 +7,34 @@
       "topics": "주제",
       "people": "사람",
       "series": "시리즈",
-      "conflicts": "충돌"
-    },
-    "status": {
-      "recording": "녹음 중",
-      "ready": "준비됨",
-      "online": "온라인",
-      "starting": "시작 중"
-    },
-    "time": {
+      "conflicts": "충돌",
       "today": "오늘",
-      "tomorrow": "내일",
-      "now": "지금",
-      "inHM": "{{h}}시간 {{m}}분 후",
-      "inM": "{{m}}분 후"
+      "library": "라이브러리",
+      "search": "검색",
+      "zero": "Meeting Zero",
+      "digest": "다이제스트"
     },
     "brand": {
       "pro": "Pro"
     },
-    "templateSelectTitle": "다음 녹음에 사용할 노트 템플릿",
     "record": "녹음",
     "stop": "정지",
-    "meetingCard": {
-      "next": "다음 회의",
-      "none": "예정된 회의가 감지되지 않았습니다"
-    },
     "call": {
       "prompt": "{{app}} 감지됨 — 이 통화를 녹음할까요?",
       "title": "{{app}} 통화",
       "record": "지금 녹음",
       "dismiss": "닫기"
     },
-    "free": {
-      "planLabel": "무료 플랜",
-      "usage": "무료 회의 {{limit}}개 중 {{used}}개 사용",
-      "unlock": "Pro로 잠금 해제:",
-      "unlimited": "무제한 회의",
-      "crossMeeting": "회의 간 인텔리전스",
-      "allIntegrations": "모든 통합",
-      "upgrade": "Pro로 업그레이드 — $20/mo"
-    },
-    "myWork": {
-      "title": "내 작업",
-      "refresh": "개수 새로 고침",
-      "openActions": "미완료 할 일",
-      "decisionsWeek": "이번 주 결정 사항",
-      "meetingsProcessed": "처리된 회의"
-    },
-    "navigate": "탐색",
     "toggleTheme": "라이트/다크 전환",
-    "settings": "설정"
+    "settings": "설정",
+    "account": {
+      "you": "나",
+      "upgrade": "Pro로 업그레이드"
+    },
+    "autoRecord": {
+      "min": "분",
+      "platformOn": "{{platform}} · 자동 전사 켜짐"
+    }
   },
   "app": {
     "error": {
@@ -68,9 +46,7 @@
       "unreachable": "로컬 엔진에 연결할 수 없습니다 — 앱을 다시 시작하세요",
       "starting": "로컬 엔진 시작 중…"
     },
-    "dragResize": "드래그하여 크기 조절",
-    "expandList": "목록 펼치기",
-    "expandMeetingList": "회의 목록 펼치기"
+    "dragResize": "드래그하여 크기 조절"
   },
   "intel": {
     "title": {
@@ -231,11 +207,7 @@
       "themeDesc": "앱 전체의 색상 팔레트를 설정합니다.",
       "themes": {
         "default": "기본",
-        "dark": "다크",
-        "rose": "로즈",
-        "navy": "네이비",
-        "warm": "웜",
-        "neon": "네온"
+        "dark": "다크"
       },
       "fontSize": "글자 크기",
       "fontSizeDesc": "앱 전체의 텍스트 크기를 조정합니다. 보통이 기본값입니다.",
@@ -308,7 +280,12 @@
       "accessDenied": "캘린더 접근이 거부되었습니다. 시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 접근을 허용하세요.",
       "disable": "사용 안 함",
       "enable": "사용",
-      "pollNote": "Aguacate는 30초마다 연결된 캘린더를 확인하고 캘린더 간 중복 일정을 자동으로 병합합니다. Apple Calendar를 처음 사용 설정하면 macOS가 캘린더 권한을 요청합니다."
+      "pollNote": "Aguacate는 30초마다 연결된 캘린더를 확인하고 캘린더 간 중복 일정을 자동으로 병합합니다. Apple Calendar를 처음 사용 설정하면 macOS가 캘린더 권한을 요청합니다.",
+      "intro": "캘린더를 연결하면 회의에 참여하는 순간 Aguacate가 자동으로 전사를 시작해요 — 녹음 버튼을 누를 필요가 없어요.",
+      "autoTranscribe": "캘린더 회의 자동 전사",
+      "autoTranscribeDesc": "확인 없이 Zoom, Meet, Teams에 자동으로 참여해요.",
+      "notify5min": "5분 전에 알림",
+      "notify5minDesc": "자동 녹음될 회의가 시작되기 전 앱 내 배너로 알려드려요."
     },
     "integrations": {
       "connected": "연결됨",
@@ -480,14 +457,6 @@
       "selectMeeting": "회의 선택",
       "selectMeetingSub": "목록에서 회의를 선택하면 노트를 볼 수 있습니다"
     },
-    "processing": {
-      "recording": "녹음 진행 중…",
-      "transcribingPct": "로컬에서 전사 중 — {{pct}}%",
-      "transcribing": "Whisper로 로컬에서 전사 중…",
-      "writing": "Claude가 노트를 작성하고 있습니다…",
-      "processing": "처리 중…",
-      "audioLocal": "오디오는 이 Mac을 떠나지 않습니다."
-    },
     "action": {
       "tbd": "미정",
       "owner": "담당자",
@@ -501,23 +470,15 @@
       "myItems": "내 항목",
       "download": "다운로드",
       "setNameFilter": "설정 → 일반에서 이름을 설정하면 내 항목을 필터링할 수 있습니다",
-      "noneAssigned": "이 회의에서 나에게 할당된 할 일이 없습니다."
+      "noneAssigned": "이 회의에서 나에게 할당된 할 일이 없습니다.",
+      "none": "이 회의에는 실행 항목이 없습니다.",
+      "showMore_other": "{{count}}개 더 보기"
     },
     "conflict": {
       "detected": "충돌 감지됨",
       "new": "신규",
       "supersedes": "새 결정이 대체함",
       "markReviewed": "검토 완료로 표시"
-    },
-    "coach": {
-      "speakingDensity": "발화 밀도",
-      "questions": "질문",
-      "fillers": "군말",
-      "longSilences": "긴 침묵"
-    },
-    "transcript": {
-      "none": "사용 가능한 전사가 없습니다.",
-      "full": "전체 전사"
     },
     "confirm": {
       "delete": "이 회의를 삭제할까요? 되돌릴 수 없습니다."
@@ -532,7 +493,8 @@
       "exportedActions": "할 일 항목을 내보냈습니다",
       "sendingTo": "{{label}}(으)로 전송 중…",
       "regenerating": "노트 재생성 중…",
-      "sharedTeam": "팀 작업 공간에 공유됨"
+      "sharedTeam": "팀 작업 공간에 공유됨",
+      "pdfDesktopOnly": "PDF 내보내기는 데스크톱 앱에서만 사용할 수 있어요."
     },
     "header": {
       "recorded": "녹음됨",
@@ -542,7 +504,12 @@
       "moreOptions": "추가 옵션",
       "shareMeeting": "회의 공유",
       "shareTeam": "팀에 공유",
-      "deleteMeeting": "회의 삭제"
+      "deleteMeeting": "회의 삭제",
+      "share": "공유",
+      "star": "회의 즐겨찾기",
+      "unstar": "즐겨찾기 해제",
+      "titleAria": "회의 제목",
+      "today": "오늘"
     },
     "error": {
       "processingFailed": "처리 실패",
@@ -551,9 +518,10 @@
       "noNotes": "아직 이 회의에 대한 노트가 없습니다."
     },
     "tab": {
-      "notes": "노트",
       "transcript": "전사",
-      "shared": "공유됨"
+      "overview": "개요",
+      "timeline": "타임라인",
+      "ask": "질문"
     },
     "bar": {
       "actions": "할 일",
@@ -565,7 +533,19 @@
     "section": {
       "actionItems": "할 일 항목",
       "keyDecisions": "주요 결정 사항",
-      "relatedMeetings": "관련 회의"
+      "relatedMeetings": "관련 회의",
+      "overview": "개요",
+      "actions": "실행 항목",
+      "decisions": "결정",
+      "questions": "미해결 질문",
+      "topics": "주제",
+      "discussions": "주요 논의",
+      "nextSteps": "다음 단계",
+      "compliance": "컴플라이언스 알림",
+      "summaryBy": "Aguacate 요약",
+      "noSummary": "아직 요약이 없어요.",
+      "highlight": "하이라이트",
+      "flaggedMoment": "표시된 순간"
     },
     "toolbar": {
       "followup": "후속 조치",
@@ -580,6 +560,9 @@
       "copyLink": "링크 복사",
       "expires": "링크는 30일 후 만료됩니다. 이 링크가 있는 누구나 이 회의의 읽기 전용 요약을 볼 수 있습니다.",
       "close": "닫기"
+    },
+    "decisions": {
+      "none": "이 회의에는 기록된 결정이 없습니다."
     }
   },
   "store": {
@@ -601,13 +584,310 @@
       "pulseBody_other": "지연된 할 일 {{count}}개에 주의가 필요합니다.",
       "conflictTitle": "충돌 감지됨",
       "conflictBody": "새로운 결정이 이전 결정과 모순됩니다.",
-      "transcriptionDoneTitle": "전사 완료",
-      "transcriptionDoneBody": "Claude가 지금 노트를 작성하고 있습니다.",
+      "transcriptionDoneTitle": "거의 다 됐어요",
+      "transcriptionDoneBody": "대화가 형태를 갖추고 있어요.",
       "notesReadyTitle": "노트 준비됨",
       "notesReadyBody": "회의 노트와 할 일 항목을 검토할 준비가 되었습니다.",
       "meetingDetectedTitle": "회의 감지됨",
       "meetingDetectedBody": "{{title}}이(가) 곧 시작됩니다.",
       "fallbackMeeting": "회의"
     }
+  },
+  "common": {
+    "cancel": "취소",
+    "confirm": "확인",
+    "delete": "삭제",
+    "copy": "복사",
+    "close": "닫기",
+    "undo": "실행 취소",
+    "meetingDeleted": "회의가 삭제됨",
+    "loading": "로딩 중…"
+  },
+  "list": {
+    "title": "회의",
+    "searchPlaceholder": "회의 검색",
+    "noMatch": "“{{query}}”와 일치하는 회의가 없습니다. 사람, 주제 또는 작업으로 검색해 보세요.",
+    "empty": {
+      "allHead": "아직 회의가 없습니다",
+      "allSub": "첫 회의를 녹음해 시작하세요"
+    },
+    "startRecording": "녹음 시작",
+    "menu": {
+      "more": "추가 옵션",
+      "options": "회의 옵션",
+      "delete": "회의 삭제"
+    },
+    "deleteTitle": "이 회의를 삭제할까요?",
+    "deleteBody": "“{{title}}” — 녹음, 전사, 노트가 삭제됩니다. 삭제 후 몇 초 동안 실행 취소할 수 있습니다.",
+    "group": {
+      "today": "오늘",
+      "yesterday": "어제",
+      "week": "이번 주",
+      "month": "이번 달",
+      "earlier": "이전",
+      "upcoming": "예정됨"
+    },
+    "status": {
+      "growing": "생성 중…",
+      "failed": "실패 — 자세히 보려면 열기"
+    },
+    "scopeToday": "오늘",
+    "upcoming": {
+      "startingNow": "지금 시작",
+      "inMinutes_other": "{{count}}분 후",
+      "autoTranscribe": "자동 전사 예정"
+    }
+  },
+  "followUp": {
+    "title": "후속 이메일",
+    "tone": {
+      "professional": "격식체",
+      "friendly": "친근하게",
+      "concise": "간결하게"
+    },
+    "draftCta": "Claude로 초안 작성",
+    "drafting": "작성 중…",
+    "redrafting": "다시 작성 중…",
+    "to": "받는 사람",
+    "recipients": "수신자",
+    "subject": "제목",
+    "body": "본문",
+    "openInMail": "Mail에서 열기",
+    "openedMail": "메일 클라이언트에서 열림",
+    "copied": "후속 메일이 클립보드에 복사됨"
+  },
+  "coach": {
+    "title": "회의 코치",
+    "collapse": "코치 접기",
+    "expand": "코치 펼치기",
+    "listening": "듣는 중…",
+    "speakingDensity": "발화 밀도",
+    "denseHint": "발언이 많습니다 — 다른 사람에게 여지를 주세요.",
+    "questions": "질문",
+    "fillers": "군말",
+    "silences": "5초+ 침묵",
+    "elapsed": "경과",
+    "minutes": "{{count}}분",
+    "noQuestionsHint": "아직 질문이 없습니다 — 하나 던져 보세요.",
+    "coverage": "템플릿 커버리지",
+    "muteTitle": "음소거 중에는 오디오 대신 무음이 녹음됩니다",
+    "muted": "음소거됨",
+    "muteZone": "음소거 구간",
+    "flagMoment": "순간 표시"
+  },
+  "brief": {
+    "kicker": "회의 브리핑",
+    "startsIn": "{{count}}분 후 시작",
+    "talkingPoints": "제안된 대화 포인트",
+    "openActions": "이 그룹의 미완료 작업",
+    "standingDecisions": "유효한 결정",
+    "previousMeetings": "이전 회의"
+  },
+  "onboarding": {
+    "title": "Aguacate에 오신 것을 환영합니다",
+    "sub": "AI 회의 노트. 봇 없음. 클라우드 없음.",
+    "loadDemo": "데모 회의 불러오기",
+    "loading": "불러오는 중…",
+    "skip": "건너뛰기",
+    "callouts": {
+      "local": {
+        "title": "로컬 & 프라이빗",
+        "desc": "오디오가 이 Mac을 벗어나지 않습니다"
+      },
+      "ai": {
+        "title": "AI 인텔리전스",
+        "desc": "모든 회의의 작업, 결정, 주제"
+      },
+      "offline": {
+        "title": "오프라인 지원",
+        "desc": "전사가 100% 기기에서 실행됩니다"
+      }
+    },
+    "titlePrefix": "모든 대화는",
+    "titleEmphasis": "성장하여",
+    "titleSuffix": "지식이 돼요."
+  },
+  "tour": {
+    "stepIndicator": "{{total}}단계 중 {{step}}단계",
+    "skip": "건너뛰기",
+    "next": "다음",
+    "done": "완료",
+    "final": {
+      "title": "준비 완료",
+      "desc": "데모 회의를 살펴보거나, 첫 실제 회의를 기록할 준비가 되면 녹음을 누르세요.",
+      "cta": "알겠어요, 시작하죠"
+    },
+    "steps": {
+      "record": {
+        "title": "어떤 회의든 녹음",
+        "desc": "봇이 통화에 참여하지 않습니다. 오디오가 이 Mac을 벗어나지 않습니다. 녹음을 누르면 Aguacate가 Whisper AI로 모든 것을 로컬에서 캡처합니다."
+      },
+      "list": {
+        "title": "정리된 내 회의",
+        "desc": "모든 녹음이 여기에 자동으로 나타납니다. 회의를 클릭하면 AI가 생성한 노트, 작업, 결정을 볼 수 있습니다."
+      },
+      "notes": {
+        "title": "즉시 생성되는 AI 노트",
+        "desc": "Claude가 전사를 읽고 구조화된 노트를 작성합니다 — 요약, 핵심 논의, 결정, 작업."
+      },
+      "actions": {
+        "title": "자동 추출되는 작업",
+        "desc": "모든 작업이 담당자와 기한과 함께 자동으로 추출됩니다. 완료로 표시해 책임을 추적하세요."
+      },
+      "intel": {
+        "title": "회의 간 인텔리전스",
+        "desc": "작업, 결정, 주제, 사람 보기가 모든 회의의 패턴을 자동으로 드러냅니다."
+      }
+    }
+  },
+  "prompt": {
+    "autoStarts": "카운트다운이 끝나면 자동으로 녹음이 시작됩니다",
+    "startingSoon": "곧 시작 — 이 회의를 녹음할까요?",
+    "attendees": "참석자 {{count}}명",
+    "skip": "건너뛰기",
+    "recordNow": "지금 녹음"
+  },
+  "processing": {
+    "growing": "회의가 자라나고 있어요…",
+    "takesAbout": "보통 30초 정도 걸립니다.",
+    "aria": "처리 중"
+  },
+  "recording": {
+    "untitled": "제목 없는 회의",
+    "listening": "녹음 중",
+    "paused": "일시정지됨",
+    "muted": "음소거됨",
+    "aria": "녹음",
+    "mute": "마이크 음소거",
+    "unmute": "음소거 해제",
+    "micLabel": "마이크",
+    "mutedLabel": "음소거",
+    "pause": "녹음 일시정지",
+    "resume": "녹음 재개",
+    "pauseLabel": "일시정지",
+    "resumeLabel": "재개",
+    "stop": "녹음 중지",
+    "stopLabel": "중지"
+  },
+  "timeline": {
+    "emptyHead": "아직 타임라인이 없어요",
+    "emptySub": "회의에 전사가 생기면 대화 타임라인이 표시됩니다.",
+    "flagged": "표시한 순간",
+    "speakerFallback": "발화자 1",
+    "started": "회의 시작",
+    "wrapUp": "회의 마무리",
+    "flaggedPill": "표시됨"
+  },
+  "transcript": {
+    "emptyHead": "아직 전사가 없어요",
+    "emptySub": "회의 처리가 끝나면 전사가 여기에 표시됩니다.",
+    "play": "재생",
+    "pause": "일시정지",
+    "scrub": "탐색",
+    "nowPlaying": "재생 중",
+    "searchPlaceholder": "전사 검색",
+    "matchCount_other": "{{count}}개 일치",
+    "moments": "순간들",
+    "noMoments": "이 회의에는 표시된 순간이 없어요."
+  },
+  "ask": {
+    "emptyHead": "이 회의에 대해 물어보세요",
+    "emptySub": "답변은 이 회의의 노트와 전사만을 근거로 합니다.",
+    "placeholder": "이 회의에 대해 질문…",
+    "send": "보내기",
+    "sourceCount_other": "{{count}}개 출처",
+    "helpful": "도움됨",
+    "notHelpful": "도움 안 됨",
+    "thinking": "생각 중…",
+    "sources": "출처",
+    "suggestion": {
+      "risks": "위험 요소는 무엇인가요?",
+      "pricing": "가격 논의를 요약해 주세요",
+      "unresolved": "아직 해결되지 않은 것은 무엇인가요?"
+    }
+  },
+  "today": {
+    "title": "오늘",
+    "emptyHead": "오늘 일정이 없어요",
+    "emptySub": "오늘의 회의와 캘린더가 여기에 표시됩니다.",
+    "onCalendar": "캘린더 일정",
+    "captured": "오늘 기록됨",
+    "attendeeCount_other": "참석자 {{count}}명",
+    "openNotes": "노트 열기",
+    "record": "녹음",
+    "openActions_other": "미완료 실행 항목 {{count}}개"
+  },
+  "search": {
+    "title": "검색",
+    "sub": "모든 회의를 검색하거나 질문해 보세요.",
+    "placeholder": "검색 또는 질문…",
+    "fromMeetings": "내 회의에서",
+    "noAnswer": "회의에서 답을 찾지 못했어요",
+    "matches_other": "결과 {{count}}건",
+    "askCta": "Aguacate에게 “{{query}}” 물어보기",
+    "hint": "제목, 노트, 전사, 실행 항목을 검색하려면 입력하세요."
+  },
+  "zero": {
+    "title": "Meeting Zero",
+    "sub": "다음 회의 전에 준비하세요.",
+    "emptyHead": "예정된 회의가 없어요",
+    "emptySub": "캘린더에 회의가 생기면 준비 내용이 여기에 표시됩니다.",
+    "noHistory": "이 그룹과의 기록이 아직 없어요."
+  },
+  "digest": {
+    "title": "다이제스트",
+    "sub": "모든 회의를 자동으로 요약 — 수작업 없이",
+    "emptyHead": "이 기간에는 내용이 없어요",
+    "emptySub": "녹음한 회의가 여기에 자동으로 모여요.",
+    "meetingToday": "오늘 만나는 사람들",
+    "stale": "오래 대기 중",
+    "rangeLabel": "{{range}} · 회의 {{count}}개 · {{minutes}}분 녹음",
+    "weekly": "주간",
+    "daily": "일간",
+    "summaryBy": "Aguacate 요약",
+    "heroSentence": "{{periodWord}} 팀은 주로 {{topic}}에 집중했고, 아직 {{count}}개의 실행 항목이 남아 있어요.",
+    "heroSentenceNoTopic": "이번 기간 아직 {{count}}개의 실행 항목이 남아 있어요.",
+    "meetings": "회의",
+    "recurringTopics": "반복 주제",
+    "topicCount": "{{name}} · {{count}}",
+    "openActions": "미완료 실행 항목",
+    "periodWord_week": "이번 주",
+    "periodWord_day": "오늘"
+  },
+  "capture": {
+    "idleTitle": "캡처 준비 완료",
+    "idleSubtitle": "녹음을 시작하면 Aguacate가 듣기 시작해요.",
+    "recordingTitle": "새 녹음",
+    "recordingSubtitle": "Aguacate가 듣고 있어요 · {{time}}",
+    "rec": "REC",
+    "startRecording": "녹음 시작",
+    "viewMeeting": "회의 보기",
+    "replay": "다시 재생",
+    "chip": {
+      "actions_other": "실행 항목 {{count}}개",
+      "decisions_other": "결정 {{count}}개",
+      "topics_other": "주제 {{count}}개"
+    }
+  },
+  "upcomingToast": {
+    "startsIn": "{{title}}이(가) {{minutes}}분 후에 시작해요",
+    "willTranscribe": "통화에 참여하면 Aguacate가 자동으로 전사를 시작해요.",
+    "dismiss": "닫기"
+  },
+  "pdf": {
+    "eyebrow": "Aguacate — 회의 노트",
+    "execSummary": "요약",
+    "keyDiscussions": "주요 논의",
+    "decisionsMade": "결정 사항",
+    "actionItems": "실행 항목",
+    "owner": "담당자",
+    "action": "내용",
+    "due": "마감일",
+    "done": "완료",
+    "nextSteps": "다음 단계",
+    "complianceFlags": "컴플라이언스 플래그",
+    "noneIdentified": "발견된 사항 없음",
+    "generatedBy": "Aguacate에서 생성됨",
+    "participantCount_other": "참가자 {{count}}명"
   }
 }

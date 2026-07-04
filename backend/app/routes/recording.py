@@ -23,6 +23,10 @@ class MuteBody(BaseModel):
     muted: bool
 
 
+class PauseBody(BaseModel):
+    paused: bool
+
+
 @router.get("/devices")
 def devices():
     return {
@@ -39,6 +43,7 @@ def status():
         "recording": recorder.is_recording,
         "meeting_id": recorder.meeting_id,
         "muted": recorder.muted,
+        "paused": recorder.paused,
         "markers": len(recorder.markers),
     }
 
@@ -149,3 +154,12 @@ def set_mute(body: MuteBody):
         raise HTTPException(status_code=409, detail="Not recording")
     recorder.set_muted(body.muted)
     return {"muted": recorder.muted}
+
+
+@router.post("/pause")
+def set_pause(body: PauseBody):
+    """Pause: captures drop frames, so the recording timeline stops."""
+    if not recorder.is_recording:
+        raise HTTPException(status_code=409, detail="Not recording")
+    recorder.set_paused(body.paused)
+    return {"paused": recorder.paused}

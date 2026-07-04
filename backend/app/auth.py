@@ -14,11 +14,16 @@ def _check(token: str | None) -> bool:
 async def require_token(
     authorization: str | None = Header(default=None),
     x_aguacate_token: str | None = Header(default=None),
+    # arg named auth_qs (not "token") so it never collides with routes that
+    # have a {token} path param (share links); still read from ?token=
+    auth_qs: str | None = Query(default=None, alias="token"),
 ) -> None:
-    token = x_aguacate_token
-    if token is None and authorization and authorization.startswith("Bearer "):
-        token = authorization[7:]
-    if not _check(token):
+    # ?token= exists for media elements (<audio src>) that cannot send headers —
+    # same pattern as the WebSocket auth below.
+    value = x_aguacate_token or auth_qs
+    if value is None and authorization and authorization.startswith("Bearer "):
+        value = authorization[7:]
+    if not _check(value):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 

@@ -387,6 +387,35 @@ ipcMain.handle("aguacate:show-in-folder", async (_event, filePath) => {
   return { ok: true };
 });
 
+// Prints whatever is currently in the renderer's #pdf-print-root (the only
+// element visible under @media print — see styles.css) to a real PDF via
+// Chromium itself, so the export matches the HTML/CSS template exactly
+// instead of a separate PDF-drawing library re-implementing the design.
+const EXPORTS_DIR = path.join(DATA_DIR, "exports");
+ipcMain.handle("aguacate:export-pdf", async (event, filename) => {
+  if (typeof filename !== "string" || filename.length > 120) {
+    return { ok: false, error: "Invalid filename" };
+  }
+  const safeName = filename.replace(/[^A-Za-z0-9 _-]/g, "").trim().slice(0, 60) || "meeting";
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) return { ok: false, error: "No window" };
+  try {
+    fs.mkdirSync(EXPORTS_DIR, { recursive: true, mode: 0o700 });
+    const buffer = await win.webContents.printToPDF({
+      printBackground: true,
+      preferCSSPageSize: true,
+      margins: { marginType: "none" },
+    });
+    const dest = path.join(EXPORTS_DIR, `${safeName}.pdf`);
+    fs.writeFileSync(dest, buffer, { mode: 0o600 });
+    fs.chmodSync(dest, 0o600); // in case the file pre-existed with looser perms
+    return { ok: true, path: dest };
+  } catch (err) {
+    console.error("[export-pdf] failed:", err.message);
+    return { ok: false, error: err.message };
+  }
+});
+
 const WINDOW_ACTIONS = new Set(["minimize", "maximize", "close"]);
 ipcMain.handle("aguacate:window-control", (_event, action) => {
   if (typeof action !== "string" || !WINDOW_ACTIONS.has(action) || !mainWindow) {

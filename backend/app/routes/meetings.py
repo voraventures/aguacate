@@ -13,7 +13,12 @@ router = APIRouter(prefix="/api/meetings", tags=["meetings"])
 
 
 class RenameBody(BaseModel):
-    title: str = Field(min_length=1, max_length=300)
+    title: str | None = Field(default=None, min_length=1, max_length=300)
+    starred: bool | None = None
+
+
+class MeetingAskBody(BaseModel):
+    query: str = Field(min_length=3, max_length=300)
 
 
 class CreateMeetingBody(BaseModel):
@@ -145,13 +150,55 @@ def get_meeting(meeting_id: str):
 @router.patch("/{meeting_id}")
 def rename_meeting(meeting_id: str, body: RenameBody):
     db = get_db()
+    sets, params = [], []
+    if body.title is not None:
+        sets.append("title=?")
+        params.append(body.title.strip())
+    if body.starred is not None:
+        sets.append("starred=?")
+        params.append(1 if body.starred else 0)
+    if not sets:
+        raise HTTPException(status_code=422, detail="Nothing to update")
     cur = db.execute(
-        "UPDATE meetings SET title=? WHERE id=?", (body.title.strip(), meeting_id)
+        f"UPDATE meetings SET {', '.join(sets)} WHERE id=?", (*params, meeting_id)
     )
     db.commit()
     if cur.rowcount == 0:
         raise HTTPException(status_code=404, detail="Meeting not found")
     return {"ok": True}
+
+
+@router.get("/{meeting_id}/audio")
+def meeting_audio(meeting_id: str):
+    """Stream the recording so the transcript playback bar can seek it."""
+    from pathlib import Path
+
+    from fastapi.responses import FileResponse
+
+    from ..config import RECORDINGS_DIR
+
+    db = get_db()
+    row = db.execute(
+        "SELECT audio_path FROM meetings WHERE id=?", (meeting_id,)
+    ).fetchone()
+    if not row or not row["audio_path"]:
+        raise HTTPException(status_code=404, detail="No recording for this meeting")
+    path = Path(row["audio_path"])
+    # only serve files that actually live in the recordings dir
+    if not path.is_file() or RECORDINGS_DIR.resolve() not in path.resolve().parents:
+        raise HTTPException(status_code=404, detail="Recording file not found")
+    return FileResponse(path, media_type="audio/wav")
+
+
+@router.post("/{meeting_id}/ask")
+def ask_meeting_route(meeting_id: str, body: MeetingAskBody):
+    """Answer a question about this meeting from its notes and transcript."""
+    from ..services.ai import ask_meeting
+
+    try:
+        return ask_meeting(meeting_id, body.query.strip())
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.delete("/{meeting_id}")

@@ -1,34 +1,25 @@
+// The meeting workspace — header + tabs recreated from
+// design_handoff_aguacate_workspace/Aguacate Meeting.dc.html (#5i, canonical).
+// Title is static (zero manual labor: nothing here is ever typed by the
+// user), a green-gradient summary hero dominates, then Actions/Decisions
+// (left, heavier) and Topics/Open Questions/Highlight (right, lighter).
+// Content types the canonical mockup doesn't show (Heads Up, Compliance,
+// Conflicts, Next Steps, Key Discussions, Related) are real, still-shipping
+// capabilities — kept as conditional callouts above the hero (alerts) or
+// quiet unboxed sections below the two columns (extra generated content),
+// so the primary layout stays pixel-true while nothing is removed.
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, showInFolder } from "../api.js";
-import { useStore } from "../store.jsx";
+import { useStore, useLogo } from "../store.jsx";
+import AskTab from "./AskTab.jsx";
 import FollowUp from "./FollowUp.jsx";
 import Markdown from "./Markdown.jsx";
 import Onboarding from "./Onboarding.jsx";
-import LiveTranscript from "./LiveTranscript.jsx";
-import {
-  CheckIcon,
-  ClockIcon,
-  ExportIcon,
-  GavelIcon,
-  MicIcon,
-  RefreshIcon,
-  SendIcon,
-  SparkIcon,
-  TagIcon,
-  UsersIcon,
-  WarnIcon,
-} from "./icons.jsx";
-import { EmptyNotes } from "./illustrations.jsx";
-import cornerHeadsUp from "../assets/illustrations/corner-headsup-right.png";
-import cornerSummary from "../assets/illustrations/corner-summary-right.png";
-import cornerActions from "../assets/illustrations/corner-actions-right.png";
-import cornerDecisions from "../assets/illustrations/corner-decisions-right.png";
-import cornerDiscussion from "../assets/illustrations/corner-discussion-right.png";
-import bgSummary from "../assets/illustrations/bg-summary.png";
-import bgActions from "../assets/illustrations/bg-actions.png";
-import bgDecisions from "../assets/illustrations/bg-decisions.png";
-import bgCream from "../assets/illustrations/bg-cream.png";
+import TimelineTab from "./TimelineTab.jsx";
+import TranscriptTab from "./TranscriptTab.jsx";
+import { CheckIcon, ClockIcon, DotsIcon, StarIcon, UsersIcon, WarnIcon } from "./icons.jsx";
+import { Confirm } from "./ui.jsx";
 
 const INTEGRATION_LABELS = {
   slack: "Slack",
@@ -41,43 +32,52 @@ const INTEGRATION_LABELS = {
   zapier: "Zapier",
 };
 
-// Sections handled by dedicated components, not the generic renderer.
-const SPECIAL_SECTIONS = new Set(["Action Items", "Decisions Made"]);
-const SECTION_ICONS = {
-  "Executive Summary": SparkIcon,
-  "Compliance Flags": WarnIcon,
-  "Flagged Moments": TagIcon,
-};
+const AVATAR_COLORS = ["var(--av-amber)", "var(--av-purple)", "var(--av-teal)", "var(--av-green)"];
+const ACTIONS_PREVIEW = 4;
+
+const PLACED = new Set([
+  "Executive Summary",
+  "Action Items",
+  "Decisions Made",
+  "Key Discussions",
+  "Next Steps",
+  "Compliance Flags",
+]);
+const isQuestionSection = (name) => /question/i.test(name);
+const isRiskSection = (name) => /risk|compliance|flag/i.test(name);
+// "None identified." bodies leave the callout hidden (shown only when
+// applicable) — also when the model renders it as a bullet ("- None …").
+const hasContent = (body) => body && body.trim() && !/^[-*\s]*none\b/i.test(body.trim());
+
+function initials(name) {
+  return (name || "")
+    .split(/\s+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
 
 function EmptyState() {
   const { t } = useTranslation();
   return (
     <div className="empty-state" data-tour="notes-panel">
-      <div className="empty-art">
-        <EmptyNotes />
-      </div>
-      <div className="empty-title">{t('notes.empty.selectMeeting')}</div>
-      <div className="empty-sub">{t('notes.empty.selectMeetingSub')}</div>
+      <div className="empty-title">{t("notes.empty.selectMeeting")}</div>
+      <div className="empty-sub">{t("notes.empty.selectMeetingSub")}</div>
     </div>
   );
 }
 
-function ProcessingState({ stage, pct }) {
-  const { t } = useTranslation();
-  const labels = {
-    recording: t('notes.processing.recording'),
-    transcribing: pct
-      ? t('notes.processing.transcribingPct', { pct: Math.round(pct * 100) })
-      : t('notes.processing.transcribing'),
-    generating: t('notes.processing.writing'),
-  };
+function DetailSkeleton() {
   return (
-    <div className="processing-state">
-      <div className="processing-ring" />
-      <div style={{ fontSize: 12 }}>
-        {labels[stage] || t('notes.processing.processing')}
+    <div className="workspace">
+      <div className="ws-inner skeleton-detail" aria-hidden="true">
+        <div className="skeleton" style={{ height: 38, width: "62%" }} />
+        <div className="skeleton" style={{ height: 16, width: "38%" }} />
+        <div className="skeleton" style={{ height: 180, borderRadius: 18 }} />
+        <div className="skeleton" style={{ height: 140, borderRadius: 14 }} />
       </div>
-      <div style={{ fontSize: 11.5 }}>{t('notes.processing.audioLocal')}</div>
     </div>
   );
 }
@@ -86,17 +86,8 @@ function ActionRow({ item, onAssign, onComplete }) {
   const { t } = useTranslation();
   const [assigning, setAssigning] = useState(false);
   const [name, setName] = useState("");
-  const [copied, setCopied] = useState(false);
   const isTbd = !item.owner || item.owner.trim().toUpperCase() === "TBD";
-
-  const copy = () => {
-    navigator.clipboard
-      .writeText(`${item.owner}: ${item.action}${item.due ? ` (due ${item.due})` : ""}`)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      });
-  };
+  const done = item.status === "done";
 
   const submit = () => {
     const trimmed = name.trim();
@@ -105,53 +96,38 @@ function ActionRow({ item, onAssign, onComplete }) {
     setName("");
   };
 
-  const done = item.status === "done";
-
   return (
-    <div className={`action-row${done ? " completed" : ""}`}>
-      <span className={`owner-chip${isTbd ? " tbd" : ""}`}>
-        {isTbd ? t('notes.action.tbd') : item.owner}
-      </span>
-      <span className={`action-text${done ? " done" : ""}`}>
-        {item.action}
-      </span>
-      {item.due && <span className="action-due">{item.due}</span>}
-      <span className="action-tools">
-        {assigning ? (
-          <input
-            className="assign-input"
-            autoFocus
-            placeholder={t('notes.action.owner')}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") submit();
-              if (e.key === "Escape") setAssigning(false);
-            }}
-            onBlur={submit}
-          />
-        ) : (
-          <button className="tool-btn" onClick={() => setAssigning(true)}>
-            {t('notes.action.assign')}
-          </button>
-        )}
-        <button className="tool-btn" onClick={copy}>
-          {copied ? t('notes.action.copied') : t('notes.action.copy')}
-        </button>
+    <div className="ov-action-row">
+      <button
+        className={`ov-check${done ? " done" : ""}`}
+        onClick={() => onComplete(item)}
+        aria-label={done ? t("notes.action.markIncomplete") : t("notes.action.markComplete")}
+      >
+        {done && <CheckIcon size={10} strokeWidth={3.5} />}
+      </button>
+      <span className={`ov-action-text${done ? " done" : ""}`}>{item.action}</span>
+      {assigning ? (
+        <input
+          className="assign-input"
+          autoFocus
+          placeholder={t("notes.action.owner")}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submit();
+            if (e.key === "Escape") setAssigning(false);
+          }}
+          onBlur={submit}
+        />
+      ) : (
         <button
-          className={`tool-btn${done ? " done" : ""}`}
-          onClick={() => onComplete(item)}
-          title={done ? t('notes.action.markIncomplete') : t('notes.action.markComplete')}
+          className={`ov-action-owner${isTbd ? " tbd" : ""}`}
+          onClick={() => setAssigning(true)}
         >
-          {done ? (
-            <>
-              <CheckIcon size={12} /> {t('notes.action.done')}
-            </>
-          ) : (
-            t('notes.action.complete')
-          )}
+          {isTbd ? t("notes.action.tbd") : item.owner}
         </button>
-      </span>
+      )}
+      <span className="ov-action-due">{done ? t("notes.action.done").toUpperCase() : item.due}</span>
     </div>
   );
 }
@@ -160,12 +136,14 @@ function ConflictCard({ conflict, onResolve }) {
   const { t } = useTranslation();
   return (
     <div className="conflict-card">
-      <div className="section-label" style={{ color: "var(--danger)" }}>
-        <WarnIcon size={13} /> {t('notes.conflict.detected')}
+      <div className="surface-title">
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <WarnIcon size={15} /> {t("notes.conflict.detected")}
+        </span>
       </div>
       <div className="conflict-pair">
         <div className="conflict-side new">
-          <span className="conflict-tag">{t('notes.conflict.new')}</span>
+          <span className="conflict-tag">{t("notes.conflict.new")}</span>
           <p>{conflict.new_decision}</p>
         </div>
         <div className="conflict-side old">
@@ -175,136 +153,16 @@ function ConflictCard({ conflict, onResolve }) {
           <p>{conflict.old_decision}</p>
         </div>
       </div>
-      {conflict.explanation && (
-        <p className="conflict-why">{conflict.explanation}</p>
-      )}
-      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-        <button className="btn" style={{ padding: "6px 12px", fontSize: 12 }} onClick={() => onResolve(conflict.id, "superseded")}>
-          {t('notes.conflict.supersedes')}
+      {conflict.explanation && <p className="conflict-why">{conflict.explanation}</p>}
+      <div className="conflict-actions">
+        <button className="btn compact" onClick={() => onResolve(conflict.id, "superseded")}>
+          {t("notes.conflict.supersedes")}
         </button>
-        <button className="btn secondary" style={{ padding: "6px 12px", fontSize: 12 }} onClick={() => onResolve(conflict.id, "reviewed")}>
-          {t('notes.conflict.markReviewed')}
+        <button className="btn secondary compact" onClick={() => onResolve(conflict.id, "reviewed")}>
+          {t("notes.conflict.markReviewed")}
         </button>
       </div>
     </div>
-  );
-}
-
-function CoachRecap({ coach }) {
-  const { t } = useTranslation();
-  if (!coach || !coach.elapsed_sec) return null;
-  return (
-    <div className="ai-meta-bar" style={{ marginTop: 12 }}>
-      <span className="ai-meta-item">
-        <strong>{Math.round((coach.talk_density || 0) * 100)}%</strong> {t('notes.coach.speakingDensity')}
-      </span>
-      <span className="ai-meta-item">
-        <strong>{coach.questions}</strong> {t('notes.coach.questions')}
-      </span>
-      <span className="ai-meta-item">
-        <strong>{coach.fillers}</strong> {t('notes.coach.fillers')}
-      </span>
-      <span className="ai-meta-item">
-        <strong>{coach.long_silences}</strong> {t('notes.coach.longSilences')}
-      </span>
-    </div>
-  );
-}
-
-function SpeakerBadge({ speaker }) {
-  const n = parseInt(speaker?.replace("Speaker ", ""), 10) || 1;
-  const colors = ["var(--accent)", "var(--muted)", "#7b68ee", "#e8923c", "#2fb88b"];
-  return (
-    <span
-      className="speaker-badge"
-      style={{ background: colors[(n - 1) % colors.length] }}
-    >
-      S{n}
-    </span>
-  );
-}
-
-function TranscriptView({ segments }) {
-  const { t } = useTranslation();
-  if (!segments || segments.length === 0) {
-    return <p style={{ color: "var(--muted)", fontSize: 12 }}>{t('notes.transcript.none')}</p>;
-  }
-  const hasSpeakers = segments.some((s) => s.speaker);
-  if (!hasSpeakers) {
-    return (
-      <p style={{ fontSize: 12.5, lineHeight: 1.65 }}>
-        {segments.map((s) => s.text).join(" ")}
-      </p>
-    );
-  }
-  // Group consecutive segments by speaker
-  const groups = [];
-  for (const seg of segments) {
-    const last = groups[groups.length - 1];
-    if (last && last.speaker === seg.speaker) {
-      last.texts.push(seg.text);
-    } else {
-      groups.push({ speaker: seg.speaker || "Speaker 1", texts: [seg.text] });
-    }
-  }
-  return (
-    <div className="diarized-transcript">
-      {groups.map((g, i) => (
-        <div key={i} className="diarized-turn">
-          <SpeakerBadge speaker={g.speaker} />
-          <span className="diarized-text">{g.texts.join(" ")}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Sections with a pastel card treatment (data-section styling).
-const FIG_SECTIONS = new Set([
-  "Heads Up",
-  "Executive Summary",
-  "Action Items",
-  "Key Decisions",
-  "Key Discussions",
-  "Next Steps",
-]);
-
-function figureSectionName(section) {
-  if (!section) return null;
-  if (FIG_SECTIONS.has(section)) return section;
-  const normalized = section.toLowerCase();
-  if (normalized.includes("key discussion")) return "Key Discussions";
-  if (normalized.includes("next step")) return "Next Steps";
-  return null;
-}
-
-// Illustration bled off each card's right edge, behind the text,
-// with a soft watercolor wash glowing behind it.
-const CARD_ILLUSTRATIONS = {
-  "Heads Up": cornerHeadsUp,
-  "Executive Summary": cornerSummary,
-  "Action Items": cornerActions,
-  "Key Decisions": cornerDecisions,
-  "Key Discussions": cornerDiscussion,
-};
-// ponytail: no bg-discussion.png asset exists; bg-cream is the warm stand-in
-const CARD_WASHES = {
-  "Heads Up": bgSummary,
-  "Executive Summary": bgSummary,
-  "Action Items": bgActions,
-  "Key Decisions": bgDecisions,
-  "Key Discussions": bgCream,
-};
-
-function CardFigures({ section }) {
-  const name = figureSectionName(section);
-  const src = CARD_ILLUSTRATIONS[name];
-  if (!src) return null;
-  return (
-    <>
-      <img className="card-fig-wash" src={CARD_WASHES[name]} alt="" aria-hidden="true" />
-      <img className="card-fig" src={src} alt="" aria-hidden="true" />
-    </>
   );
 }
 
@@ -321,70 +179,50 @@ export default function NotesPanel() {
     selectMeeting,
     deleteMeeting,
     templates,
-    meetings,
-    recording,
   } = useStore();
-  const [title, setTitle] = useState("");
-  const [sendOpen, setSendOpen] = useState(false);
-  const [regenOpen, setRegenOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const logoUrl = useLogo();
+  const [tab, setTab] = useState("overview"); // overview | timeline | transcript | ask
+  const [menu, setMenu] = useState(null); // null | "main" | "send" | "regen"
   const [followUpOpen, setFollowUpOpen] = useState(false);
-  const [coachVisible, setCoachVisible] = useState(false);
   const [shareModal, setShareModal] = useState(null); // { url }
-  const [notesTab, setNotesTab] = useState("notes"); // notes | transcript
-  const [myItemsOnly, setMyItemsOnly] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [showAllActions, setShowAllActions] = useState(false);
   const [onboarded, setOnboarded] = useState(
     () => localStorage.getItem("aguacate_onboarded") === "true"
   );
-  const titleRef = useRef(null);
-  const moreRef = useRef(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    setTitle(meetingDetail?.title || "");
-    setSendOpen(false);
-    setRegenOpen(false);
-    setMoreOpen(false);
+    setMenu(null);
     setFollowUpOpen(false);
-    setCoachVisible(false);
-    setNotesTab("notes");
+    setTab("overview");
+    setShowAllActions(false);
   }, [meetingDetail?.id]);
 
   useEffect(() => {
-    api.get("/api/settings/user-name").then((r) => setUserName(r.user_name || "")).catch(() => {});
-  }, []);
-
-  // Close the overflow menu when clicking outside it.
-  useEffect(() => {
-    if (!moreOpen) return;
+    if (!menu) return;
     const onDocMouseDown = (e) => {
-      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenu(null);
     };
     document.addEventListener("mousedown", onDocMouseDown);
     return () => document.removeEventListener("mousedown", onDocMouseDown);
-  }, [moreOpen]);
-
-  const deleteFromNotes = () => {
-    setMoreOpen(false);
-    if (window.confirm(t('notes.confirm.delete'))) {
-      deleteMeeting(meetingDetail.id);
-    }
-  };
+  }, [menu]);
 
   if (!onboarded) {
-    return <Onboarding onDone={() => setOnboarded(true)} />;
-  }
-  if (!selectedId) {
-    return <EmptyState />;
-  }
-  if (!meetingDetail)
     return (
-      <div className="detail-panel">
-        <div className="processing-state" style={{ paddingTop: 120 }}>
-          <div className="processing-ring" />
-        </div>
+      <div className="workspace">
+        <Onboarding onDone={() => setOnboarded(true)} />
       </div>
     );
+  }
+  if (!selectedId) {
+    return (
+      <div className="workspace">
+        <EmptyState />
+      </div>
+    );
+  }
+  if (!meetingDetail) return <DetailSkeleton />;
 
   const m = meetingDetail;
   const live = progress[m.id]?.stage || m.status;
@@ -392,30 +230,36 @@ export default function NotesPanel() {
   const actions = intel.actions || [];
   const decisions = intel.decisions || [];
   const participants = intel.participants || [];
+  const topics = intel.topics || [];
   const headsUp = intel.heads_up || [];
   const related = intel.related || [];
   const conflicts = (m.conflicts || []).filter((c) => c.status === "open");
+  const markers = m.markers || [];
   const sections = m.notes?.sections || {};
   const executiveSummary = sections["Executive Summary"] || "";
-  const sectionEntries = Object.entries(sections).filter(
-    ([name, body]) => !SPECIAL_SECTIONS.has(name) && name !== "Executive Summary" && body?.trim()
+  const keyDiscussions = sections["Key Discussions"] || "";
+  const nextSteps = sections["Next Steps"] || "";
+  const compliance = sections["Compliance Flags"] || "";
+  const questionEntries = Object.entries(sections).filter(
+    ([name, body]) => isQuestionSection(name) && hasContent(body)
   );
-  const showMetaBar =
-    actions.length > 0 || decisions.length > 0 || participants.length > 0;
+  const riskEntries = Object.entries(sections).filter(
+    ([name, body]) =>
+      !PLACED.has(name) && !isQuestionSection(name) && isRiskSection(name) && hasContent(body)
+  );
+  const otherEntries = Object.entries(sections).filter(
+    ([name, body]) =>
+      !PLACED.has(name) && !isQuestionSection(name) && !isRiskSection(name) && body?.trim()
+  );
 
-  const saveTitle = () => {
-    const t = title.trim();
-    if (t && t !== m.title) {
-      api
-        .patch(`/api/meetings/${m.id}`, { title: t })
-        .then(() => {
-          refreshMeetings();
-          refreshDetail();
-        })
-        .catch((e) => showToast(e.message, "error"));
-    } else {
-      setTitle(m.title);
-    }
+  const toggleStar = () => {
+    api
+      .patch(`/api/meetings/${m.id}`, { starred: !m.starred })
+      .then(() => {
+        refreshDetail();
+        refreshMeetings();
+      })
+      .catch((e) => showToast(e.message, "error"));
   };
 
   const assign = (actionId, owner) => {
@@ -443,7 +287,7 @@ export default function NotesPanel() {
   };
 
   const shareMeeting = () => {
-    setMoreOpen(false);
+    setMenu(null);
     api
       .post(`/api/meetings/${m.id}/share`)
       .then((r) => setShareModal({ url: r.share_url }))
@@ -452,74 +296,68 @@ export default function NotesPanel() {
 
   const copyShareLink = () => {
     if (!shareModal) return;
-    const text = shareModal.url;
-    const ok = () => showToast(t('notes.toast.linkCopied'));
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
-    } else {
-      fallbackCopy(text, ok);
-    }
+    navigator.clipboard
+      ?.writeText(shareModal.url)
+      .then(() => showToast(t("notes.toast.linkCopied")))
+      .catch(() => showToast(t("notes.toast.copyFailed"), "error"));
   };
-
-  function fallbackCopy(text, cb) {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try {
-      document.execCommand("copy");
-      cb();
-    } catch {
-      showToast(t('notes.toast.copyFailed'), "error");
-    }
-    document.body.removeChild(ta);
-  }
 
   const resolveConflict = (conflictId, resolution) => {
     api
       .patch(`/api/intelligence/conflicts/${conflictId}`, { resolution })
       .then(() => {
         refreshDetail();
-        showToast(resolution === "superseded" ? t('notes.toast.oldSuperseded') : t('notes.toast.markedReviewed'));
+        showToast(
+          resolution === "superseded"
+            ? t("notes.toast.oldSuperseded")
+            : t("notes.toast.markedReviewed")
+        );
       })
       .catch((e) => showToast(e.message, "error"));
   };
 
   const doExport = (fmt) => {
+    setMenu(null);
+    if (fmt === "pdf") {
+      // Prints the live #pdf-print-root (design-reference/Meeting Note PDF.dc.html)
+      // via Electron's own Chromium instead of the fpdf2 drawing library, so the
+      // export matches the real HTML/CSS template exactly.
+      if (!window.aguacate?.exportPdf) {
+        showToast(t("notes.toast.pdfDesktopOnly"), "error");
+        return;
+      }
+      window.aguacate
+        .exportPdf(m.title)
+        .then((res) => {
+          if (!res?.ok) throw new Error(res?.error || "Export failed");
+          showToast(t("notes.toast.exported", { fmt: "PDF" }));
+          showInFolder(res.path);
+        })
+        .catch((e) => showToast(e.message, "error"));
+      return;
+    }
     api
       .post(`/api/export/${m.id}/${fmt}`)
       .then(({ path }) => {
-        showToast(t('notes.toast.exported', { fmt: fmt.toUpperCase() }));
+        showToast(t("notes.toast.exported", { fmt: fmt.toUpperCase() }));
         showInFolder(path);
       })
       .catch((e) => showToast(e.message, "error"));
   };
 
   const copySlackDigest = () => {
+    setMenu(null);
     api
       .get(`/api/export/${m.id}/slack`)
       .then(({ text }) =>
-        navigator.clipboard.writeText(text).then(() => showToast(t('notes.toast.slackCopied')))
+        navigator.clipboard.writeText(text).then(() => showToast(t("notes.toast.slackCopied")))
       )
       .catch((e) => showToast(e.message, "error"));
   };
 
-  const downloadMyActions = () => {
-    api
-      .post(`/api/export/${m.id}/my-actions`)
-      .then(({ path }) => {
-        showToast(t('notes.toast.exportedActions'));
-        showInFolder(path);
-      })
-      .catch((e) => showToast(e.message, "error"));
-  };
-
   const sendTo = (provider) => {
-    setSendOpen(false);
-    showToast(t('notes.toast.sendingTo', { label: INTEGRATION_LABELS[provider] }));
+    setMenu(null);
+    showToast(t("notes.toast.sendingTo", { label: INTEGRATION_LABELS[provider] }));
     api
       .post(`/api/integrations/${provider}/send/${m.id}`)
       .then((r) => showToast(r.message))
@@ -527,400 +365,434 @@ export default function NotesPanel() {
   };
 
   const regenerateWith = (templateId) => {
-    setRegenOpen(false);
+    setMenu(null);
     api
       .post(`/api/meetings/${m.id}/regenerate`, { template_id: templateId })
-      .then(() => showToast(t('notes.toast.regenerating')))
+      .then(() => showToast(t("notes.toast.regenerating")))
       .catch((e) => showToast(e.message, "error"));
   };
 
-  const fmtDate = new Date(m.started_at).toLocaleString([], {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-  const templateName = templates.find((t) => t.id === m.template_id)?.name;
+  const started = new Date(m.started_at);
+  const isToday = started.toDateString() === new Date().toDateString();
+  const fmtDate = `${
+    isToday
+      ? t("notes.header.today")
+      : started.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })
+  }, ${started.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+  const durationMins =
+    m.started_at && m.ended_at ? Math.round((new Date(m.ended_at) - started) / 60000) : 0;
+  const durationLabel =
+    durationMins >= 60
+      ? `${Math.floor(durationMins / 60)}h ${durationMins % 60 ? `${durationMins % 60}m` : ""}`.trim()
+      : `${durationMins}m`;
+
+  const busy = ["recording", "transcribing", "generating"].includes(live);
+  const ready = !busy && live !== "error" && m.notes;
+
+  const visibleActions = showAllActions ? actions : actions.slice(0, ACTIONS_PREVIEW);
+  const hiddenActionCount = actions.length - visibleActions.length;
+  const firstMarker = markers.length > 0 ? markers[0] : null;
 
   return (
-    <div className="detail-panel">
-      <div className="detail-inner" data-tour="notes-panel">
-        <input
-          ref={titleRef}
-          className="notes-title-input"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onBlur={saveTitle}
-          onKeyDown={(e) => e.key === "Enter" && titleRef.current?.blur()}
-          spellCheck={false}
-        />
-
-        <div className="meta-pills">
-          {m.audio_path && (
-            <span className="pill rec">
-              <MicIcon size={11} /> {t('notes.header.recorded')}
-            </span>
-          )}
-          <span className="pill">
-            <ClockIcon size={11} /> {fmtDate}
-          </span>
-          {participants.length > 0 && (
-            <span className="pill">
-              <UsersIcon size={11} /> {t('notes.header.attendee', { count: participants.length })}
-            </span>
-          )}
-          {templateName && templateName !== "Default" && (
-            <span className="pill">
-              <TagIcon size={11} /> {templateName}
-            </span>
-          )}
-          {!!m.followup_sent && (
-            <span className="pill rec">
-              <SendIcon size={11} /> {t('notes.header.followupSent')}
-            </span>
-          )}
-          <div className="notes-header-menu" ref={moreRef}>
-            <button
-              className="notes-header-menu-btn"
-              aria-label={t('notes.header.moreOptions')}
-              onClick={() => setMoreOpen(!moreOpen)}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <circle cx="5" cy="12" r="2" />
-                <circle cx="12" cy="12" r="2" />
-                <circle cx="19" cy="12" r="2" />
-              </svg>
-            </button>
-            {moreOpen && (
-              <div className="card-menu-dropdown" role="menu">
-                <button className="menu-item" onClick={shareMeeting}>
-                  {t('notes.header.shareMeeting')}
-                </button>
-                <button
-                  className="menu-item"
-                  onClick={() => {
-                    setMoreOpen(false);
-                    api
-                      .post(`/api/meetings/${m.id}/share-to-workspace`)
-                      .then(() => showToast(t('notes.toast.sharedTeam')))
-                      .catch((e) => showToast(e.message, "error"));
-                  }}
-                >
-                  {t('notes.header.shareTeam')}
-                </button>
-                <button className="delete-menu-item" onClick={deleteFromNotes}>
-                  {t('notes.header.deleteMeeting')}
-                </button>
-              </div>
+    <div className="workspace">
+      <div className="ws-inner" data-tour="notes-panel">
+        <div className="ws-header">
+          <div className="ws-header-left">
+            <div className="ws-title-row">
+              <h1 className="ws-title">{m.title}</h1>
+              <button
+                className={`ws-star${m.starred ? " on" : ""}`}
+                title={m.starred ? t("notes.header.unstar") : t("notes.header.star")}
+                onClick={toggleStar}
+              >
+                <StarIcon size={19} filled={!!m.starred} />
+              </button>
+            </div>
+            <div className="ws-meta">
+              <span>{fmtDate}</span>
+              {durationMins > 0 && (
+                <span className="meta-item">
+                  <ClockIcon size={14} /> {durationLabel}
+                </span>
+              )}
+              {participants.length > 0 && (
+                <span className="meta-item">
+                  <UsersIcon size={14} /> {t("notes.header.attendee", { count: participants.length })}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="ws-header-right">
+            {participants.length > 0 && (
+              <span className="avatar-stack" title={participants.join(", ")}>
+                {participants.slice(0, 3).map((p, i) => (
+                  <span
+                    className="avatar"
+                    key={p}
+                    style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}
+                  >
+                    {initials(p)}
+                  </span>
+                ))}
+                {participants.length > 3 && (
+                  <span className="avatar" style={{ background: "var(--surface-2)", color: "var(--muted)" }}>
+                    +{participants.length - 3}
+                  </span>
+                )}
+              </span>
             )}
+            <button className="ws-share-btn" onClick={shareMeeting}>
+              {t("notes.header.share")}
+            </button>
+            <div className="row-menu" style={{ position: "relative", top: 0, right: 0 }} ref={menuRef}>
+              <button
+                className="icon-btn"
+                aria-label={t("notes.header.moreOptions")}
+                onClick={() => setMenu(menu ? null : "main")}
+              >
+                <DotsIcon size={16} />
+              </button>
+              {menu === "main" && (
+                <div className="card-menu-dropdown" role="menu">
+                  <button
+                    className="menu-item"
+                    onClick={() => {
+                      setMenu(null);
+                      setFollowUpOpen(true);
+                    }}
+                  >
+                    {t("notes.toolbar.followup")}
+                  </button>
+                  <button className="menu-item" onClick={() => doExport("pdf")}>
+                    {t("notes.toolbar.pdf")}
+                  </button>
+                  <button className="menu-item" onClick={() => doExport("markdown")}>
+                    {t("notes.toolbar.md")}
+                  </button>
+                  <button className="menu-item" onClick={copySlackDigest}>
+                    {t("notes.toolbar.slackDigest")}
+                  </button>
+                  <button className="menu-item" onClick={() => setMenu("send")}>
+                    {t("notes.toolbar.sendTo")} ›
+                  </button>
+                  <button className="menu-item" onClick={() => setMenu("regen")}>
+                    {t("notes.toolbar.regenerate")} ›
+                  </button>
+                  <div className="menu-divider" />
+                  <button
+                    className="menu-item"
+                    onClick={() => {
+                      setMenu(null);
+                      api
+                        .post(`/api/meetings/${m.id}/share-to-workspace`)
+                        .then(() => showToast(t("notes.toast.sharedTeam")))
+                        .catch((e) => showToast(e.message, "error"));
+                    }}
+                  >
+                    {t("notes.header.shareTeam")}
+                  </button>
+                  <button
+                    className="delete-menu-item"
+                    onClick={() => {
+                      setMenu(null);
+                      setConfirmDelete(true);
+                    }}
+                  >
+                    {t("notes.header.deleteMeeting")}
+                  </button>
+                </div>
+              )}
+              {menu === "send" && (
+                <div className="card-menu-dropdown" role="menu">
+                  {Object.entries(INTEGRATION_LABELS).map(([key, label]) => (
+                    <button key={key} className="menu-item" onClick={() => sendTo(key)}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {menu === "regen" && (
+                <div className="card-menu-dropdown" role="menu">
+                  {templates.map((tpl) => (
+                    <button key={tpl.id} className="menu-item" onClick={() => regenerateWith(tpl.id)}>
+                      {tpl.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {live === "recording" && recording.active && recording.meetingId === m.id ? (
-          <LiveTranscript startedAt={m.started_at} />
-        ) : ["recording", "transcribing", "generating"].includes(live) ? (
-          <ProcessingState stage={live} pct={progress[m.id]?.pct} />
+        {busy ? (
+          <div className="empty-state" style={{ height: "auto", padding: "120px 24px" }}>
+            <div className="empty-title">{t("processing.growing")}</div>
+            <div className="empty-sub">{t("processing.takesAbout")}</div>
+          </div>
         ) : live === "error" ? (
-          <div className="section-card warning">
-            <div className="section-label">
-              <WarnIcon size={13} /> {t('notes.error.processingFailed')}
+          <div className="callout risk" style={{ marginTop: 28 }}>
+            <WarnIcon size={15} />
+            <div className="callout-body">
+              <div className="callout-title">{t("notes.error.processingFailed")}</div>
+              <div className="section-body">
+                <p>{m.error || t("notes.error.processingFailedSub")}</p>
+              </div>
+              <button className="btn compact" style={{ marginTop: 10 }} onClick={() => regenerateWith(null)}>
+                {t("notes.error.retry")}
+              </button>
             </div>
-            <div className="section-body">
-              <p>{m.error || t('notes.error.processingFailedSub')}</p>
-            </div>
-            <button
-              className="toolbar-btn"
-              style={{ marginTop: 12 }}
-              onClick={() => regenerateWith(null)}
-            >
-              <RefreshIcon size={13} /> {t('notes.error.retry')}
-            </button>
           </div>
         ) : !m.notes ? (
-          <div className="processing-state">
-            <div style={{ fontSize: 13 }}>{t('notes.error.noNotes')}</div>
+          <div className="empty-state" style={{ height: "auto", padding: "80px 24px" }}>
+            <div className="empty-sub">{t("notes.error.noNotes")}</div>
           </div>
         ) : (
           <>
-            {/* Tab switcher: Notes | Transcript */}
-            {m.transcript && (
-              <div className="notes-tab-bar">
+            <div className="ws-tabs">
+              {["overview", "timeline", "transcript", "ask"].map((k) => (
                 <button
-                  className={`notes-tab-btn${notesTab === "notes" ? " active" : ""}`}
-                  onClick={() => setNotesTab("notes")}
+                  key={k}
+                  className={`ws-tab${tab === k ? " active" : ""}`}
+                  onClick={() => setTab(k)}
                 >
-                  {t('notes.tab.notes')}
+                  {t(`notes.tab.${k}`)}
                 </button>
-                <button
-                  className={`notes-tab-btn${notesTab === "transcript" ? " active" : ""}`}
-                  onClick={() => setNotesTab("transcript")}
-                >
-                  {t('notes.tab.transcript')}
-                </button>
-                {m.workspace_id && (
-                  <span className="workspace-shared-badge">{t('notes.tab.shared')}</span>
-                )}
-              </div>
-            )}
-
-            {notesTab === "transcript" && m.transcript ? (
-              <div className="section-card">
-                <div className="section-label">{t('notes.transcript.full')}</div>
-                <div className="section-body transcript-body">
-                  <TranscriptView segments={m.transcript._segments} />
-                </div>
-              </div>
-            ) : (
-            <>
-            {showMetaBar && (
-              <div className="ai-meta-bar">
-                <span className="ai-meta-item">
-                  <strong>{actions.length}</strong> {t('notes.bar.actions')}
-                </span>
-                <span className="ai-meta-item">
-                  <strong>{decisions.length}</strong> {t('notes.bar.decisions')}
-                </span>
-                <span className="ai-meta-item">
-                  <strong>{participants.length}</strong> {t('notes.bar.participants')}
-                </span>
-                {m.coach && (
-                  <button
-                    className="tool-btn"
-                    style={{ marginLeft: "auto" }}
-                    onClick={() => setCoachVisible(!coachVisible)}
-                  >
-                    {t('notes.bar.coachRecap')}
-                  </button>
-                )}
-              </div>
-            )}
-            {coachVisible && <CoachRecap coach={m.coach} />}
-
-            {conflicts.map((c) => (
-              <ConflictCard key={c.id} conflict={c} onResolve={resolveConflict} />
-            ))}
-
-            {headsUp.length > 0 && (
-              <div className="section-card warning" data-section="Heads Up">
-                <CardFigures section="Heads Up" />
-                <div className="section-label">
-                  <WarnIcon size={13} /> {t('notes.bar.headsUp')}
-                </div>
-                <div className="section-body">
-                  <ul>
-                    {headsUp.map((h, i) => (
-                      <li key={i}>{h}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            <div
-              className="section-card stagger"
-              data-section="Executive Summary"
-              style={{ animationDelay: "0ms" }}
-            >
-              <CardFigures section="Executive Summary" />
-              <div className="section-label">
-                <SparkIcon size={13} /> Executive Summary
-              </div>
-              <Markdown text={executiveSummary} />
+              ))}
             </div>
 
-            <div
-              className="section-card stagger"
-              data-tour="action-items"
-              data-section="Action Items"
-              style={{ animationDelay: "60ms" }}
-            >
-              <CardFigures section="Action Items" />
-              <div className="section-label action-section-label">
-                <span><CheckIcon size={13} /> {t('notes.section.actionItems')}</span>
-                <span className="action-section-tools">
-                  <button
-                    className={`toolbar-btn${myItemsOnly ? " primary" : ""}`}
-                    onClick={() => {
-                      setMyItemsOnly((v) => !v);
-                      api
-                        .get("/api/settings/user-name")
-                        .then((r) => setUserName(r.user_name || ""))
-                        .catch(() => {});
-                    }}
-                  >
-                    {t('notes.action.myItems')}
-                  </button>
-                  {myItemsOnly && userName && (
-                    <button className="toolbar-btn" onClick={downloadMyActions}>
-                      <ExportIcon size={13} /> {t('notes.action.download')}
-                    </button>
-                  )}
-                </span>
-              </div>
-              {myItemsOnly && !userName ? (
-                <div className="section-empty-note">
-                  {t('notes.action.setNameFilter')}
-                </div>
-              ) : (
-                (() => {
-                  const list = myItemsOnly
-                    ? actions.filter(
-                        (a) =>
-                          (a.owner || "").trim().toLowerCase() ===
-                          userName.trim().toLowerCase()
-                      )
-                    : actions;
-                  if (myItemsOnly && list.length === 0) {
-                    return (
-                      <div className="section-empty-note">
-                        {t('notes.action.noneAssigned')}
+            {tab === "overview" && ready && (
+              <div className="ws-tabbody">
+                {headsUp.length > 0 && (
+                  <div className="callout">
+                    <WarnIcon size={15} />
+                    <div className="callout-body">
+                      <div className="callout-title">{t("notes.bar.headsUp")}</div>
+                      <div className="section-body">
+                        <ul>
+                          {headsUp.map((h, i) => (
+                            <li key={i}>{h}</li>
+                          ))}
+                        </ul>
                       </div>
-                    );
-                  }
-                  return list.map((a) => (
-                    <ActionRow key={a.id} item={a} onAssign={assign} onComplete={completeAction} />
-                  ));
-                })()
-              )}
-            </div>
-
-            <div
-              className="section-card stagger"
-              data-section="Key Decisions"
-              style={{ animationDelay: "120ms" }}
-            >
-              <CardFigures section="Key Decisions" />
-              <div className="section-label">
-                <GavelIcon size={13} /> {t('notes.section.keyDecisions')}
-              </div>
-              <div className="section-body">
-                <ul>
-                  {decisions.map((d) => (
-                    <li key={d.id} className={d.status === "superseded" ? "superseded" : ""}>
-                      {d.text}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Template-driven sections, in the order Claude produced them */}
-            {sectionEntries.map(([name, body], i) => {
-              const Icon = SECTION_ICONS[name];
-              const figSection = figureSectionName(name);
-              return (
-                <div
-                  className={`section-card stagger${name === "Compliance Flags" ? " warning" : ""}`}
-                  style={{ animationDelay: `${Math.min(i + 3, 6) * 60}ms` }}
-                  data-section={figSection || undefined}
-                  key={name}
-                >
-                  <CardFigures section={figSection} />
-                  <div className="section-label">
-                    {Icon && <Icon size={13} />} {name}
+                    </div>
                   </div>
-                  <Markdown text={body} />
-                </div>
-              );
-            })}
-
-            {related.length > 0 && (
-              <div className="section-card stagger">
-                <div className="section-label">{t('notes.section.relatedMeetings')}</div>
-                {related.map((r) => (
-                  <button
-                    key={r.meeting_id}
-                    className="related-row"
-                    onClick={() => selectMeeting(r.meeting_id)}
-                  >
-                    <span className="related-title">{r.title}</span>
-                    <span className="related-topics">
-                      {r.shared_topics.map((t) => (
-                        <span className="topic-tag" key={t}>
-                          {t}
-                        </span>
-                      ))}
-                    </span>
-                  </button>
+                )}
+                {hasContent(compliance) && (
+                  <div className="callout risk">
+                    <WarnIcon size={15} />
+                    <div className="callout-body">
+                      <div className="callout-title">{t("notes.section.compliance")}</div>
+                      <Markdown text={compliance} />
+                    </div>
+                  </div>
+                )}
+                {riskEntries.map(([name, body]) => (
+                  <div className="callout risk" key={name}>
+                    <WarnIcon size={15} />
+                    <div className="callout-body">
+                      <div className="callout-title">{name}</div>
+                      <Markdown text={body} />
+                    </div>
+                  </div>
                 ))}
+                {conflicts.map((c) => (
+                  <ConflictCard key={c.id} conflict={c} onResolve={resolveConflict} />
+                ))}
+
+                {/* the one deliberate green moment */}
+                <div className="summary-hero">
+                  <img className="summary-hero-watermark" src={logoUrl} alt="" aria-hidden="true" />
+                  <div className="summary-hero-head">
+                    <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" />
+                    <span className="summary-eyebrow">{t("notes.section.summaryBy")}</span>
+                  </div>
+                  {executiveSummary ? (
+                    <p className="summary-body">{executiveSummary}</p>
+                  ) : (
+                    <p className="summary-body summary-empty">{t("notes.section.noSummary")}</p>
+                  )}
+                </div>
+
+                <div className="ov-columns">
+                  <div className="ov-col-left">
+                    <div className="ov-section-head">
+                      <span className="ov-eyebrow">{t("notes.section.actions")}</span>
+                      <span className="ov-count">{String(actions.length).padStart(2, "0")}</span>
+                    </div>
+                    {actions.length === 0 ? (
+                      <div className="section-empty-note">{t("notes.action.none")}</div>
+                    ) : (
+                      <>
+                        {visibleActions.map((a) => (
+                          <ActionRow key={a.id} item={a} onAssign={assign} onComplete={completeAction} />
+                        ))}
+                        {hiddenActionCount > 0 && (
+                          <button className="ov-show-more" onClick={() => setShowAllActions(true)}>
+                            {t("notes.action.showMore", { count: hiddenActionCount })}
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    <div className="ov-section-head ov-section-head-spaced">
+                      <span className="ov-eyebrow">{t("notes.section.decisions")}</span>
+                      <span className="ov-count">{String(decisions.length).padStart(2, "0")}</span>
+                    </div>
+                    {decisions.length === 0 ? (
+                      <div className="section-empty-note">{t("notes.decisions.none")}</div>
+                    ) : (
+                      decisions.map((d) => (
+                        <div className="ov-decision-row" key={d.id}>
+                          <span className="ov-decision-dot" />
+                          <span className={d.status === "superseded" ? "superseded" : ""}>{d.text}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="ov-col-right">
+                    <div className="ov-eyebrow">{t("notes.section.topics")}</div>
+                    {topics.length === 0 ? (
+                      <div className="section-empty-note">{t("notes.action.none")}</div>
+                    ) : (
+                      <div className="ov-topic-chips">
+                        {topics.map((tp) => (
+                          <span className="ov-topic-chip" key={tp}>
+                            {tp}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {questionEntries.length > 0 &&
+                      questionEntries.map(([name, body]) => (
+                        <React.Fragment key={name}>
+                          <div className="ov-section-head ov-section-head-spaced">
+                            <span className="ov-eyebrow">{t("notes.section.questions")}</span>
+                          </div>
+                          <div className="ov-questions">
+                            <Markdown text={body} />
+                          </div>
+                        </React.Fragment>
+                      ))}
+
+                    {firstMarker != null && (
+                      <>
+                        <div className="ov-eyebrow ov-eyebrow-spaced">{t("notes.section.highlight")}</div>
+                        <div className="ov-highlight-card">
+                          <span className="ov-highlight-text">{t("notes.section.flaggedMoment")}</span>
+                          <span className="ov-highlight-time">
+                            {`${Math.floor(firstMarker / 60)}:${String(Math.floor(firstMarker % 60)).padStart(2, "0")}`}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {nextSteps.trim() && (
+                  <div className="plain-section">
+                    <div className="surface-title">{t("notes.section.nextSteps")}</div>
+                    <Markdown text={nextSteps} />
+                  </div>
+                )}
+                {keyDiscussions.trim() && (
+                  <div className="plain-section">
+                    <div className="surface-title">{t("notes.section.discussions")}</div>
+                    <Markdown text={keyDiscussions} />
+                  </div>
+                )}
+                {otherEntries.map(([name, body]) => (
+                  <div className="plain-section" key={name}>
+                    <div className="surface-title">{name}</div>
+                    <Markdown text={body} />
+                  </div>
+                ))}
+                {related.length > 0 && (
+                  <div className="plain-section">
+                    <div className="surface-title">{t("notes.section.relatedMeetings")}</div>
+                    {related.map((r) => (
+                      <button
+                        key={r.meeting_id}
+                        className="related-row"
+                        onClick={() => selectMeeting(r.meeting_id)}
+                      >
+                        <span className="related-title">{r.title}</span>
+                        <span className="topic-chips">
+                          {r.shared_topics.map((tp) => (
+                            <span className="topic-tag" key={tp}>
+                              {tp}
+                            </span>
+                          ))}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
-            <div className="notes-toolbar">
-              <button className="toolbar-btn primary" onClick={() => setFollowUpOpen(true)}>
-                <SendIcon size={13} /> {t('notes.toolbar.followup')}
-              </button>
-              <button className="toolbar-btn" onClick={() => doExport("pdf")}>
-                <ExportIcon size={13} /> {t('notes.toolbar.pdf')}
-              </button>
-              <button className="toolbar-btn" onClick={() => doExport("markdown")}>
-                <ExportIcon size={13} /> {t('notes.toolbar.md')}
-              </button>
-              <button className="toolbar-btn" onClick={copySlackDigest}>
-                <ExportIcon size={13} /> {t('notes.toolbar.slackDigest')}
-              </button>
-              <div style={{ position: "relative" }}>
-                <button className="toolbar-btn" onClick={() => setSendOpen(!sendOpen)}>
-                  <SendIcon size={13} /> {t('notes.toolbar.sendTo')}
-                </button>
-                {sendOpen && (
-                  <div className="popover-menu">
-                    {Object.entries(INTEGRATION_LABELS).map(([key, label]) => (
-                      <button key={key} className="nav-item" onClick={() => sendTo(key)}>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+            {tab === "timeline" && (
+              <div className="ws-tabbody">
+                <TimelineTab meeting={m} />
               </div>
-              <div style={{ position: "relative" }}>
-                <button className="toolbar-btn" onClick={() => setRegenOpen(!regenOpen)}>
-                  <RefreshIcon size={13} /> {t('notes.toolbar.regenerate')}
-                </button>
-                {regenOpen && (
-                  <div className="popover-menu">
-                    {templates.map((t) => (
-                      <button key={t.id} className="nav-item" onClick={() => regenerateWith(t.id)}>
-                        {t.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
+            )}
+            {tab === "transcript" && (
+              <div className="ws-tabbody">
+                <TranscriptTab meeting={m} />
               </div>
-            </div>
-            </>
+            )}
+            {tab === "ask" && (
+              <div className="ws-tabbody ask-tabbody">
+                <AskTab meeting={m} />
+              </div>
             )}
           </>
         )}
       </div>
+
+      {confirmDelete && (
+        <Confirm
+          title={t("list.deleteTitle")}
+          body={t("list.deleteBody", { title: m.title })}
+          confirmLabel={t("common.delete")}
+          danger
+          onConfirm={() => {
+            setConfirmDelete(false);
+            deleteMeeting(m.id);
+          }}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
       {followUpOpen && <FollowUp meeting={m} onClose={() => setFollowUpOpen(false)} />}
       {shareModal && (
         <div
-          className="modal-backdrop"
-          style={{ zIndex: 70 }}
+          className="modal-backdrop share-backdrop"
           onMouseDown={(e) => e.target === e.currentTarget && setShareModal(null)}
         >
-          <div className="modal" style={{ width: 440 }}>
+          <div className="modal share-modal">
             <div className="modal-header">
-              <div className="modal-title">{t('notes.share.created')}</div>
-              <button className="icon-btn" onClick={() => setShareModal(null)} aria-label={t('notes.share.close')}>
+              <div className="modal-title">{t("notes.share.created")}</div>
+              <button className="icon-btn" onClick={() => setShareModal(null)} aria-label={t("notes.share.close")}>
                 ✕
               </button>
             </div>
             <div className="modal-body">
-              <div style={{ display: "flex", gap: 7 }}>
-                <input className="text-input" readOnly value={shareModal.url} onFocus={(e) => e.target.select()} />
+              <div className="share-row">
+                <input
+                  className="text-input"
+                  readOnly
+                  value={shareModal.url}
+                  onFocus={(e) => e.target.select()}
+                />
                 <button className="btn" onClick={copyShareLink}>
-                  {t('notes.share.copyLink')}
+                  {t("notes.share.copyLink")}
                 </button>
               </div>
-              <div className="field-help" style={{ marginTop: 8 }}>
-                {t('notes.share.expires')}
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+              <div className="field-help share-expires">{t("notes.share.expires")}</div>
+              <div className="share-foot">
                 <button className="btn secondary" onClick={() => setShareModal(null)}>
-                  {t('notes.share.close')}
+                  {t("notes.share.close")}
                 </button>
               </div>
             </div>

@@ -7,56 +7,34 @@
       "topics": "Sujets",
       "people": "Personnes",
       "series": "Séries",
-      "conflicts": "Conflits"
-    },
-    "status": {
-      "recording": "Enregistrement",
-      "ready": "Prêt",
-      "online": "En ligne",
-      "starting": "Démarrage"
-    },
-    "time": {
+      "conflicts": "Conflits",
       "today": "Aujourd'hui",
-      "tomorrow": "Demain",
-      "now": "maintenant",
-      "inHM": "dans {{h}} h {{m}} min",
-      "inM": "dans {{m}} min"
+      "library": "Bibliothèque",
+      "search": "Rechercher",
+      "zero": "Meeting Zero",
+      "digest": "Digest"
     },
     "brand": {
       "pro": "Pro"
     },
-    "templateSelectTitle": "Modèle de notes pour le prochain enregistrement",
     "record": "Enregistrer",
     "stop": "Arrêter",
-    "meetingCard": {
-      "next": "Prochaine réunion",
-      "none": "Aucune réunion à venir détectée"
-    },
     "call": {
       "prompt": "{{app}} détecté — enregistrer cet appel ?",
       "title": "Appel {{app}}",
       "record": "Enregistrer maintenant",
       "dismiss": "Ignorer"
     },
-    "free": {
-      "planLabel": "FORMULE GRATUITE",
-      "usage": "{{used}} sur {{limit}} réunions gratuites utilisées",
-      "unlock": "Débloquer avec Pro :",
-      "unlimited": "Réunions illimitées",
-      "crossMeeting": "Intelligence inter-réunions",
-      "allIntegrations": "Toutes les intégrations",
-      "upgrade": "Passer à Pro — $20/mo"
-    },
-    "myWork": {
-      "title": "Mon travail",
-      "refresh": "Actualiser les compteurs",
-      "openActions": "Actions ouvertes",
-      "decisionsWeek": "Décisions cette semaine",
-      "meetingsProcessed": "Réunions traitées"
-    },
-    "navigate": "Naviguer",
     "toggleTheme": "Basculer clair/sombre",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "account": {
+      "you": "Vous",
+      "upgrade": "Passer à Pro"
+    },
+    "autoRecord": {
+      "min": "MIN",
+      "platformOn": "{{platform}} · transcription auto activée"
+    }
   },
   "app": {
     "error": {
@@ -68,9 +46,7 @@
       "unreachable": "IMPOSSIBLE DE JOINDRE LE MOTEUR LOCAL — REDÉMARREZ L'APPLICATION",
       "starting": "DÉMARRAGE DU MOTEUR LOCAL…"
     },
-    "dragResize": "Glisser pour redimensionner",
-    "expandList": "Développer la liste",
-    "expandMeetingList": "Développer la liste des réunions"
+    "dragResize": "Glisser pour redimensionner"
   },
   "intel": {
     "title": {
@@ -231,11 +207,7 @@
       "themeDesc": "Définit la palette de couleurs dans toute l'application.",
       "themes": {
         "default": "Par défaut",
-        "dark": "Sombre",
-        "rose": "Rose",
-        "navy": "Marine",
-        "warm": "Chaud",
-        "neon": "Néon"
+        "dark": "Sombre"
       },
       "fontSize": "Taille du texte",
       "fontSizeDesc": "Ajuste la taille du texte dans toute l'application. Moyenne est la valeur par défaut.",
@@ -308,7 +280,12 @@
       "accessDenied": "Accès au calendrier refusé. Accordez l'accès dans Réglages Système → Confidentialité et sécurité → Calendriers.",
       "disable": "Désactiver",
       "enable": "Activer",
-      "pollNote": "Aguacate interroge les calendriers connectés toutes les 30 secondes et fusionne automatiquement les événements en double entre les calendriers. macOS demandera l'autorisation d'accès au calendrier la première fois qu'Apple Calendar est activé."
+      "pollNote": "Aguacate interroge les calendriers connectés toutes les 30 secondes et fusionne automatiquement les événements en double entre les calendriers. macOS demandera l'autorisation d'accès au calendrier la première fois qu'Apple Calendar est activé.",
+      "intro": "Connectez un calendrier pour qu'Aguacate transcrive automatiquement les réunions dès que vous les rejoignez — pas besoin d'appuyer sur enregistrer.",
+      "autoTranscribe": "Transcrire automatiquement les réunions du calendrier",
+      "autoTranscribeDesc": "Rejoint Zoom, Meet et Teams automatiquement, sans confirmation.",
+      "notify5min": "Prévenir 5 minutes avant",
+      "notify5minDesc": "Bannière dans l'app avant le début d'une réunion enregistrée automatiquement."
     },
     "integrations": {
       "connected": "CONNECTÉ",
@@ -480,14 +457,6 @@
       "selectMeeting": "Sélectionnez une réunion",
       "selectMeetingSub": "Choisissez une réunion dans la liste pour afficher ses notes"
     },
-    "processing": {
-      "recording": "Enregistrement en cours…",
-      "transcribingPct": "Transcription en local — {{pct}} %",
-      "transcribing": "Transcription en local avec Whisper…",
-      "writing": "Claude rédige vos notes…",
-      "processing": "Traitement…",
-      "audioLocal": "L'audio ne quitte jamais ce Mac."
-    },
     "action": {
       "tbd": "À définir",
       "owner": "Responsable",
@@ -501,23 +470,16 @@
       "myItems": "Mes éléments",
       "download": "Télécharger",
       "setNameFilter": "Définissez votre nom dans Réglages → Général pour filtrer vos éléments",
-      "noneAssigned": "Aucune action à mener ne vous est attribuée dans cette réunion."
+      "noneAssigned": "Aucune action à mener ne vous est attribuée dans cette réunion.",
+      "none": "Aucune action dans cette réunion.",
+      "showMore_one": "Afficher {{count}} de plus",
+      "showMore_other": "Afficher {{count}} de plus"
     },
     "conflict": {
       "detected": "Conflit détecté",
       "new": "NOUVEAU",
       "supersedes": "La nouvelle décision remplace",
       "markReviewed": "Marquer comme examiné"
-    },
-    "coach": {
-      "speakingDensity": "densité de parole",
-      "questions": "questions",
-      "fillers": "mots de remplissage",
-      "longSilences": "longs silences"
-    },
-    "transcript": {
-      "none": "Aucune transcription disponible.",
-      "full": "Transcription complète"
     },
     "confirm": {
       "delete": "Supprimer cette réunion ? Cette action est irréversible."
@@ -532,7 +494,8 @@
       "exportedActions": "Vos actions à mener exportées",
       "sendingTo": "Envoi vers {{label}}…",
       "regenerating": "Régénération des notes…",
-      "sharedTeam": "Partagé avec l'espace de travail d'équipe"
+      "sharedTeam": "Partagé avec l'espace de travail d'équipe",
+      "pdfDesktopOnly": "L'export PDF n'est disponible que dans l'application de bureau."
     },
     "header": {
       "recorded": "Enregistrée",
@@ -542,7 +505,12 @@
       "moreOptions": "Plus d'options",
       "shareMeeting": "Partager la réunion",
       "shareTeam": "Partager avec l'équipe",
-      "deleteMeeting": "Supprimer la réunion"
+      "deleteMeeting": "Supprimer la réunion",
+      "share": "Partager",
+      "star": "Marquer la réunion",
+      "unstar": "Retirer le marquage",
+      "titleAria": "Titre de la réunion",
+      "today": "Aujourd'hui"
     },
     "error": {
       "processingFailed": "Échec du traitement",
@@ -551,9 +519,10 @@
       "noNotes": "Aucune note pour cette réunion pour l'instant."
     },
     "tab": {
-      "notes": "Notes",
       "transcript": "Transcription",
-      "shared": "Partagé"
+      "overview": "Aperçu",
+      "timeline": "Chronologie",
+      "ask": "Demander"
     },
     "bar": {
       "actions": "Actions",
@@ -565,7 +534,19 @@
     "section": {
       "actionItems": "Actions à mener",
       "keyDecisions": "Décisions clés",
-      "relatedMeetings": "Réunions liées"
+      "relatedMeetings": "Réunions liées",
+      "overview": "Aperçu",
+      "actions": "Actions",
+      "decisions": "Décisions",
+      "questions": "Questions ouvertes",
+      "topics": "Sujets",
+      "discussions": "Discussions clés",
+      "nextSteps": "Prochaines étapes",
+      "compliance": "Signalements de conformité",
+      "summaryBy": "Résumé par Aguacate",
+      "noSummary": "Pas encore de résumé.",
+      "highlight": "Moment fort",
+      "flaggedMoment": "Moment marqué"
     },
     "toolbar": {
       "followup": "Suivi",
@@ -580,6 +561,9 @@
       "copyLink": "Copier le lien",
       "expires": "Le lien expire dans 30 jours. Toute personne disposant de ce lien peut consulter un résumé en lecture seule de cette réunion.",
       "close": "Fermer"
+    },
+    "decisions": {
+      "none": "Aucune décision enregistrée dans cette réunion."
     }
   },
   "store": {
@@ -601,13 +585,322 @@
       "pulseBody_other": "{{count}} actions obsolètes nécessitent votre attention.",
       "conflictTitle": "Conflit détecté",
       "conflictBody": "Une nouvelle décision en contredit une plus ancienne.",
-      "transcriptionDoneTitle": "Transcription terminée",
-      "transcriptionDoneBody": "Claude rédige vos notes maintenant.",
+      "transcriptionDoneTitle": "Presque prêt",
+      "transcriptionDoneBody": "Votre conversation prend forme.",
       "notesReadyTitle": "Notes prêtes",
       "notesReadyBody": "Vos notes de réunion et vos actions à mener sont prêtes à être consultées.",
       "meetingDetectedTitle": "Réunion détectée",
       "meetingDetectedBody": "{{title}} est sur le point de commencer.",
       "fallbackMeeting": "Une réunion"
     }
+  },
+  "common": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "copy": "Copier",
+    "close": "Fermer",
+    "undo": "Annuler l'action",
+    "meetingDeleted": "Réunion supprimée",
+    "loading": "Chargement…"
+  },
+  "list": {
+    "title": "Réunions",
+    "searchPlaceholder": "Rechercher des réunions",
+    "noMatch": "Aucune réunion ne correspond à “{{query}}”. Essayez une personne, un sujet ou une action.",
+    "empty": {
+      "allHead": "Pas encore de réunion",
+      "allSub": "Enregistrez votre première réunion pour commencer"
+    },
+    "startRecording": "Démarrer l'enregistrement",
+    "menu": {
+      "more": "Plus d'options",
+      "options": "Options de la réunion",
+      "delete": "Supprimer la réunion"
+    },
+    "deleteTitle": "Supprimer cette réunion ?",
+    "deleteBody": "“{{title}}” — l'enregistrement, la transcription et les notes seront supprimés. Vous pouvez annuler pendant quelques secondes après la suppression.",
+    "group": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "week": "Cette semaine",
+      "month": "Ce mois-ci",
+      "earlier": "Plus ancien",
+      "upcoming": "À venir"
+    },
+    "status": {
+      "growing": "En pleine croissance…",
+      "failed": "Échec — ouvrir pour les détails"
+    },
+    "scopeToday": "Aujourd'hui",
+    "upcoming": {
+      "startingNow": "Commence maintenant",
+      "inMinutes_one": "dans {{count}} min",
+      "inMinutes_other": "dans {{count}} min",
+      "autoTranscribe": "Transcription automatique"
+    }
+  },
+  "followUp": {
+    "title": "E-mail de suivi",
+    "tone": {
+      "professional": "Professionnel",
+      "friendly": "Chaleureux",
+      "concise": "Concis"
+    },
+    "draftCta": "Rédiger avec Claude",
+    "drafting": "Rédaction…",
+    "redrafting": "Nouvelle rédaction…",
+    "to": "À",
+    "recipients": "Destinataires",
+    "subject": "Objet",
+    "body": "Corps",
+    "openInMail": "Ouvrir dans Mail",
+    "openedMail": "Ouvert dans votre client de messagerie",
+    "copied": "Suivi copié dans le presse-papiers"
+  },
+  "coach": {
+    "title": "COACH DE RÉUNION",
+    "collapse": "Réduire le coach",
+    "expand": "Développer le coach",
+    "listening": "Écoute…",
+    "speakingDensity": "Densité de parole",
+    "denseHint": "Temps de parole dense — laissez de l'espace aux autres.",
+    "questions": "questions",
+    "fillers": "tics de langage",
+    "silences": "silences >5s",
+    "elapsed": "écoulé",
+    "minutes": "{{count}} min",
+    "noQuestionsHint": "Aucune question posée — pensez à en ouvrir une.",
+    "coverage": "Couverture du modèle",
+    "muteTitle": "En sourdine, du silence est enregistré à la place de l'audio",
+    "muted": "En sourdine",
+    "muteZone": "Zone muette",
+    "flagMoment": "Marquer un moment"
+  },
+  "brief": {
+    "kicker": "BRIEF DE RÉUNION",
+    "startsIn": "Commence dans {{count}} minute",
+    "startsIn_other": "Commence dans {{count}} minutes",
+    "talkingPoints": "Points de discussion suggérés",
+    "openActions": "Actions ouvertes avec ce groupe",
+    "standingDecisions": "Décisions en vigueur",
+    "previousMeetings": "Réunions précédentes"
+  },
+  "onboarding": {
+    "title": "Bienvenue dans Aguacate",
+    "sub": "Notes de réunion IA. Sans bot. Sans cloud.",
+    "loadDemo": "Charger une réunion de démo",
+    "loading": "Chargement…",
+    "skip": "Passer",
+    "callouts": {
+      "local": {
+        "title": "Local et privé",
+        "desc": "Votre audio ne quitte jamais ce Mac"
+      },
+      "ai": {
+        "title": "Intelligence IA",
+        "desc": "Actions, décisions et sujets de toutes vos réunions"
+      },
+      "offline": {
+        "title": "Fonctionne hors ligne",
+        "desc": "La transcription s'exécute 100% sur l'appareil"
+      }
+    },
+    "titlePrefix": "Chaque conversation",
+    "titleEmphasis": "grandit",
+    "titleSuffix": "en connaissance."
+  },
+  "tour": {
+    "stepIndicator": "ÉTAPE {{step}} SUR {{total}}",
+    "skip": "Passer",
+    "next": "Suivant",
+    "done": "Terminé",
+    "final": {
+      "title": "Tout est prêt",
+      "desc": "Explorez votre réunion de démo ou appuyez sur Enregistrer quand vous serez prêt à capturer votre première vraie réunion.",
+      "cta": "Compris, allons-y"
+    },
+    "steps": {
+      "record": {
+        "title": "Enregistrez n'importe quelle réunion",
+        "desc": "Aucun bot ne rejoint votre appel. Aucun audio ne quitte ce Mac. Appuyez sur Enregistrer et Aguacate capture tout localement avec Whisper AI."
+      },
+      "list": {
+        "title": "Vos réunions, organisées",
+        "desc": "Chaque enregistrement apparaît ici automatiquement. Cliquez sur une réunion pour ouvrir ses notes, actions et décisions générées par l'IA."
+      },
+      "notes": {
+        "title": "Notes IA, instantanément",
+        "desc": "Claude lit votre transcription et rédige des notes structurées : résumé exécutif, discussions clés, décisions et actions."
+      },
+      "actions": {
+        "title": "Actions extraites",
+        "desc": "Chaque action est extraite automatiquement avec responsable et échéance. Marquez-les comme terminées pour suivre les engagements."
+      },
+      "intel": {
+        "title": "Intelligence inter-réunions",
+        "desc": "Les vues Actions, Décisions, Sujets et Personnes révèlent automatiquement des tendances dans toutes vos réunions."
+      }
+    }
+  },
+  "prompt": {
+    "autoStarts": "L'enregistrement démarre automatiquement à la fin du compte à rebours",
+    "startingSoon": "Ça commence bientôt — enregistrer cette réunion ?",
+    "attendees": "{{count}} participant",
+    "attendees_other": "{{count}} participants",
+    "skip": "Passer",
+    "recordNow": "Enregistrer"
+  },
+  "processing": {
+    "growing": "Votre réunion grandit…",
+    "takesAbout": "Cela prend environ 30 secondes.",
+    "aria": "Traitement"
+  },
+  "recording": {
+    "untitled": "Réunion sans titre",
+    "listening": "Enregistrement",
+    "paused": "En pause",
+    "muted": "Micro coupé",
+    "aria": "Enregistrement",
+    "mute": "Couper le micro",
+    "unmute": "Réactiver le micro",
+    "micLabel": "Micro",
+    "mutedLabel": "Coupé",
+    "pause": "Mettre en pause",
+    "resume": "Reprendre l'enregistrement",
+    "pauseLabel": "Pause",
+    "resumeLabel": "Reprendre",
+    "stop": "Arrêter l'enregistrement",
+    "stopLabel": "Arrêter"
+  },
+  "timeline": {
+    "emptyHead": "Pas encore de chronologie",
+    "emptySub": "La chronologie de la conversation apparaît dès que la réunion a une transcription.",
+    "flagged": "Moment marqué",
+    "speakerFallback": "Interlocuteur 1",
+    "started": "Réunion démarrée",
+    "wrapUp": "Clôture de la réunion",
+    "flaggedPill": "MARQUÉ"
+  },
+  "transcript": {
+    "emptyHead": "Pas encore de transcription",
+    "emptySub": "La transcription apparaîtra ici une fois la réunion prête.",
+    "play": "Lecture",
+    "pause": "Pause",
+    "scrub": "Avancer",
+    "nowPlaying": "en cours de lecture",
+    "searchPlaceholder": "Rechercher dans la transcription",
+    "matchCount_one": "{{count}} résultat",
+    "matchCount_other": "{{count}} résultats",
+    "moments": "Moments",
+    "noMoments": "Aucun moment marqué dans cette réunion."
+  },
+  "ask": {
+    "emptyHead": "Interrogez cette réunion",
+    "emptySub": "Les réponses s'appuient uniquement sur les notes et la transcription de cette réunion.",
+    "placeholder": "Posez une question sur cette réunion…",
+    "send": "Envoyer",
+    "sourceCount_one": "{{count}} source",
+    "sourceCount_other": "{{count}} sources",
+    "helpful": "Utile",
+    "notHelpful": "Pas utile",
+    "thinking": "Réflexion…",
+    "sources": "Sources",
+    "suggestion": {
+      "risks": "Quels sont les risques ?",
+      "pricing": "Résumer la discussion sur les prix",
+      "unresolved": "Qu'est-ce qui reste à résoudre ?"
+    }
+  },
+  "today": {
+    "title": "Aujourd'hui",
+    "emptyHead": "Rien de prévu aujourd'hui",
+    "emptySub": "Les réunions du jour et votre calendrier apparaîtront ici.",
+    "onCalendar": "Sur votre calendrier",
+    "captured": "Capturé aujourd'hui",
+    "attendeeCount_one": "{{count}} participant",
+    "attendeeCount_other": "{{count}} participants",
+    "openNotes": "Ouvrir les notes",
+    "record": "Enregistrer",
+    "openActions_one": "{{count}} action ouverte",
+    "openActions_other": "{{count}} actions ouvertes"
+  },
+  "search": {
+    "title": "Rechercher",
+    "sub": "Cherchez dans toutes vos réunions ou posez une question.",
+    "placeholder": "Rechercher ou demander…",
+    "fromMeetings": "Depuis vos réunions",
+    "noAnswer": "Aucune réponse trouvée dans vos réunions",
+    "matches_one": "{{count}} résultat",
+    "matches_other": "{{count}} résultats",
+    "askCta": "Demander à Aguacate : « {{query}} »",
+    "hint": "Tapez pour chercher dans les titres, notes, transcriptions et actions."
+  },
+  "zero": {
+    "title": "Meeting Zero",
+    "sub": "Arrivez préparé à votre prochaine réunion.",
+    "emptyHead": "Aucune réunion à venir",
+    "emptySub": "Quand une réunion figurera à votre calendrier, votre préparation apparaîtra ici.",
+    "noHistory": "Pas encore d'historique avec ce groupe."
+  },
+  "digest": {
+    "title": "Digest",
+    "sub": "Résumé généré automatiquement de toutes les réunions — sans effort manuel",
+    "emptyHead": "Rien pour cette période",
+    "emptySub": "Les réunions que vous enregistrez apparaîtront ici automatiquement.",
+    "meetingToday": "Personnes que vous voyez aujourd'hui",
+    "stale": "En attente depuis un moment",
+    "rangeLabel": "{{range}} · {{count}} réunions · {{minutes}}m enregistrées",
+    "weekly": "Hebdo",
+    "daily": "Quotidien",
+    "summaryBy": "Résumé par Aguacate",
+    "heroSentence": "Votre équipe a surtout travaillé sur {{topic}} {{periodWord}}, avec {{count}} actions encore ouvertes.",
+    "heroSentenceNoTopic": "{{count}} actions encore ouvertes cette période.",
+    "meetings": "Réunions",
+    "recurringTopics": "Sujets récurrents",
+    "topicCount": "{{name}} · {{count}}",
+    "openActions": "Actions ouvertes",
+    "periodWord_week": "cette semaine",
+    "periodWord_day": "aujourd'hui"
+  },
+  "capture": {
+    "idleTitle": "Prêt à capturer",
+    "idleSubtitle": "Démarrez un enregistrement et Aguacate écoutera.",
+    "recordingTitle": "Nouvel enregistrement",
+    "recordingSubtitle": "Aguacate écoute · {{time}}",
+    "rec": "REC",
+    "startRecording": "Démarrer l'enregistrement",
+    "viewMeeting": "Voir la réunion",
+    "replay": "Rejouer",
+    "chip": {
+      "actions_one": "{{count}} action",
+      "actions_other": "{{count}} actions",
+      "decisions_one": "{{count}} décision",
+      "decisions_other": "{{count}} décisions",
+      "topics_one": "{{count}} sujet",
+      "topics_other": "{{count}} sujets"
+    }
+  },
+  "upcomingToast": {
+    "startsIn": "{{title}} commence dans {{minutes}} min",
+    "willTranscribe": "Aguacate transcrira automatiquement dès que vous rejoindrez l'appel.",
+    "dismiss": "Ignorer"
+  },
+  "pdf": {
+    "eyebrow": "Aguacate — Notes de réunion",
+    "execSummary": "Résumé exécutif",
+    "keyDiscussions": "Points discutés",
+    "decisionsMade": "Décisions prises",
+    "actionItems": "Actions",
+    "owner": "Responsable",
+    "action": "Action",
+    "due": "Échéance",
+    "done": "FAIT",
+    "nextSteps": "Prochaines étapes",
+    "complianceFlags": "Alertes de conformité",
+    "noneIdentified": "Aucune identifiée",
+    "generatedBy": "Généré par Aguacate",
+    "participantCount_one": "{{count}} participant",
+    "participantCount_other": "{{count}} participants"
   }
 }

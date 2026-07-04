@@ -386,6 +386,87 @@ def action_pulse() -> dict:
     }
 
 
+def digest_summary(period: str = "week") -> dict:
+    """Auto-generated rollup for the Digest screen: real meetings, recurring
+    topics, and aggregated actions/decisions in the period — no per-item
+    fabricated data. The frontend templates the hero sentence from these
+    numbers itself (i18n-friendly) rather than a new LLM call."""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    if period == "day":
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=1)
+    else:
+        start = (now - timedelta(days=now.weekday())).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        end = start + timedelta(days=7)
+
+    rows = db.execute(
+        "SELECT id, title, started_at, ended_at FROM meetings "
+        "WHERE started_at >= ? AND started_at < ? ORDER BY started_at",
+        (start.isoformat(), end.isoformat()),
+    ).fetchall()
+    ids = [r["id"] for r in rows]
+
+    meetings = []
+    total_minutes = 0
+    for r in rows:
+        dur_min = 0
+        if r["ended_at"]:
+            started = datetime.fromisoformat(r["started_at"])
+            ended = datetime.fromisoformat(r["ended_at"])
+            dur_min = round((ended - started).total_seconds() / 60)
+            total_minutes += dur_min
+        day = datetime.fromisoformat(r["started_at"]).strftime("%a").upper()
+        meetings.append(
+            {"id": r["id"], "title": r["title"], "duration_min": dur_min, "day": day}
+        )
+
+    topics, open_actions, decisions = [], [], []
+    if ids:
+        ph = ",".join("?" * len(ids))
+        topics = [
+            dict(row)
+            for row in db.execute(
+                f"""SELECT name, COUNT(DISTINCT meeting_id) n FROM topics
+                    WHERE meeting_id IN ({ph}) GROUP BY LOWER(name)
+                    ORDER BY n DESC, name LIMIT 10""",
+                ids,
+            ).fetchall()
+        ]
+        open_actions = [
+            dict(row)
+            for row in db.execute(
+                f"""SELECT a.*, m.title AS meeting_title FROM action_items a
+                    JOIN meetings m ON m.id = a.meeting_id
+                    WHERE a.meeting_id IN ({ph}) AND a.status='open'
+                    ORDER BY m.started_at""",
+                ids,
+            ).fetchall()
+        ]
+        decisions = [
+            dict(row)
+            for row in db.execute(
+                f"""SELECT * FROM decisions WHERE meeting_id IN ({ph})
+                    AND status='active' ORDER BY decided_at""",
+                ids,
+            ).fetchall()
+        ]
+
+    return {
+        "period": period,
+        "range_start": start.isoformat(),
+        "range_end": (end - timedelta(seconds=1)).isoformat(),
+        "meeting_count": len(meetings),
+        "total_minutes": total_minutes,
+        "meetings": meetings,
+        "recurring_topics": topics,
+        "open_actions": open_actions,
+        "decisions": decisions,
+    }
+
+
 def meeting_brief(attendees: list[str], title: str) -> dict:
     """Pre-meeting intelligence: history with these attendees / this series."""
     db = get_db()
@@ -489,10 +570,18 @@ def meeting_intelligence(meeting_id: str) -> dict:
             participants = json.loads(meeting["attendees"])
         except json.JSONDecodeError:
             participants = []
+    topics = [
+        r["name"]
+        for r in db.execute(
+            "SELECT DISTINCT name FROM topics WHERE meeting_id=? ORDER BY name",
+            (meeting_id,),
+        )
+    ]
     return {
         "actions": actions,
         "decisions": decisions,
         "participants": participants,
+        "topics": topics,
         "heads_up": heads_up(meeting_id),
         "related": related_meetings(meeting_id),
     }

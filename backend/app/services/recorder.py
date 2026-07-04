@@ -105,6 +105,8 @@ class _DeviceCapture:
         channels = min(2, max(1, info["max_input_channels"]))
 
         def callback(indata, frames, time_info, status):
+            if recorder.paused:
+                return  # paused: drop frames entirely, the timeline stops
             if recorder.muted:
                 # privacy mute zone: keep the timeline, drop the content
                 self.chunks.append(np.zeros_like(indata))
@@ -157,6 +159,8 @@ class _WasapiLoopbackCapture:
                 with self._mic.recorder(samplerate=self.samplerate, channels=2) as rec:
                     while not self._stop.is_set():
                         data = rec.record(numframes=self.samplerate // 10)
+                        if recorder.paused:
+                            continue
                         self.chunks.append(np.asarray(data, dtype=np.float32))
             except Exception as exc:  # pragma: no cover
                 log.error("WASAPI loopback capture failed: %s", exc)
@@ -204,6 +208,7 @@ class Recorder:
         self._stop_levels = threading.Event()
         self._started_at: float | None = None
         self.muted = False           # privacy mute zone: capture writes silence
+        self.paused = False          # paused: captures drop frames entirely
         self.markers: list[float] = []  # flagged moments, seconds from start
 
     @property
@@ -215,6 +220,12 @@ class Recorder:
     def set_muted(self, muted: bool) -> None:
         self.muted = muted
         hub.emit("recording_muted", {"muted": muted})
+
+    # ponytail: elapsed/markers keep counting wall-clock while paused; only the
+    # audio timeline stops. Track pause offsets if marker precision matters.
+    def set_paused(self, paused: bool) -> None:
+        self.paused = paused
+        hub.emit("recording_paused", {"paused": paused})
 
     def add_marker(self) -> float | None:
         if self._meeting_id is None:
@@ -276,6 +287,7 @@ class Recorder:
 
             self._started_at = time.monotonic()
             self.muted = False
+            self.paused = False
             self.markers = []
             self._stop_levels.clear()
             self._level_thread = threading.Thread(target=self._emit_levels, daemon=True)
@@ -335,6 +347,7 @@ class Recorder:
             self._meeting_id = None
             self._started_at = None
             self.muted = False
+            self.paused = False
 
         tracks = [t for t in tracks if len(t) > 0]
         if tracks:

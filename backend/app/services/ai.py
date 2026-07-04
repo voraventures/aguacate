@@ -62,6 +62,62 @@ def compose_followup(meeting_id: str, tone: str) -> dict:
     }
 
 
+def ask_meeting(meeting_id: str, query: str) -> dict:
+    """Answer a question about one meeting from its notes and transcript.
+    Returns {"answer": str, "sources": [{"quote": str}]}."""
+    db = get_db()
+    meeting = db.execute("SELECT * FROM meetings WHERE id=?", (meeting_id,)).fetchone()
+    if not meeting:
+        raise RuntimeError("Meeting not found")
+    note = db.execute(
+        "SELECT content FROM notes WHERE meeting_id=?", (meeting_id,)
+    ).fetchone()
+    transcript = db.execute(
+        "SELECT text FROM transcripts WHERE meeting_id=?", (meeting_id,)
+    ).fetchone()
+    context_parts = []
+    if note and note["content"]:
+        context_parts.append("NOTES:\n" + note["content"][:10000])
+    if transcript and transcript["text"]:
+        context_parts.append("TRANSCRIPT:\n" + transcript["text"][:14000])
+    if not context_parts:
+        raise RuntimeError("This meeting has no notes or transcript yet")
+
+    client = get_client()
+    message = client.messages.create(
+        model=current_model(),
+        max_tokens=800,
+        system=(
+            "You answer questions about one specific meeting using only the "
+            "provided notes and transcript. Output ONLY JSON: "
+            '{"answer": "direct, concise answer", "sources": [{"quote": "short '
+            'verbatim or tightly paraphrased passage the answer rests on"}]}. '
+            "At most 3 sources. If the material does not contain the answer, "
+            'say so plainly in "answer" and return "sources": []. Never invent '
+            "content."
+        ),
+        messages=[
+            {
+                "role": "user",
+                "content": f"Meeting: {meeting['title']}\n\n"
+                + "\n\n".join(context_parts)
+                + f"\n\nQuestion: {query[:300]}",
+            }
+        ],
+    )
+    text = "".join(b.text for b in message.content if b.type == "text")
+    try:
+        parsed = _extract_json(text)
+    except (ValueError, json.JSONDecodeError):
+        return {"answer": text.strip()[:1500], "sources": []}
+    sources = [
+        {"quote": str(s.get("quote", ""))[:400]}
+        for s in (parsed.get("sources") or [])
+        if isinstance(s, dict) and s.get("quote")
+    ][:3]
+    return {"answer": str(parsed.get("answer", ""))[:1500], "sources": sources}
+
+
 def semantic_search(query: str) -> list[dict]:
     """Rank relevant excerpts across all meeting notes for a natural-language
     question. One Claude call over a compact corpus of summaries."""

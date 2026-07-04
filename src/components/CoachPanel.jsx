@@ -1,10 +1,7 @@
 // Meeting Coach: live conversational intelligence overlay during recording.
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "../store.jsx";
-
-function fmtMin(sec) {
-  return `${Math.max(1, Math.round(sec / 60))} min`;
-}
 
 function Meter({ value, warn }) {
   return (
@@ -18,6 +15,7 @@ function Meter({ value, warn }) {
 }
 
 export default function CoachPanel() {
+  const { t } = useTranslation();
   const { recording, coachData, coachOpen, setCoachOpen, muted, toggleMute, markerCount, dropMarker } =
     useStore();
 
@@ -34,64 +32,60 @@ export default function CoachPanel() {
       <button
         className="coach-toggle"
         onClick={() => setCoachOpen(!coachOpen)}
-        title={coachOpen ? "Collapse coach" : "Expand coach"}
+        title={coachOpen ? t("coach.collapse") : t("coach.expand")}
       >
         {coachOpen ? "›" : "‹"}
       </button>
       {coachOpen && (
         <div className="coach-body">
-          <div className="coach-title">MEETING COACH</div>
+          <div className="coach-title">{t("coach.title")}</div>
 
           {!c ? (
             <div className="coach-waiting">
-              <span className="spinner" /> Listening…
+              <span className="spinner" /> {t("coach.listening")}
             </div>
           ) : (
             <>
               <div className="coach-stat">
                 <div className="coach-stat-row">
-                  <span>Speaking density</span>
+                  <span>{t("coach.speakingDensity")}</span>
                   <strong className={densityWarn ? "warn" : ""}>
                     {Math.round((density || 0) * 100)}%
                   </strong>
                 </div>
                 <Meter value={density || 0} warn={densityWarn} />
                 {densityWarn && (
-                  <div className="coach-hint">
-                    Dense airtime — leave space for others.
-                  </div>
+                  <div className="coach-hint">{t("coach.denseHint")}</div>
                 )}
               </div>
 
               <div className="coach-grid">
                 <div className="coach-cell">
                   <strong>{c.questions}</strong>
-                  <span>questions</span>
+                  <span>{t("coach.questions")}</span>
                 </div>
                 <div className="coach-cell">
                   <strong className={c.fillers > 12 ? "warn" : ""}>{c.fillers}</strong>
-                  <span>fillers</span>
+                  <span>{t("coach.fillers")}</span>
                 </div>
                 <div className="coach-cell">
                   <strong>{c.long_silences}</strong>
-                  <span>silences &gt;5s</span>
+                  <span>{t("coach.silences")}</span>
                 </div>
                 <div className="coach-cell">
-                  <strong>{fmtMin(c.elapsed_sec)}</strong>
-                  <span>elapsed</span>
+                  <strong>{t("coach.minutes", { count: Math.max(1, Math.round((c.elapsed_sec || 0) / 60)) })}</strong>
+                  <span>{t("coach.elapsed")}</span>
                 </div>
               </div>
 
               {c.questions === 0 && c.elapsed_sec > 600 && (
-                <div className="coach-hint">
-                  No questions asked yet — consider opening one up.
-                </div>
+                <div className="coach-hint">{t("coach.noQuestionsHint")}</div>
               )}
 
               {total > 0 && (
                 <div className="coach-stat">
                   <div className="coach-stat-row">
-                    <span>Template coverage</span>
+                    <span>{t("coach.coverage")}</span>
                     <strong>
                       {covered}/{total}
                     </strong>
@@ -110,12 +104,12 @@ export default function CoachPanel() {
             <button
               className={`tool-btn${muted ? " danger" : ""}`}
               onClick={toggleMute}
-              title="While muted, silence is recorded instead of audio"
+              title={t("coach.muteTitle")}
             >
-              {muted ? "● Muted" : "Mute zone"}
+              {muted ? `● ${t("coach.muted")}` : t("coach.muteZone")}
             </button>
             <button className="tool-btn" onClick={dropMarker} title="⌘⇧M">
-              Flag moment{markerCount > 0 ? ` (${markerCount})` : ""}
+              {t("coach.flagMoment")}{markerCount > 0 ? ` (${markerCount})` : ""}
             </button>
           </div>
         </div>

@@ -52,6 +52,13 @@ export const api = {
   delete: (path) => request("DELETE", path),
 };
 
+// URL for media elements (<audio src>), which cannot send auth headers —
+// the backend accepts ?token= for this case.
+export function mediaUrl(path) {
+  if (!backend) return null;
+  return `${base()}${path}?token=${encodeURIComponent(backend.token)}`;
+}
+
 export function connectWebSocket(onEvent) {
   if (!backend) return () => {};
   let ws;

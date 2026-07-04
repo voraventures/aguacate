@@ -14,6 +14,27 @@ log = logging.getLogger("aguacate.calsync")
 
 POLL_INTERVAL = 30  # seconds, per spec
 PROMPT_WINDOW = 35  # prompt when start is within this many seconds
+WARN_WINDOW = 5 * 60  # 5-minute heads-up banner, per SPEC-calendar-autorecord.md
+
+_LINK_PATTERNS = [
+    (re.compile(r"https?://[^\s<>\"]*zoom\.us/[^\s<>\"]+", re.I), "Zoom"),
+    (re.compile(r"https?://meet\.google\.com/[^\s<>\"]+", re.I), "Google Meet"),
+    (re.compile(r"https?://teams\.microsoft\.com/[^\s<>\"]+", re.I), "Microsoft Teams"),
+    (re.compile(r"https?://[^\s<>\"]*webex\.com/[^\s<>\"]+", re.I), "Webex"),
+]
+
+
+def extract_meeting_link(*texts: str | None) -> tuple[str | None, str | None]:
+    """Find a real video-call link in any of the given text blobs (native
+    conferencing field, location, description) — never invents a platform."""
+    for text in texts:
+        if not text:
+            continue
+        for pattern, label in _LINK_PATTERNS:
+            m = pattern.search(text)
+            if m:
+                return label, m.group(0)
+    return None, None
 
 
 def _norm_title(title: str) -> str:
@@ -60,6 +81,9 @@ def sync_now() -> int:
     merged: dict[str, dict] = {}
     for ev in raw:
         key = dedup_key(ev["title"], ev.get("start"))
+        platform, join_url = extract_meeting_link(
+            ev.get("native_link"), ev.get("location"), ev.get("description")
+        )
         existing = merged.get(key)
         if existing:
             existing["provider_ids"].append(f"{ev['provider']}:{ev['provider_id']}")
@@ -67,6 +91,8 @@ def sync_now() -> int:
                 {a for a in existing["attendees"] + ev.get("attendees", []) if a}
             )
             existing["cancelled"] = existing["cancelled"] and ev.get("cancelled", False)
+            if not existing["join_url"] and join_url:
+                existing["platform"], existing["join_url"] = platform, join_url
         else:
             merged[key] = {
                 "id": key,
@@ -77,17 +103,20 @@ def sync_now() -> int:
                 "end": ev.get("end"),
                 "attendees": [a for a in ev.get("attendees", []) if a],
                 "cancelled": bool(ev.get("cancelled")),
+                "platform": platform,
+                "join_url": join_url,
             }
 
     db = get_db()
     for ev in merged.values():
         db.execute(
-            """INSERT INTO calendar_events(id,provider,provider_ids,title,start,end,attendees,cancelled)
-               VALUES(?,?,?,?,?,?,?,?)
+            """INSERT INTO calendar_events(id,provider,provider_ids,title,start,end,attendees,cancelled,platform,join_url)
+               VALUES(?,?,?,?,?,?,?,?,?,?)
                ON CONFLICT(id) DO UPDATE SET
                  provider_ids=excluded.provider_ids, title=excluded.title,
                  start=excluded.start, end=excluded.end,
-                 attendees=excluded.attendees, cancelled=excluded.cancelled""",
+                 attendees=excluded.attendees, cancelled=excluded.cancelled,
+                 platform=excluded.platform, join_url=excluded.join_url""",
             (
                 ev["id"],
                 ev["provider"],
@@ -97,6 +126,8 @@ def sync_now() -> int:
                 ev["end"],
                 json.dumps(ev["attendees"]),
                 int(ev["cancelled"]),
+                ev["platform"],
+                ev["join_url"],
             ),
         )
     db.commit()
@@ -248,6 +279,43 @@ def _check_auto_record() -> None:
                 hub.emit("meeting_prompt", payload)
 
 
+def _check_five_min_warning() -> None:
+    """Non-blocking 5-minute heads-up for calendar meetings with a real
+    video-call link — separate from the 35s auto-record prompt/start.
+    Per SPEC-calendar-autorecord.md: dismissible, informational only."""
+    mode = get_setting("recording_mode", "confirm_30s")
+    if mode in ("manual", "off") or not get_setting("notify_5min", True):
+        return
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    for row in db.execute(
+        "SELECT * FROM calendar_events WHERE cancelled=0 AND warned_5min=0 "
+        "AND recorded_meeting_id IS NULL AND join_url IS NOT NULL"
+    ).fetchall():
+        if _is_excluded(row["title"]):
+            continue
+        start = _parse_dt(row["start"])
+        if not start:
+            continue
+        until = (start - now).total_seconds()
+        if 0 <= until <= WARN_WINDOW:
+            db.execute(
+                "UPDATE calendar_events SET warned_5min=1 WHERE id=?", (row["id"],)
+            )
+            db.commit()
+            hub.emit(
+                "auto_record_upcoming",
+                {
+                    "event_id": row["id"],
+                    "title": row["title"],
+                    "start": row["start"],
+                    "seconds_until_start": max(0, int(until)),
+                    "platform": row["platform"],
+                    "join_url": row["join_url"],
+                },
+            )
+
+
 _poller_started = False
 
 
@@ -267,6 +335,7 @@ def start_poller() -> None:
                     sync_now()
                     last_sync = time.time()
                 _check_auto_record()
+                _check_five_min_warning()
                 _check_briefs()
                 if time.time() - last_housekeeping >= 3600:
                     _check_retention()
