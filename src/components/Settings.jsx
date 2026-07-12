@@ -872,7 +872,7 @@ export default function Settings() {
                 </div>
                 <div className="set-card-control">
                   <Select
-                    value={settings.whisper_model || "base"}
+                    value={settings.whisper_model || "small"}
                     onChange={(v) => saveSetting("whisper_model", v)}
                     options={[
                       { value: "tiny", label: t('settings.recording.modelTiny') },
@@ -1224,6 +1224,7 @@ export default function Settings() {
                               className="tpl-use-btn"
                               onClick={() => {
                                 setSelectedTemplate(activeTpl.id);
+                                saveSetting("default_template", activeTpl.id);
                                 showToast(t('settings.templates.setAsTemplate', { name: activeTpl.name }));
                               }}
                             >

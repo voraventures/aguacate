@@ -7,19 +7,34 @@ from datetime import datetime, timedelta, timezone
 log = logging.getLogger("aguacate.applecal")
 
 # JXA script: today's window events from all local calendars as JSON.
+#
+# Permission is checked with the SYNCHRONOUS EKEventStore.authorizationStatusForEntityType
+# (EKEntityTypeEvent = 0). The GCD dispatch_semaphore_* functions used previously are not
+# bridged into JXA ($.dispatch_semaphore_create is undefined), so the old async-request +
+# semaphore pattern threw before the request was even made and every fetch silently returned
+# no events. EKAuthorizationStatus: 0 notDetermined, 1 restricted, 2 denied, 3 fullAccess.
 _JXA = """
 ObjC.import('EventKit');
+ObjC.import('Foundation');
 function run(argv) {
   const hours = parseInt(argv[0] || '18', 10);
+  let status = Number($.EKEventStore.authorizationStatusForEntityType(0)) | 0;
+  if (status === 0) {
+    // First run: fire the request to surface the OS prompt, then spin the run loop
+    // briefly so it registers. The completion handler is unreliable in a short-lived
+    // osascript process, so we re-read the status instead of awaiting the callback.
+    const s0 = $.EKEventStore.alloc.init;
+    s0.requestFullAccessToEventsWithCompletion(function(ok, err) {});
+    const deadline = $.NSDate.dateWithTimeIntervalSinceNow(2);
+    while ($.NSDate.date.compare(deadline) < 0) {
+      $.NSRunLoop.currentRunLoop.runModeBeforeDate($.NSDefaultRunLoopMode, $.NSDate.dateWithTimeIntervalSinceNow(0.1));
+    }
+    status = Number($.EKEventStore.authorizationStatusForEntityType(0)) | 0;
+  }
+  if (status !== 3) {
+    return JSON.stringify({error: status === 0 ? 'not_determined' : 'access_denied', events: []});
+  }
   const store = $.EKEventStore.alloc.init;
-  let granted = false;
-  // Synchronous-enough permission check; events query fails silently if denied.
-  const sema = $.dispatch_semaphore_create(0);
-  store.requestFullAccessToEventsWithCompletion(function(ok, err) {
-    granted = ok; $.dispatch_semaphore_signal(sema);
-  });
-  $.dispatch_semaphore_wait(sema, $.dispatch_time($.DISPATCH_TIME_NOW, 10 * 1e9));
-  if (!granted) { return JSON.stringify({error: 'access_denied', events: []}); }
   const now = $.NSDate.date;
   const end = $.NSDate.dateWithTimeIntervalSinceNow(hours * 3600);
   const start = $.NSDate.dateWithTimeIntervalSinceNow(-3600);
@@ -57,27 +72,28 @@ def is_available() -> bool:
     return True  # macOS always has osascript; permission is requested on first use
 
 
-# JXA probe: request EventKit access and report only whether it was granted.
+# JXA probe: read the current EventKit authorization status SYNCHRONOUSLY and report
+# it. authorizationStatusForEntityType needs no completion handler and no GCD semaphore
+# (the previous dispatch_semaphore_create version was undefined in JXA and always threw,
+# so a real denial silently returned success). EKEntityTypeEvent = 0; EKAuthorizationStatus:
+# 0 notDetermined, 1 restricted, 2 denied, 3 fullAccess, 4 writeOnly.
 _JXA_PROBE = """
 ObjC.import('EventKit');
 function run() {
-  const store = $.EKEventStore.alloc.init;
-  let granted = false;
-  const sema = $.dispatch_semaphore_create(0);
-  store.requestFullAccessToEventsWithCompletion(function(ok, err) {
-    granted = ok; $.dispatch_semaphore_signal(sema);
-  });
-  $.dispatch_semaphore_wait(sema, $.dispatch_time($.DISPATCH_TIME_NOW, 10 * 1e9));
-  return JSON.stringify({granted: granted});
+  const status = Number($.EKEventStore.authorizationStatusForEntityType(0)) | 0;
+  return JSON.stringify({status: status});
 }
 """
 
 
 def probe_access() -> str | None:
-    """Return "access_denied" if EventKit denies calendar access, else None.
+    """Return "access_denied" if EventKit calendar access is denied or restricted,
+    else None.
 
-    Transient failures (missing osascript, timeout, malformed output) are not
-    treated as a definitive denial — they return None so the caller doesn't
+    Reads the current authorization status synchronously. notDetermined (the prompt
+    has not been answered) and fullAccess both return None — only an explicit denial
+    or MDM/parental restriction surfaces "access_denied". Transient failures (missing
+    osascript, timeout, malformed output) also return None so the caller doesn't
     surface a false "access denied" on a flaky probe.
     """
     try:
@@ -91,9 +107,8 @@ def probe_access() -> str | None:
             log.warning("Apple Calendar access probe failed: %s", proc.stderr.strip()[:200])
             return None
         payload = json.loads(proc.stdout.strip() or "{}")
-        if payload.get("granted") is True:
-            return None
-        if payload.get("granted") is False:
+        # 1 restricted, 2 denied → the app cannot read calendars; surface it.
+        if payload.get("status") in (1, 2):
             return "access_denied"
         return None
     except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError) as exc:

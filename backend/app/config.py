@@ -33,7 +33,10 @@ CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-sonnet-4-6")
 DEFAULT_AI_PROVIDER = os.environ.get("AGUACATE_AI_PROVIDER", "anthropic")
 DEFAULT_OPENAI_MODEL = os.environ.get("AGUACATE_OPENAI_MODEL", "gpt-4o")
 DEFAULT_GEMINI_MODEL = os.environ.get("AGUACATE_GEMINI_MODEL", "gemini-2.0-flash")
-WHISPER_MODEL = os.environ.get("AGUACATE_WHISPER_MODEL", "base")
+# Default to "small": measurably better on names/numbers than "base" for a modest
+# speed cost (~9s extra per 3 min of audio on Apple Silicon). A user's explicit
+# whisper_model setting still overrides this.
+WHISPER_MODEL = os.environ.get("AGUACATE_WHISPER_MODEL", "small")
 LICENSE_SERVER_URL = os.environ.get(
     "AGUACATE_LICENSE_SERVER", "https://license.aguacatenotes.com/api"
 )
