@@ -288,6 +288,40 @@ body.reduce-motion *::after {
   margin-bottom: 6px;
 }
 
+/* Record — dark ink pill, deliberately NOT green (README §5: green is the
+   single semantic accent; Record gets its own high-contrast affordance) */
+.record-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #232320;
+  transition: background 0.15s ease;
+}
+.record-btn:hover {
+  background: #3c3c38;
+}
+.record-btn.active {
+  background: #3c3c38;
+}
+.record-btn svg {
+  flex-shrink: 0;
+}
+:root[data-theme="dark"] .record-btn {
+  background: var(--text);
+  color: var(--bg);
+}
+:root[data-theme="dark"] .record-btn:hover,
+:root[data-theme="dark"] .record-btn.active {
+  background: var(--muted);
+}
+
 /* auto-record card — real upcoming calendar event with a video-call link,
    shown only when one genuinely qualifies (AguacateChrome.dc.html §6) */
 .auto-record-card {
@@ -601,6 +635,19 @@ body.reduce-motion *::after {
   color: var(--faint);
   margin-top: 2px;
   font-variant-numeric: tabular-nums;
+}
+.demo-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 99px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  color: var(--warning);
+  background: var(--warning-bg);
+  vertical-align: middle;
 }
 
 /* calendar date badge: month strip + big day number */
@@ -984,6 +1031,10 @@ body.reduce-motion *::after {
   color: var(--faint);
   font-style: italic;
   font-size: 17px;
+}
+.summary-key {
+  font-style: italic;
+  color: var(--accent-deep);
 }
 
 /* two columns */
@@ -3513,6 +3564,13 @@ textarea.text-input {
   color: var(--muted);
   line-height: 1.5;
   margin-top: 2px;
+}
+.set-card-warning {
+  font-size: 12.5px;
+  color: var(--warning);
+  line-height: 1.5;
+  margin-top: 4px;
+  font-weight: 600;
 }
 .set-card-control {
   flex-shrink: 0;

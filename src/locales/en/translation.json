@@ -236,6 +236,8 @@
       "modeOff": "Off",
       "microphone": "Microphone",
       "micDesc": "Input device for your voice.",
+      "micDescResolved": "Input device for your voice. Currently resolves to \"{{name}}\".",
+      "micLoopbackWarning": "⚠ This is a virtual/loopback device, not a real microphone — recordings will be silent unless audio is explicitly routed into it. Pick your actual microphone.",
       "systemDefault": "System default",
       "systemAudio": "System audio device",
       "winHint": "Windows: pick the \"(loopback)\" entry matching your speakers — Aguacate taps system audio via WASAPI, no driver needed.",
@@ -613,6 +615,7 @@
       "allSub": "Record your first meeting to get started"
     },
     "startRecording": "Start Recording",
+    "demoBadge": "Sample",
     "menu": {
       "more": "More options",
       "options": "Meeting options",

@@ -236,6 +236,8 @@
       "modeOff": "꺼짐",
       "microphone": "마이크",
       "micDesc": "음성 입력 장치입니다.",
+      "micDescResolved": "음성 입력 장치입니다. 현재 \"{{name}}\"(으)로 연결되어 있습니다.",
+      "micLoopbackWarning": "⚠ 이 장치는 실제 마이크가 아닌 가상/루프백 장치입니다 — 오디오가 명시적으로 라우팅되지 않으면 녹음이 무음으로 저장됩니다. 실제 마이크를 선택하세요.",
       "systemDefault": "시스템 기본값",
       "systemAudio": "시스템 오디오 장치",
       "winHint": "Windows: 스피커와 일치하는 \"(loopback)\" 항목을 선택하세요 — Aguacate는 드라이버 없이 WASAPI를 통해 시스템 오디오를 가져옵니다.",
@@ -612,6 +614,7 @@
       "allSub": "첫 회의를 녹음해 시작하세요"
     },
     "startRecording": "녹음 시작",
+    "demoBadge": "샘플",
     "menu": {
       "more": "추가 옵션",
       "options": "회의 옵션",

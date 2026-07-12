@@ -236,6 +236,8 @@
       "modeOff": "Desligado",
       "microphone": "Microfone",
       "micDesc": "Dispositivo de entrada para sua voz.",
+      "micDescResolved": "Dispositivo de entrada para sua voz. Atualmente aponta para \"{{name}}\".",
+      "micLoopbackWarning": "⚠ Este é um dispositivo virtual/loopback, não um microfone real — as gravações ficarão silenciosas a menos que o áudio seja explicitamente roteado para ele. Escolha seu microfone real.",
       "systemDefault": "Padrão do sistema",
       "systemAudio": "Dispositivo de áudio do sistema",
       "winHint": "Windows: escolha a entrada \"(loopback)\" correspondente às suas caixas de som — o Aguacate captura o áudio do sistema via WASAPI, sem driver necessário.",
@@ -613,6 +615,7 @@
       "allSub": "Grave sua primeira reunião para começar"
     },
     "startRecording": "Iniciar gravação",
+    "demoBadge": "Exemplo",
     "menu": {
       "more": "Mais opções",
       "options": "Opções da reunião",

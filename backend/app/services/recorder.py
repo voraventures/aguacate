@@ -71,6 +71,12 @@ def _list_wasapi_loopbacks() -> list[dict]:
     return out
 
 
+def _is_loopback_like(name: str) -> bool:
+    return any(
+        k in name.lower() for k in ("blackhole", "loopback", "aggregate", "soundflower")
+    )
+
+
 def list_input_devices() -> list[dict]:
     devices = []
     if AUDIO_AVAILABLE:
@@ -82,14 +88,52 @@ def list_input_devices() -> list[dict]:
                         "name": dev["name"],
                         "channels": dev["max_input_channels"],
                         "default_samplerate": dev["default_samplerate"],
-                        "is_loopback_like": any(
-                            k in dev["name"].lower()
-                            for k in ("blackhole", "loopback", "aggregate", "soundflower")
-                        ),
+                        "is_loopback_like": _is_loopback_like(dev["name"]),
                     }
                 )
     devices.extend(_list_wasapi_loopbacks())
     return devices
+
+
+def default_input_status() -> dict:
+    """What device 'System default' actually resolves to right now, so the UI
+    can warn if it's a virtual/loopback device instead of a real mic — the
+    cause of silent recordings when nothing is routed into that device."""
+    if not AUDIO_AVAILABLE:
+        return {"name": None, "is_loopback_like": False}
+    try:
+        idx = sd.default.device[0]
+        info = sd.query_devices(idx, "input")
+        return {"name": info["name"], "is_loopback_like": _is_loopback_like(info["name"])}
+    except Exception:
+        return {"name": None, "is_loopback_like": False}
+
+
+def _resolve_mic_device(requested: int | None) -> int | None:
+    """Pick the mic capture device. An explicit user choice is always honored
+    (even a virtual device — that may be deliberate). When nothing is chosen,
+    don't silently record from a virtual loopback device that happens to be
+    the OS default input (e.g. BlackHole with nothing routed into it, which
+    produces a real-looking but completely silent recording) — fall back to
+    the first real microphone instead."""
+    if requested is not None or not AUDIO_AVAILABLE:
+        return requested
+    default = default_input_status()
+    if not default["is_loopback_like"]:
+        return None  # real default mic — keep using sounddevice's own default
+    for dev in list_input_devices():
+        if not dev["is_loopback_like"]:
+            log.warning(
+                "System default input %r is a virtual/loopback device; "
+                "falling back to real microphone %r",
+                default["name"],
+                dev["name"],
+            )
+            return dev["index"]
+    raise RuntimeError(
+        "No real microphone found — the system default input is a virtual "
+        "device (e.g. BlackHole). Select a microphone in Settings → Recording."
+    )
 
 
 class _DeviceCapture:
@@ -267,6 +311,7 @@ class Recorder:
                 raise RuntimeError("A recording is already in progress")
             self._captures = []
             try:
+                mic_device = _resolve_mic_device(mic_device)
                 mic = _make_capture(mic_device)
                 mic.start()
                 self._captures.append(mic)

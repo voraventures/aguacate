@@ -2,13 +2,34 @@
 import json
 import logging
 import threading
+import wave
 from pathlib import Path
+
+import numpy as np
 
 from ..db import get_db, now_iso
 from ..events import hub
 from . import intelligence, notes, transcriber
 
 log = logging.getLogger("aguacate.pipeline")
+
+# Real speech peaks well above this even at low mic gain; digital silence
+# (dead input device, e.g. a virtual/loopback device with nothing routed
+# into it) reads as exactly 0.0. Catches that case before wasting a
+# transcription pass and a paid notes-generation call on empty audio.
+SILENCE_PEAK_THRESHOLD = 0.01
+
+
+def _is_silent(audio_path: Path) -> bool:
+    try:
+        with wave.open(str(audio_path), "rb") as wf:
+            raw = wf.readframes(wf.getnframes())
+        if not raw:
+            return True
+        data = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768
+        return float(np.abs(data).max()) < SILENCE_PEAK_THRESHOLD
+    except Exception:
+        return False  # unreadable file — let transcription surface the real error
 
 
 def _safe_error(exc: Exception) -> str:
@@ -111,6 +132,14 @@ def process_meeting(meeting_id: str, audio_path: Path) -> None:
             (now_iso(), str(audio_path), meeting_id),
         )
         db.commit()
+
+        if _is_silent(audio_path):
+            _set_status(
+                meeting_id,
+                "error",
+                "No audio captured — check your input device in Settings → Recording.",
+            )
+            return
 
         _set_status(meeting_id, "transcribing")
         result = transcriber.transcribe(meeting_id, audio_path)

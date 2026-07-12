@@ -135,6 +135,7 @@ _MIGRATIONS = {
         ("markers", "TEXT NOT NULL DEFAULT '[]'"),  # JSON [seconds,...]
         ("workspace_id", "TEXT"),             # NULL = personal, set = shared to workspace
         ("starred", "INTEGER NOT NULL DEFAULT 0"),
+        ("is_demo", "INTEGER NOT NULL DEFAULT 0"),  # onboarding sample meeting, not real AI output
     ],
     "transcripts": [("segments", "TEXT NOT NULL DEFAULT '[]'")],
     "decisions": [("status", "TEXT NOT NULL DEFAULT 'active'")],

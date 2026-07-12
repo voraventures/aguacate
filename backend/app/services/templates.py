@@ -7,12 +7,22 @@ working regardless of template.
 """
 from ..db import get_db, new_id, now_iso
 
+GROUNDING_RULE = """GROUNDING — the single most important rule, overriding every
+other instruction below: every fact, name, number, date, owner, and quote you
+write must come from the transcript. Never infer, assume, or invent content
+that is not present, even to fill a section that expects one. If a section
+has nothing to report, write "Not discussed." instead of manufacturing
+content. An action item or decision gets a named owner ONLY if the transcript
+shows that person saying or being assigned it — otherwise the owner is "TBD",
+regardless of who the note is being generated for."""
+
 SHARED_RULES = """Rules for every section:
 - Mark each major theme with a **Bold Topic Phrase** at the start of its line
   or bullet — these power cross-meeting topic intelligence.
-- Never invent facts not present in the transcript; be specific with names,
-  numbers, and dates. Keep the total under 800 words.
-- Use level-2 markdown headers (##) exactly matching the section names given."""
+- Be specific with names, numbers, and dates. Keep the total under 800 words.
+- Use level-2 markdown headers (##) exactly matching the section names given.
+- In the Executive Summary section only, wrap the single most pivotal phrase
+  (the crux of what changed or was decided) in *single asterisks* for emphasis."""
 
 SHARED_TAIL = """## Decisions Made
 A bullet list of concrete decisions. If none, write "- No decisions recorded."
@@ -194,8 +204,8 @@ def compose_system_prompt(template: dict) -> str:
     return (
         "You are Aguacate, an elite meeting-intelligence analyst. You turn raw "
         "meeting transcripts into precise, outcome-focused notes for busy "
-        "executives.\n\nProduce ONLY markdown with exactly these level-2 "
-        f"sections, in this order:\n\n{body}\n\n{SHARED_RULES}"
+        f"executives.\n\n{GROUNDING_RULE}\n\nProduce ONLY markdown with exactly "
+        f"these level-2 sections, in this order:\n\n{body}\n\n{SHARED_RULES}"
     )
 
 

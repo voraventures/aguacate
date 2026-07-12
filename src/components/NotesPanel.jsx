@@ -49,6 +49,30 @@ const isRiskSection = (name) => /risk|compliance|flag/i.test(name);
 // applicable) — also when the model renders it as a bullet ("- None …").
 const hasContent = (body) => body && body.trim() && !/^[-*\s]*none\b/i.test(body.trim());
 
+// Executive Summary asks the model for one *emphasized* key phrase (single
+// asterisks) — rendered italic green in the hero, per the design spec.
+function renderSummary(text) {
+  const parts = [];
+  let rest = text;
+  let i = 0;
+  while (rest.length) {
+    const start = rest.indexOf("*");
+    const end = start === -1 ? -1 : rest.indexOf("*", start + 1);
+    if (start === -1 || end === -1) {
+      parts.push(rest);
+      break;
+    }
+    if (start > 0) parts.push(rest.slice(0, start));
+    parts.push(
+      <em className="summary-key" key={`sk${i++}`}>
+        {rest.slice(start + 1, end)}
+      </em>
+    );
+    rest = rest.slice(end + 1);
+  }
+  return parts;
+}
+
 function initials(name) {
   return (name || "")
     .split(/\s+/)
@@ -400,6 +424,7 @@ export default function NotesPanel() {
           <div className="ws-header-left">
             <div className="ws-title-row">
               <h1 className="ws-title">{m.title}</h1>
+              {!!m.is_demo && <span className="demo-badge">{t("list.demoBadge")}</span>}
               <button
                 className={`ws-star${m.starred ? " on" : ""}`}
                 title={m.starred ? t("notes.header.unstar") : t("notes.header.star")}
@@ -607,7 +632,7 @@ export default function NotesPanel() {
                     <span className="summary-eyebrow">{t("notes.section.summaryBy")}</span>
                   </div>
                   {executiveSummary ? (
-                    <p className="summary-body">{executiveSummary}</p>
+                    <p className="summary-body">{renderSummary(executiveSummary)}</p>
                   ) : (
                     <p className="summary-body summary-empty">{t("notes.section.noSummary")}</p>
                   )}

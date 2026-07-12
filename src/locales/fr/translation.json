@@ -236,6 +236,8 @@
       "modeOff": "Désactivé",
       "microphone": "Microphone",
       "micDesc": "Périphérique d'entrée pour votre voix.",
+      "micDescResolved": "Périphérique d'entrée pour votre voix. Correspond actuellement à \"{{name}}\".",
+      "micLoopbackWarning": "⚠ Il s'agit d'un périphérique virtuel/de bouclage, pas d'un vrai microphone — les enregistrements seront silencieux sauf si l'audio y est explicitement routé. Choisissez votre vrai microphone.",
       "systemDefault": "Valeur par défaut du système",
       "systemAudio": "Périphérique audio du système",
       "winHint": "Windows : choisissez l'entrée \"(loopback)\" correspondant à vos haut-parleurs — Aguacate capte l'audio du système via WASAPI, sans pilote requis.",
@@ -613,6 +615,7 @@
       "allSub": "Enregistrez votre première réunion pour commencer"
     },
     "startRecording": "Démarrer l'enregistrement",
+    "demoBadge": "Exemple",
     "menu": {
       "more": "Plus d'options",
       "options": "Options de la réunion",

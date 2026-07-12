@@ -60,13 +60,15 @@ def list_meetings():
 @router.post("")
 def create_meeting(body: CreateMeetingBody):
     """Insert a ready-to-view meeting plus its notes, then index actions/
-    decisions/topics from the markdown (mirrors pipeline._generate_and_index)."""
+    decisions/topics from the markdown (mirrors pipeline._generate_and_index).
+    The only caller is the onboarding demo loader, so every meeting created
+    here is flagged is_demo so it can never be mistaken for real AI output."""
     db = get_db()
     meeting_id = new_id()
     started = (body.date or now_iso()).strip() or now_iso()
     db.execute(
-        "INSERT INTO meetings(id,title,started_at,ended_at,status,attendees) "
-        "VALUES(?,?,?,?,?,?)",
+        "INSERT INTO meetings(id,title,started_at,ended_at,status,attendees,is_demo) "
+        "VALUES(?,?,?,?,?,?,1)",
         (meeting_id, body.title.strip(), started, now_iso(), "ready",
          json.dumps([a for a in body.attendees if isinstance(a, str)])),
     )

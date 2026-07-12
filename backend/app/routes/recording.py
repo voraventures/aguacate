@@ -8,7 +8,12 @@ from ..db import get_db, get_setting, new_id, now_iso
 from ..services import license as license_svc
 from ..services import pipeline, templates as templates_svc
 from ..services.coach import coach
-from ..services.recorder import AUDIO_AVAILABLE, list_input_devices, recorder
+from ..services.recorder import (
+    AUDIO_AVAILABLE,
+    default_input_status,
+    list_input_devices,
+    recorder,
+)
 
 router = APIRouter(prefix="/api/recording", tags=["recording"])
 
@@ -34,6 +39,7 @@ def devices():
         "devices": list_input_devices(),
         "mic_device": get_setting("mic_device"),
         "system_device": get_setting("system_device"),
+        "default_input": default_input_status(),
     }
 
 

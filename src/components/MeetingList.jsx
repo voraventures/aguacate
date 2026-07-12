@@ -93,7 +93,10 @@ function MeetingRow({ m, selected, onSelect, progress, onDeleteRequest, now }) {
     <button className={`meeting-row${selected ? " active" : ""}`} onClick={() => onSelect(m.id)}>
       <DateBadge iso={m.started_at} isToday={isToday} />
       <div className="meeting-row-main">
-        <div className="row-title">{m.title}</div>
+        <div className="row-title">
+          {m.title}
+          {!!m.is_demo && <span className="demo-badge">{t("list.demoBadge")}</span>}
+        </div>
         <div className="row-meta">
           {when && <span>{when}</span>}
           {isToday && dur && <span>{" · " + dur}</span>}

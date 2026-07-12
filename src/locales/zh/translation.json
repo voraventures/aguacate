@@ -236,6 +236,8 @@
       "modeOff": "关闭",
       "microphone": "麦克风",
       "micDesc": "用于采集你声音的输入设备。",
+      "micDescResolved": "用于采集你声音的输入设备，当前解析为「{{name}}」。",
+      "micLoopbackWarning": "⚠ 这是一个虚拟/环回设备，不是真正的麦克风 — 除非显式将音频路由到该设备，否则录音将是静音的。请选择你的实际麦克风。",
       "systemDefault": "系统默认",
       "systemAudio": "系统音频设备",
       "winHint": "Windows：选择与你扬声器匹配的 \"(loopback)\" 项 — Aguacate 通过 WASAPI 接入系统音频，无需驱动。",
@@ -612,6 +614,7 @@
       "allSub": "录制你的第一场会议开始使用"
     },
     "startRecording": "开始录制",
+    "demoBadge": "示例",
     "menu": {
       "more": "更多选项",
       "options": "会议选项",

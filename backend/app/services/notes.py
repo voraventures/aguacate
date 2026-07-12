@@ -100,8 +100,10 @@ def generate_notes(
 
     user_name = get_setting("user_name", "")
     user_note = (
-        f"\n\nThe user's name is {user_name}. When assigning action items, "
-        "use their exact name as the owner."
+        f"\n\nThe person recording this meeting is {user_name} — use this only "
+        "to recognize them if the transcript refers to them by name. Never "
+        "assign them, or anyone, as an action item owner unless the transcript "
+        "itself makes that assignment."
         if user_name else ""
     )
 

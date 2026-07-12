@@ -101,11 +101,11 @@ export default function Sidebar() {
 
       <nav className="rail-nav" data-tour="nav-section">
         <button
-          className={`nav-item${recording.active || captureOpen ? " active" : ""}`}
+          className={`record-btn${recording.active || captureOpen ? " active" : ""}`}
           data-tour="record-btn"
           onClick={() => (recording.active ? null : setCaptureOpen(true))}
         >
-          <MicIcon size={17} />
+          <MicIcon size={16} strokeWidth={1.9} />
           {t("sidebar.record")}
         </button>
         <AutoRecordCard />

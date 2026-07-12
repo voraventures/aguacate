@@ -810,11 +810,19 @@ export default function Settings() {
                   />
                 </div>
               </div>
-              <div className="set-card">
+              <div className="set-card stack">
                 <div className="set-card-icon"><MicrophoneIcon size={14} /></div>
                 <div className="set-card-main">
                   <div className="set-card-name">{t('settings.recording.microphone')}</div>
-                  <div className="set-card-desc">{t('settings.recording.micDesc')}</div>
+                  <div className="set-card-desc">
+                    {settings.mic_device == null && devices.default_input?.name
+                      ? t('settings.recording.micDescResolved', { name: devices.default_input.name })
+                      : t('settings.recording.micDesc')}
+                  </div>
+                  {((settings.mic_device == null && devices.default_input?.is_loopback_like) ||
+                    devices.devices.find((d) => d.index === settings.mic_device)?.is_loopback_like) && (
+                    <div className="set-card-warning">{t('settings.recording.micLoopbackWarning')}</div>
+                  )}
                 </div>
                 <div className="set-card-control">
                   <Select
@@ -822,7 +830,10 @@ export default function Settings() {
                     onChange={(v) => saveSetting("mic_device", v)}
                     options={[
                       { value: null, label: t('settings.recording.systemDefault') },
-                      ...devices.devices.map((d) => ({ value: d.index, label: d.name })),
+                      ...devices.devices.map((d) => ({
+                        value: d.index,
+                        label: `${d.name}${d.is_loopback_like ? t('settings.recording.loopbackSuffix') : ""}`,
+                      })),
                     ]}
                   />
                 </div>
