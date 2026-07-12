@@ -50,8 +50,15 @@ jobs:
           }
           Write-Host "Backend executable verified."
 
+      # Version comes from the release tag that triggered this run (GITHUB_REF_NAME,
+      # e.g. "v2.4.2"), stripped of the leading "v". This is authoritative and does
+      # not depend on `git describe` or fetched tags. The dist:win script's own
+      # git-describe fallback is only for local developer builds.
       - name: Build Windows installer
-        run: npm run dist:win
+        shell: bash
+        run: |
+          npm run build
+          npx electron-builder --win --config.extraMetadata.version="${GITHUB_REF_NAME#v}"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
