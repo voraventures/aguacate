@@ -606,9 +606,9 @@ export default function NotesPanel() {
             </button>
             {moreOpen && (
               <div className="card-menu-dropdown" role="menu">
-                <button className="menu-item" onClick={shareMeeting}>
-                  {t('notes.header.shareMeeting')}
-                </button>
+                {/* Public share links removed: they minted aguacate:// URLs no
+                    recipient could open (backend is loopback-only). Re-add once
+                    a real hosted share page exists. Team sharing below works. */}
                 <button
                   className="menu-item"
                   onClick={() => {

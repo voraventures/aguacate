@@ -57,8 +57,10 @@ export function connectWebSocket(onEvent) {
   let ws;
   let closed = false;
   let pingTimer;
+  let reconnectTimer;
 
   function open() {
+    if (closed) return; // a pending reconnect fired after cleanup — stay closed
     ws = new WebSocket(
       `ws://127.0.0.1:${backend.port}/ws?token=${encodeURIComponent(backend.token)}`
     );
@@ -71,19 +73,24 @@ export function connectWebSocket(onEvent) {
       }
     };
     ws.onopen = () => {
+      if (closed) {
+        ws.close();
+        return;
+      }
       pingTimer = setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) ws.send("ping");
       }, 25000);
     };
     ws.onclose = () => {
       clearInterval(pingTimer);
-      if (!closed) setTimeout(open, 2000);
+      if (!closed) reconnectTimer = setTimeout(open, 2000);
     };
   }
   open();
   return () => {
     closed = true;
     clearInterval(pingTimer);
+    clearTimeout(reconnectTimer);
     ws?.close();
   };
 }

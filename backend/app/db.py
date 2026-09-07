@@ -151,7 +151,12 @@ def _migrate(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+_schema_lock = threading.Lock()
+_schema_ready = False
+
+
 def get_db() -> sqlite3.Connection:
+    global _schema_ready
     conn = getattr(_local, "conn", None)
     if conn is None:
         existed = DB_PATH.exists()
@@ -160,13 +165,32 @@ def get_db() -> sqlite3.Connection:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
-        conn.executescript(SCHEMA)
-        conn.commit()
-        _migrate(conn)
+        # Schema + migrations run once per process, under a lock — two worker
+        # threads racing first-run ALTER TABLEs would otherwise collide.
+        if not _schema_ready:
+            with _schema_lock:
+                if not _schema_ready:
+                    conn.executescript(SCHEMA)
+                    conn.commit()
+                    _migrate(conn)
+                    _schema_ready = True
         if not existed:
             secure_file(DB_PATH)
         _local.conn = conn
     return conn
+
+
+def close_db() -> None:
+    """Close this thread's connection. Short-lived worker threads (pipeline,
+    regenerate) must call this on exit — thread-local connections are otherwise
+    reclaimed only by GC, leaking file handles across many recordings."""
+    conn = getattr(_local, "conn", None)
+    if conn is not None:
+        try:
+            conn.close()
+        except sqlite3.Error:
+            pass
+        _local.conn = None
 
 
 def now_iso() -> str:

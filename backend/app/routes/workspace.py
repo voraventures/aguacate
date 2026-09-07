@@ -20,6 +20,7 @@ WORKSPACE_DIR = Path.home() / "Aguacate" / "workspace"
 # Polling thread for incoming shared meetings from network folder
 _poll_thread: threading.Thread | None = None
 _poll_stop = threading.Event()
+_poll_workspace: str | None = None
 
 
 def _ensure_workspace_dir(workspace_id: str) -> Path:
@@ -44,14 +45,20 @@ def _install_id() -> str:
 
 
 def _start_poll(workspace_id: str) -> None:
-    global _poll_thread, _poll_stop
+    global _poll_thread, _poll_stop, _poll_workspace
     if _poll_thread and _poll_thread.is_alive():
-        return
-    _poll_stop.clear()
+        if _poll_workspace == workspace_id:
+            return
+        # Leave→join within the old thread's 60s wait window: retire the old
+        # poller (it holds a reference to the old Event) and start a fresh one,
+        # or the new workspace would never sync until restart.
+        _poll_stop.set()
+        _poll_stop = threading.Event()
+    _poll_workspace = workspace_id
+    stop = _poll_stop
 
     def _run():
-        import time
-        while not _poll_stop.wait(60):
+        while not stop.wait(60):
             try:
                 _sync_incoming(workspace_id)
             except Exception as exc:

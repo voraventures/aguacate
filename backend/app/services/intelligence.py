@@ -293,8 +293,14 @@ def detect_series() -> list[dict]:
             f"ORDER BY n DESC LIMIT 8",
             ids,
         ).fetchall()
-        # cadence: median gap between consecutive occurrences
-        dates = [datetime.fromisoformat(m["started_at"]) for m in items]
+        # cadence: median gap between consecutive occurrences; tolerate rows
+        # with unparseable dates rather than 500ing the whole series view
+        dates = []
+        for m in items:
+            try:
+                dates.append(datetime.fromisoformat(m["started_at"]))
+            except (TypeError, ValueError):
+                pass
         gaps = sorted(
             (dates[i + 1] - dates[i]).days for i in range(len(dates) - 1)
         )

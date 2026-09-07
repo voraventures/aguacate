@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { openExternal } from "../api.js";
+import { api, openExternal } from "../api.js";
 import { useStore, useLogo } from "../store.jsx";
 import {
   CalendarIcon,
@@ -84,8 +84,35 @@ export default function Sidebar() {
     setSelectedTemplate,
     activeCall,
     dismissActiveCall,
+    startProUpgradePolling,
+    showToast,
   } = useStore();
   const logoUrl = useLogo();
+
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
+
+  // Same flow as Settings "Get Pro": checkout session carries the install_id so
+  // the webhook can issue the license to this install, then poll for the upgrade.
+  const startUpgrade = async () => {
+    setUpgradeLoading(true);
+    try {
+      const { install_id } = await api.get("/api/install-id");
+      const resp = await fetch("https://license.aguacatenotes.com/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ install_id }),
+      });
+      if (!resp.ok) throw new Error(t("settings.toast.checkoutFailedStatus", { status: resp.status }));
+      const data = await resp.json();
+      if (!data?.url) throw new Error(t("settings.toast.noCheckoutUrl"));
+      openExternal(data.url);
+      startProUpgradePolling();
+    } catch (e) {
+      showToast(e.message || t("settings.toast.checkoutFailed"), "error");
+    } finally {
+      setUpgradeLoading(false);
+    }
+  };
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -256,7 +283,8 @@ export default function Sidebar() {
           </ul>
           <button
             className="upgrade-cta"
-            onClick={() => window.aguacate.openExternal("https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04")}
+            disabled={upgradeLoading}
+            onClick={startUpgrade}
           >
             {t("sidebar.free.upgrade")}
           </button>

@@ -31,6 +31,14 @@ def _parse_dt(value: str | None) -> datetime | None:
         return None
 
 
+def _norm_iso(value: str | None) -> str | None:
+    """Normalize provider timestamps (offsets, Z-suffix, date-only) to a single
+    UTC ISO format so SQL string comparison and ORDER BY sort correctly across
+    providers and timezones."""
+    dt = _parse_dt(value)
+    return dt.astimezone(timezone.utc).isoformat() if dt else value
+
+
 def dedup_key(title: str, start: str | None) -> str:
     """Same meeting on multiple calendars → one key: norm title + 5-min start bucket."""
     dt = _parse_dt(start)
@@ -73,8 +81,8 @@ def sync_now() -> int:
                 "provider": ev["provider"],
                 "provider_ids": [f"{ev['provider']}:{ev['provider_id']}"],
                 "title": ev["title"],
-                "start": ev.get("start"),
-                "end": ev.get("end"),
+                "start": _norm_iso(ev.get("start")),
+                "end": _norm_iso(ev.get("end")),
                 "attendees": [a for a in ev.get("attendees", []) if a],
                 "cancelled": bool(ev.get("cancelled")),
             }

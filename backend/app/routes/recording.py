@@ -93,7 +93,9 @@ def start(body: StartBody):
             mic_device=get_setting("mic_device"),
             system_device=get_setting("system_device"),
         )
-    except RuntimeError as exc:
+    except Exception as exc:
+        # Any capture failure (RuntimeError, PortAudioError, ...) must roll the
+        # meeting row back, or it stays "recording" forever and burns a free slot.
         db.execute("DELETE FROM meetings WHERE id=?", (meeting_id,))
         db.commit()
         raise HTTPException(status_code=500, detail=str(exc))

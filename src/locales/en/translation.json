@@ -287,10 +287,11 @@
       "modelDesc": "Choose the {{name}} model used to write your notes.",
       "loading": "Loading…",
       "keyLabel": {
-        "anthropic": "Anthropic API key",
+        "anthropic": "Anthropic API key (optional — AI notes are included with Aguacate)",
         "openai": "OpenAI API key",
         "google": "Google API key"
-      }
+      },
+      "includedNote": "AI notes are included with Aguacate — no API key needed. Prefer your own account? Add your API key from Anthropic, OpenAI, or Google and Aguacate will use it instead. OpenAI and Google require your own key."
     },
     "calendars": {
       "connected": "Connected calendars",
