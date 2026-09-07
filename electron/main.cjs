@@ -237,7 +237,10 @@ function applyContentSecurityPolicy() {
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' app:; " +
     "style-src 'self' 'unsafe-inline' app:; " +
-    "connect-src 'self' app: http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* https://api.anthropic.com";
+    "connect-src 'self' app: http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* https://license.aguacatenotes.com; " +
+    // Audio playback from the local backend — must match index.html's meta CSP,
+    // since the effective policy is the stricter of the two.
+    "media-src 'self' http://127.0.0.1:* http://localhost:*";
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {

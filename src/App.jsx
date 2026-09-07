@@ -83,8 +83,11 @@ export default function App() {
       return false;
     };
     if (tryStart()) return undefined;
+    // Poll only while the welcome onboarding can still complete; give up after
+    // 10 minutes rather than polling localStorage for the app's whole lifetime.
+    let ticks = 0;
     const id = setInterval(() => {
-      if (tryStart()) clearInterval(id);
+      if (tryStart() || ++ticks > 1500) clearInterval(id);
     }, 400);
     return () => clearInterval(id);
   }, [ready]);

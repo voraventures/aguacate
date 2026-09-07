@@ -75,6 +75,11 @@ def import_vault(path: str, password: str) -> int:
     count = 0
     with tarfile.open(fileobj=io.BytesIO(payload), mode="r:gz") as tar:
         for member in tar.getmembers():
+            # Regular files only: symlinks/hardlinks/devices in a crafted vault
+            # could escape the resolve()-based path check or clobber arbitrary
+            # targets on a later extraction pass.
+            if not member.isreg():
+                continue
             target = DATA_DIR / member.name
             if not is_safe_managed_path(str(target)):
                 continue  # path traversal defense

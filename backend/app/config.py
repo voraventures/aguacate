@@ -29,7 +29,10 @@ ALLOWED_ORIGINS = [
 # Host headers we accept (DNS-rebinding defense). Port is appended at startup.
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 
-CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-sonnet-4-6")
+# Default to the cheapest current model that is accurate for structured notes
+# extraction (~$0.025/meeting-hour). Users with their own key can pick another
+# model in Settings; the bundled proxy allows haiku-4-5 and sonnet-4-6.
+CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-haiku-4-5")
 DEFAULT_AI_PROVIDER = os.environ.get("AGUACATE_AI_PROVIDER", "anthropic")
 DEFAULT_OPENAI_MODEL = os.environ.get("AGUACATE_OPENAI_MODEL", "gpt-4o")
 DEFAULT_GEMINI_MODEL = os.environ.get("AGUACATE_GEMINI_MODEL", "gemini-2.0-flash")
@@ -40,19 +43,35 @@ WHISPER_MODEL = os.environ.get("AGUACATE_WHISPER_MODEL", "small")
 LICENSE_SERVER_URL = os.environ.get(
     "AGUACATE_LICENSE_SERVER", "https://license.aguacatenotes.com/api"
 )
+# Bundled-AI proxy base URL. The Anthropic SDK appends /v1/messages; the proxy
+# authenticates by install_id and holds the real API key server-side.
+AI_PROXY_URL = LICENSE_SERVER_URL + "/ai"
+
+# Public half of the license-signing keypair. Licenses fetched from the license
+# server are only trusted if their RSA-SHA256 signature verifies against this
+# key AND they name this install AND they have not expired — so neither a spoofed
+# AGUACATE_LICENSE_SERVER nor a MITM'd response can grant Pro.
+LICENSE_PUBLIC_KEY_PEM = """-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo/bfN5nkOUQn1TKSGLYL
+XRaoWvF0tqni5b3EV+yEl4mJRxQApCg8OcOKjT5d+v40q4j5Ih4yG5nkQ4auEkIL
+nQ4oOfFdD/uMMjMTpLFgjfT8rlD+hCNwfTsidy2Cf5TxwTWBxVTzY0p+NtA9zk7j
+IhhgxxuRXbhQ0wN1PdjYBywlhVptZ5/E02VTryUcE18U1L+PgYfRQ6vhyNq4Ydf1
+q6r3xutfVxWEXg/wnFQy2FfUAIemPSdJSSliJoZsDrYWEHiAuYWhXqwkEYPerSQf
+Oz4dBfqqeSwFsew5nKqxAuFviT7mkqPsD8Lug1pQIvLD+ITaXJ3FAAnrWPqYwfY2
+NQIDAQAB
+-----END PUBLIC KEY-----"""
 STRIPE_CHECKOUT_URL = os.environ.get(
     "AGUACATE_CHECKOUT_URL", "https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04"
 )
 FREE_TIER_LIMIT = 5
 
-# DEV ONLY: gates developer-testing endpoints (e.g. /api/dev/set-tier). True when
-# DEV_MODE=true, when Electron passes AGUACATE_DEV=1 (unpackaged), or when
-# NODE_ENV is set to anything other than production. Packaged builds leave NODE_ENV
-# unset (-> "production") and set AGUACATE_DEV=0, so this stays False in production.
+# DEV ONLY: gates developer-testing endpoints (e.g. /api/dev/set-tier). Requires
+# an EXPLICIT opt-in — a packaged binary launched from a shell that happens to
+# export NODE_ENV=development must not grow a Pro-bypass endpoint, so ambient
+# environment variables are deliberately not consulted.
 DEV_MODE = (
     os.environ.get("DEV_MODE", "").lower() == "true"
     or os.environ.get("AGUACATE_DEV") == "1"
-    or os.environ.get("NODE_ENV", "production").lower() not in ("production", "prod")
 )
 
 # OAuth client config is user-supplied (never bundled). See credentials.example.json.

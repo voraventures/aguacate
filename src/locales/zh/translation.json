@@ -261,10 +261,11 @@
       "modelDesc": "选择用于撰写你笔记的 {{name}} 模型。",
       "loading": "加载中…",
       "keyLabel": {
-        "anthropic": "Anthropic API 密钥",
+        "anthropic": "Anthropic API 密钥（可选 — AI 笔记已包含在 Aguacate 中）",
         "openai": "OpenAI API 密钥",
         "google": "Google API 密钥"
-      }
+      },
+      "includedNote": "AI 笔记已包含在 Aguacate 中 — 无需 API 密钥。想使用自己的账户？添加你的 Anthropic、OpenAI 或 Google API 密钥即可。使用 OpenAI 和 Google 需要你自己的密钥。"
     },
     "calendars": {
       "connected": "已连接的日历",

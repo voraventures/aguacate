@@ -100,4 +100,12 @@ def create_app() -> FastAPI:
 
         start_poller()
 
+        # Salvage meetings interrupted by a crash/force-quit in a prior session.
+        from .services.pipeline import recover_interrupted
+
+        try:
+            recover_interrupted()
+        except Exception:
+            log.exception("Interrupted-meeting recovery failed")
+
     return app

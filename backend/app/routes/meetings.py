@@ -66,6 +66,12 @@ def create_meeting(body: CreateMeetingBody):
     db = get_db()
     meeting_id = new_id()
     started = (body.date or now_iso()).strip() or now_iso()
+    try:
+        datetime.fromisoformat(started)
+    except ValueError:
+        # A non-ISO date stored here would 500 every later fromisoformat over
+        # the meetings table (e.g. the series view) until the row is fixed.
+        raise HTTPException(status_code=422, detail="date must be an ISO-8601 datetime")
     db.execute(
         "INSERT INTO meetings(id,title,started_at,ended_at,status,attendees,is_demo) "
         "VALUES(?,?,?,?,?,?,1)",
@@ -86,15 +92,18 @@ def create_meeting(body: CreateMeetingBody):
 @router.get("/search")
 def search(q: str = Query(min_length=1, max_length=200)):
     """Full-text search across titles, notes, transcripts, and action items."""
-    like = f"%{q}%"
+    # Escape LIKE wildcards so a literal % or _ in the query matches itself.
+    escaped = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    like = f"%{escaped}%"
     db = get_db()
     rows = db.execute(
         """SELECT DISTINCT m.* FROM meetings m
            LEFT JOIN notes n ON n.meeting_id = m.id
            LEFT JOIN transcripts t ON t.meeting_id = m.id
            LEFT JOIN action_items a ON a.meeting_id = m.id
-           WHERE m.title LIKE ? OR n.content LIKE ? OR t.text LIKE ?
-              OR a.action LIKE ? OR a.owner LIKE ?
+           WHERE m.title LIKE ? ESCAPE '\\' OR n.content LIKE ? ESCAPE '\\'
+              OR t.text LIKE ? ESCAPE '\\' OR a.action LIKE ? ESCAPE '\\'
+              OR a.owner LIKE ? ESCAPE '\\'
            ORDER BY m.started_at DESC LIMIT 50""",
         (like, like, like, like, like),
     ).fetchall()

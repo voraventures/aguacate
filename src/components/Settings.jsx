@@ -900,6 +900,9 @@ export default function Settings() {
             return (
               <>
                 <div className="set-section-label first">{t('settings.ai.title')}</div>
+                <div className="field-help" style={{ marginBottom: 8 }}>
+                  {t('settings.ai.includedNote')}
+                </div>
                 <div className="set-card stack">
                   <div className="set-card-main">
                     <div className="set-card-name">{t('settings.ai.provider')}</div>
@@ -1463,22 +1466,10 @@ export default function Settings() {
                     {t('settings.export.mobileBlurb')}
                   </div>
                 </div>
-                <div className="set-card-control">
-                  <button
-                    className="btn secondary"
-                    onClick={() => {
-                      api
-                        .post("/api/mobile/auth", { device_id: "manual-qr-" + Date.now(), device_name: t('settings.export.qrToken') })
-                        .then((r) => {
-                          showToast("Mobile token: " + r.mobile_token.slice(0, 12) + "…  (copy from logs)");
-                          loadMobileSessions();
-                        })
-                        .catch((e) => showToast(e.message, "error"));
-                    }}
-                  >
-                    {t('settings.export.connectMobile')}
-                  </button>
-                </div>
+                {/* Pairing button removed: the mobile API is unreachable by any
+                    phone today (loopback-only bind + desktop-token auth), so
+                    the button could only mint tokens that never work. The
+                    "coming soon" card above stays as the honest state. */}
               </div>
               {mobileSessions.length > 0 && (
                 <div className="set-card stack">

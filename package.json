@@ -1,7 +1,7 @@
 {
   "name": "aguacate",
   "productName": "Aguacate",
-  "version": "2.4.2",
+  "version": "2.5.0",
   "description": "AI meeting notes. No bot. No cloud.",
   "private": true,
   "main": "electron/main.cjs",
@@ -70,7 +70,7 @@
         "publisherName": "Vora Ventures"
       },
       "icon": "electron/assets/icon.ico",
-      "artifactName": "Aguacate-${version}-Setup.${ext}"
+      "artifactName": "Aguacate-Setup.${ext}"
     },
     "nsis": {
       "oneClick": false,

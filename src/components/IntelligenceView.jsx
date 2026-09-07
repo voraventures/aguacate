@@ -99,6 +99,12 @@ export default function IntelligenceView() {
     return () => clearTimeout(tmr);
   }, [searchInput]);
 
+  // `selected` indexes into the FILTERED view — any filter change shifts the
+  // indices, so a kept selection would silently point at a different item.
+  useEffect(() => {
+    setSelected(null);
+  }, [actionFilter, query, rangeDays]);
+
   const goToMeeting = (meetingId) => {
     setNav("meetings");
     selectMeeting(meetingId);
@@ -114,6 +120,9 @@ export default function IntelligenceView() {
     api
       .patch(`/api/intelligence/actions/${item.id}`, { status: next })
       .then(() => {
+        // Under open/completed filters the toggled item leaves the list, so a
+        // kept index would select whatever item slid into its position.
+        if (actionFilter !== "all") setSelected(null);
         load();
         refreshMyWork();
       })

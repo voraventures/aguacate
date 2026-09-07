@@ -211,9 +211,12 @@ def get_settings():
 def list_models():
     return {
         "anthropic": [
-            {"id": "claude-opus-4-8", "name": "Claude Opus 4.8", "default": False},
-            {"id": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "default": True},
-            {"id": "claude-haiku-4-5-20251001", "name": "Claude Haiku 4.5", "default": False},
+            # Haiku is the default: cheapest current model, accurate for notes
+            # extraction, and what the bundled-inference proxy serves. Sonnet is
+            # also proxied; Opus requires the user's own API key.
+            {"id": "claude-haiku-4-5", "name": "Claude Haiku 4.5", "default": True},
+            {"id": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "default": False},
+            {"id": "claude-opus-4-8", "name": "Claude Opus 4.8 (own key required)", "default": False},
         ],
         "openai": [
             {"id": "gpt-4o", "name": "GPT-4o", "default": True},

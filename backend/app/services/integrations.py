@@ -19,6 +19,28 @@ def _require(name: str) -> str:
     return value
 
 
+def _require_public_https_base(name: str) -> str:
+    """User-configured base URLs (Jira, Salesforce) get bearer/basic credentials
+    attached — refuse hosts that resolve to private/loopback/link-local ranges
+    so a mistyped or attacker-influenced URL can't leak tokens to the LAN."""
+    import ipaddress
+    import socket
+    from urllib.parse import urlsplit
+
+    base = _require(name).rstrip("/")
+    parts = urlsplit(base)
+    if parts.scheme != "https" or not parts.hostname:
+        raise RuntimeError(f"'{name}' must be a valid https:// URL")
+    try:
+        infos = socket.getaddrinfo(parts.hostname, 443, proto=socket.IPPROTO_TCP)
+        addrs = [ipaddress.ip_address(info[4][0]) for info in infos]
+    except (socket.gaierror, ValueError):
+        raise RuntimeError(f"'{name}' host could not be resolved")
+    if any(a.is_private or a.is_loopback or a.is_link_local or a.is_reserved for a in addrs):
+        raise RuntimeError(f"'{name}' must point to a public host")
+    return base
+
+
 def send_slack(title: str, markdown: str) -> str:
     url = _require("slack_webhook_url")
     if not url.startswith("https://hooks.slack.com/"):
@@ -113,9 +135,7 @@ def send_linear(title: str, markdown: str) -> str:
 def send_jira(title: str, markdown: str) -> str:
     token = _require("jira_token")
     email = _require("jira_email")
-    base = _require("jira_base_url").rstrip("/")
-    if not base.startswith("https://"):
-        raise RuntimeError("Jira base URL must be https://")
+    base = _require_public_https_base("jira_base_url")
     projects = httpx.get(
         f"{base}/rest/api/3/project/search?maxResults=1",
         auth=(email, token),
@@ -178,9 +198,7 @@ def send_hubspot(title: str, markdown: str) -> str:
 
 def send_salesforce(title: str, markdown: str) -> str:
     token = _require("salesforce_token")
-    instance = _require("salesforce_instance_url").rstrip("/")
-    if not instance.startswith("https://"):
-        raise RuntimeError("Salesforce instance URL must be https://")
+    instance = _require_public_https_base("salesforce_instance_url")
     resp = httpx.post(
         f"{instance}/services/data/v59.0/sobjects/Note",
         headers={"Authorization": f"Bearer {token}"},

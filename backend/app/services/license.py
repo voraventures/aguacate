@@ -1,11 +1,18 @@
 """Free tier (5 lifetime meetings) + Pro license validated against remote server."""
+import json
 import logging
 import os
 import time
+from datetime import datetime, timezone
 
 import httpx
 
-from ..config import FREE_TIER_LIMIT, LICENSE_SERVER_URL, STRIPE_CHECKOUT_URL
+from ..config import (
+    FREE_TIER_LIMIT,
+    LICENSE_PUBLIC_KEY_PEM,
+    LICENSE_SERVER_URL,
+    STRIPE_CHECKOUT_URL,
+)
 from ..db import get_db, get_setting, set_setting
 from .keychain import get_secret, set_secret
 
@@ -92,7 +99,7 @@ def status() -> dict:
 def activate(license_key: str) -> dict:
     key = license_key.strip()
     set_secret("license_key", key)
-    if key == DEV_LICENSE_KEY:  # DEV ONLY: bypass the remote server entirely
+    if DEV_LICENSE_KEY and key == DEV_LICENSE_KEY:  # DEV ONLY: bypass the remote server entirely
         set_setting("license_status", {"valid": True, "dev": True, "checked_at": time.time()})
         return status()
     return refresh()
@@ -120,6 +127,46 @@ def set_tier(tier: str) -> dict:  # DEV ONLY
     return status()
 
 
+def _verify_signed_license(data: dict, install_id: str) -> bool:
+    """A license is valid only if its RSA-SHA256 signature verifies against the
+    bundled public key, it names THIS install, and it has not expired. An HTTP
+    200 from whatever AGUACATE_LICENSE_SERVER points at proves nothing."""
+    payload = data.get("payload")
+    signature_b64 = data.get("signature")
+    if not isinstance(payload, dict) or not isinstance(signature_b64, str):
+        return False
+    if payload.get("install_id") != install_id or payload.get("tier") != "pro":
+        return False
+    try:
+        expires = datetime.fromisoformat(str(payload["expires_at"]).replace("Z", "+00:00"))
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        if expires <= datetime.now(timezone.utc):
+            return False
+    except (KeyError, ValueError, TypeError):
+        return False
+    try:
+        import base64
+
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import padding
+
+        public_key = serialization.load_pem_public_key(LICENSE_PUBLIC_KEY_PEM.encode())
+        # Must byte-match the server's canonicalization:
+        # json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        public_key.verify(
+            base64.b64decode(signature_b64),
+            canonical,
+            padding.PKCS1v15(),
+            hashes.SHA256(),
+        )
+        return True
+    except Exception as exc:
+        log.warning("License signature verification failed: %s", exc)
+        return False
+
+
 def refresh() -> dict:
     """Validate the stored license key against the license server."""
     _sync_install_id_key()  # after checkout: ensure we validate the install_id
@@ -136,7 +183,11 @@ def refresh() -> dict:
             timeout=10,
         )
         data = resp.json() if resp.status_code == 200 else {}
-        valid = resp.status_code == 200 and not data.get("error")
+        valid = (
+            resp.status_code == 200
+            and not data.get("error")
+            and _verify_signed_license(data, key)
+        )
         set_setting("license_status", {"valid": valid, "checked_at": time.time()})
         # Cache the fresh portal token the server mints on each lookup; the
         # billing-portal call presents it to prove ownership of this install.

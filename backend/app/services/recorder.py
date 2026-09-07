@@ -5,9 +5,16 @@ macOS:   microphone via sounddevice/CoreAudio + optional loopback device
 Windows: microphone via sounddevice/WASAPI + native WASAPI loopback of any
          output device via the `soundcard` package (no driver needed).
 
-Streams are captured at each device's native rate, then resampled to 16 kHz
-mono and mixed at stop time. Output WAV is 0600 from creation.
+Capture chunks are spilled to disk continuously (raw float32 mono at the
+device's native rate) so a crash, force-quit, or sleep mid-meeting cannot lose
+the recording — only a bounded in-memory tail (~45s) is kept for the live
+transcript, coach, and level meter. At stop time the spilled tracks are
+resampled to 16 kHz mono and mixed in streaming blocks, so memory stays flat
+regardless of meeting length. A sidecar {meeting_id}.partial.json describes the
+in-progress tracks; startup recovery uses it to salvage interrupted meetings.
+Output WAV is 0600 from creation.
 """
+import json
 import logging
 import sys
 import threading
@@ -23,6 +30,12 @@ log = logging.getLogger("aguacate.recorder")
 
 TARGET_SR = 16000
 IS_WINDOWS = sys.platform == "win32"
+
+# In-memory tail kept per capture for live transcript (needs 15s), coach, and
+# levels. Everything older is already on disk.
+TAIL_SECONDS = 45
+# How often the spiller thread flushes old chunks to disk.
+SPILL_INTERVAL = 2.0
 
 # Synthetic device indices >= WASAPI_BASE refer to Windows loopback captures.
 WASAPI_BASE = 1000
@@ -136,11 +149,69 @@ def _resolve_mic_device(requested: int | None) -> int | None:
     )
 
 
-class _DeviceCapture:
-    def __init__(self, device_index: int | None):
-        self.device_index = device_index
+def _to_mono(audio: np.ndarray) -> np.ndarray:
+    if audio.ndim > 1:
+        return audio.mean(axis=1)
+    return audio
+
+
+class _SpillCapture:
+    """Shared chunk-buffer + disk-spill behavior for both capture kinds.
+
+    `chunks` holds the recent tail; older chunks are appended (as float32 mono
+    at native samplerate) to `spill_path`. `base_index` counts chunks already
+    spilled, so absolute chunk cursors (coach) survive pruning.
+    """
+
+    def __init__(self):
         self.chunks: list[np.ndarray] = []
         self.samplerate = TARGET_SR
+        self.base_index = 0
+        self.lock = threading.Lock()
+        self.spill_path: Path | None = None
+        self._spill_file = None
+
+    def open_spill(self, path: Path) -> None:
+        self.spill_path = path
+        touch_secure(path)
+        self._spill_file = open(path, "ab")
+
+    def spill_old_chunks(self) -> None:
+        """Move chunks beyond the in-memory tail out to disk."""
+        if self._spill_file is None:
+            return
+        tail_frames = int(TAIL_SECONDS * self.samplerate)
+        with self.lock:
+            total = sum(len(c) for c in self.chunks)
+            take = 0
+            while take < len(self.chunks) and total - len(self.chunks[take]) > tail_frames:
+                total -= len(self.chunks[take])
+                take += 1
+            to_write = self.chunks[:take]
+            del self.chunks[:take]
+            self.base_index += take
+        for chunk in to_write:
+            _to_mono(chunk).astype(np.float32).tofile(self._spill_file)
+
+    def close_spill(self) -> None:
+        """Flush every remaining chunk to disk and close the file."""
+        if self._spill_file is None:
+            return
+        with self.lock:
+            remaining = self.chunks
+            self.chunks = []
+            self.base_index += len(remaining)
+        for chunk in remaining:
+            _to_mono(chunk).astype(np.float32).tofile(self._spill_file)
+        self._spill_file.flush()
+        self._spill_file.close()
+        self._spill_file = None
+
+
+class _DeviceCapture(_SpillCapture):
+    def __init__(self, device_index: int | None):
+        super().__init__()
+        self.device_index = device_index
         self.stream = None
 
     def start(self):
@@ -166,24 +237,17 @@ class _DeviceCapture:
         )
         self.stream.start()
 
-    def stop(self) -> np.ndarray:
+    def stop(self) -> None:
         if self.stream:
             self.stream.stop()
             self.stream.close()
-        if not self.chunks:
-            return np.zeros(0, dtype=np.float32)
-        audio = np.concatenate(self.chunks, axis=0)
-        if audio.ndim > 1:
-            audio = audio.mean(axis=1)  # downmix to mono
-        if self.samplerate != TARGET_SR:
-            audio = _resample(audio, self.samplerate, TARGET_SR)
-        return audio
 
 
-class _WasapiLoopbackCapture:
+class _WasapiLoopbackCapture(_SpillCapture):
     """Windows system-audio capture through soundcard's WASAPI loopback."""
 
     def __init__(self, synthetic_index: int):
+        super().__init__()
         if synthetic_index not in _wasapi_devices:
             _list_wasapi_loopbacks()  # refresh mapping (device list may be stale)
         mic_id = _wasapi_devices.get(synthetic_index)
@@ -193,7 +257,6 @@ class _WasapiLoopbackCapture:
             )
         self._mic = sc.get_microphone(mic_id, include_loopback=True)
         self.samplerate = 48000
-        self.chunks: list[np.ndarray] = []
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
 
@@ -212,16 +275,10 @@ class _WasapiLoopbackCapture:
         self._thread = threading.Thread(target=run, daemon=True)
         self._thread.start()
 
-    def stop(self) -> np.ndarray:
+    def stop(self) -> None:
         self._stop.set()
         if self._thread:
             self._thread.join(timeout=3)
-        if not self.chunks:
-            return np.zeros(0, dtype=np.float32)
-        audio = np.concatenate(self.chunks, axis=0)
-        if audio.ndim > 1:
-            audio = audio.mean(axis=1)
-        return _resample(audio, self.samplerate, TARGET_SR)
 
 
 def _make_capture(device_index: int | None):
@@ -240,15 +297,111 @@ def _resample(audio: np.ndarray, src_sr: int, dst_sr: int) -> np.ndarray:
     return np.interp(x_new, x_old, audio).astype(np.float32)
 
 
+def _sidecar_path(meeting_id: str) -> Path:
+    return RECORDINGS_DIR / f"{meeting_id}.partial.json"
+
+
+def mix_tracks_to_wav(track_specs: list[dict], out_path: Path) -> Path:
+    """Mix raw float32-mono track files (each {path, samplerate}) into a 16 kHz
+    mono int16 WAV, streaming in 60-second blocks so memory stays flat for
+    arbitrarily long meetings. Two passes: peak scan, then scaled write."""
+    tracks = []
+    for spec in track_specs:
+        p = Path(spec["path"])
+        if not p.exists():
+            continue
+        n = p.stat().st_size // 4  # float32
+        if n > 0:
+            tracks.append({"path": p, "sr": int(spec["samplerate"]), "n": n})
+
+    block_sec = 60
+    if tracks:
+        duration = max(t["n"] / t["sr"] for t in tracks)
+    else:
+        duration = 1.0  # 1s silence placeholder
+
+    def _mixed_block(i: int) -> np.ndarray:
+        t0 = i * block_sec
+        t1 = min(duration, t0 + block_sec)
+        out_len = int(round((t1 - t0) * TARGET_SR))
+        if out_len <= 0:
+            return np.zeros(0, dtype=np.float32)
+        mixed = np.zeros(out_len, dtype=np.float32)
+        x_out = t0 + np.arange(out_len) / TARGET_SR
+        for t in tracks:
+            src_start = max(0, int(t0 * t["sr"]) - 1)
+            src_end = min(t["n"], int(np.ceil(t1 * t["sr"])) + 1)
+            if src_end <= src_start:
+                continue
+            seg = np.fromfile(
+                t["path"], dtype=np.float32, count=src_end - src_start, offset=src_start * 4
+            )
+            x_src = (src_start + np.arange(len(seg))) / t["sr"]
+            mixed += np.interp(x_out, x_src, seg, left=0.0, right=0.0).astype(np.float32)
+        return mixed
+
+    n_blocks = max(1, int(np.ceil(duration / block_sec)))
+    peak = 0.0
+    for i in range(n_blocks):
+        block = _mixed_block(i)
+        if len(block):
+            peak = max(peak, float(np.max(np.abs(block))))
+    scale = 1.0 / peak if peak > 1.0 else 1.0
+
+    touch_secure(out_path)  # 0600 before any audio bytes land (C5)
+    with wave.open(str(out_path), "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(TARGET_SR)
+        for i in range(n_blocks):
+            block = _mixed_block(i) * scale
+            wf.writeframes((block * 32767).astype(np.int16).tobytes())
+    secure_file(out_path)
+    return out_path
+
+
+def finalize_partial(meeting_id: str) -> Path | None:
+    """Startup recovery: mix whatever a crashed session managed to spill to disk
+    into the final WAV, then clean up the partial files. Returns the WAV path,
+    or None if there is nothing to salvage."""
+    sidecar = _sidecar_path(meeting_id)
+    if not sidecar.exists():
+        return None
+    try:
+        meta = json.loads(sidecar.read_text())
+        specs = [s for s in meta.get("captures", []) if Path(s["path"]).exists()]
+        if not any(Path(s["path"]).stat().st_size >= 4 for s in specs):
+            _cleanup_partial(meeting_id, meta)
+            return None
+        path = RECORDINGS_DIR / f"{meeting_id}.wav"
+        mix_tracks_to_wav(specs, path)
+        _cleanup_partial(meeting_id, meta)
+        return path
+    except Exception:
+        log.exception("Could not salvage partial recording for %s", meeting_id)
+        return None
+
+
+def list_partial_meetings() -> list[str]:
+    return [p.name.removesuffix(".partial.json") for p in RECORDINGS_DIR.glob("*.partial.json")]
+
+
+def _cleanup_partial(meeting_id: str, meta: dict) -> None:
+    for spec in meta.get("captures", []):
+        Path(spec["path"]).unlink(missing_ok=True)
+    _sidecar_path(meeting_id).unlink(missing_ok=True)
+
+
 class Recorder:
     """Singleton recorder managing one active recording at a time."""
 
     def __init__(self):
         self._lock = threading.Lock()
-        self._captures: list[_DeviceCapture] = []
+        self._captures: list[_SpillCapture] = []
         self._meeting_id: str | None = None
         self._level_thread: threading.Thread | None = None
         self._live_transcript_thread: threading.Thread | None = None
+        self._spill_thread: threading.Thread | None = None
         self._stop_levels = threading.Event()
         self._started_at: float | None = None
         self.muted = False           # privacy mute zone: capture writes silence
@@ -265,8 +418,8 @@ class Recorder:
         self.muted = muted
         hub.emit("recording_muted", {"muted": muted})
 
-    # ponytail: elapsed/markers keep counting wall-clock while paused; only the
-    # audio timeline stops. Track pause offsets if marker precision matters.
+    # elapsed/markers keep counting wall-clock while paused; only the audio
+    # timeline stops. Track pause offsets if marker precision matters.
     def set_paused(self, paused: bool) -> None:
         self.paused = paused
         hub.emit("recording_paused", {"paused": paused})
@@ -281,18 +434,19 @@ class Recorder:
 
     def drain_for_coach(self, cursor: dict) -> np.ndarray:
         """Return new 16k mono audio (mic capture only) since the last call.
-        cursor is caller-owned state: {"chunk_index": int}."""
+        cursor is caller-owned state: {"chunk_index": int} — an absolute index
+        that stays valid as old chunks are spilled to disk."""
         if not self._captures:
             return np.zeros(0, dtype=np.float32)
         cap = self._captures[0]
-        start = cursor.get("chunk_index", 0)
-        chunks = cap.chunks[start:]
-        cursor["chunk_index"] = start + len(chunks)
+        with cap.lock:
+            start_abs = cursor.get("chunk_index", 0)
+            start_rel = max(0, start_abs - cap.base_index)
+            chunks = list(cap.chunks[start_rel:])
+            cursor["chunk_index"] = cap.base_index + len(cap.chunks)
         if not chunks:
             return np.zeros(0, dtype=np.float32)
-        audio = np.concatenate(chunks, axis=0)
-        if audio.ndim > 1:
-            audio = audio.mean(axis=1)
+        audio = np.concatenate([_to_mono(c) for c in chunks], axis=0)
         return _resample(audio, cap.samplerate, TARGET_SR)
 
     @property
@@ -327,6 +481,17 @@ class Recorder:
                         pass
                 self._captures = []
                 raise
+
+            # Crash-safety: open spill files + sidecar before declaring started.
+            specs = []
+            for i, cap in enumerate(self._captures):
+                spill = RECORDINGS_DIR / f"{meeting_id}.cap{i}.f32raw"
+                cap.open_spill(spill)
+                specs.append({"path": str(spill), "samplerate": cap.samplerate})
+            sidecar = _sidecar_path(meeting_id)
+            sidecar.write_text(json.dumps({"meeting_id": meeting_id, "captures": specs}))
+            secure_file(sidecar)
+
             self._meeting_id = meeting_id
             import time
 
@@ -341,7 +506,18 @@ class Recorder:
                 target=self._emit_live_transcript, daemon=True
             )
             self._live_transcript_thread.start()
+            self._spill_thread = threading.Thread(target=self._spill_loop, daemon=True)
+            self._spill_thread.start()
             hub.emit("recording_started", {"meeting_id": meeting_id})
+
+    def _spill_loop(self):
+        """Continuously move audio older than the in-memory tail to disk."""
+        while not self._stop_levels.wait(SPILL_INTERVAL):
+            for cap in list(self._captures):
+                try:
+                    cap.spill_old_chunks()
+                except Exception:
+                    log.exception("Audio spill failed")
 
     def _emit_levels(self):
         """Emit RMS levels ~4x/sec so the UI waveform animates with real audio."""
@@ -364,14 +540,21 @@ class Recorder:
         while not self._stop_levels.wait(INTERVAL):
             try:
                 cap = self._captures[0] if self._captures else None
-                if cap is None or not cap.chunks:
+                if cap is None:
                     continue
-                # Take last 15 seconds of audio at capture samplerate
-                frames_needed = int(WINDOW_SEC * cap.samplerate)
-                all_audio = np.concatenate(cap.chunks, axis=0)
-                if all_audio.ndim > 1:
-                    all_audio = all_audio.mean(axis=1)
-                window = all_audio[-frames_needed:]
+                with cap.lock:
+                    # Only the in-memory tail is needed: it always covers ≥15s.
+                    frames_needed = int(WINDOW_SEC * cap.samplerate)
+                    got, take = 0, 0
+                    for chunk in reversed(cap.chunks):
+                        got += len(chunk)
+                        take += 1
+                        if got >= frames_needed:
+                            break
+                    recent = list(cap.chunks[len(cap.chunks) - take:]) if take else []
+                if not recent:
+                    continue
+                window = np.concatenate([_to_mono(c) for c in recent], axis=0)[-frames_needed:]
                 if len(window) < cap.samplerate:  # less than 1 second
                     continue
                 resampled = _resample(window, cap.samplerate, TARGET_SR)
@@ -387,34 +570,30 @@ class Recorder:
                 raise RuntimeError("No recording in progress")
             meeting_id = self._meeting_id
             self._stop_levels.set()
-            tracks = [c.stop() for c in self._captures]
+            captures = self._captures
+            for c in captures:
+                try:
+                    c.stop()
+                except Exception:
+                    log.exception("Capture stop failed")
             self._captures = []
             self._meeting_id = None
             self._started_at = None
             self.muted = False
             self.paused = False
 
-        tracks = [t for t in tracks if len(t) > 0]
-        if tracks:
-            length = max(len(t) for t in tracks)
-            mixed = np.zeros(length, dtype=np.float32)
-            for t in tracks:
-                mixed[: len(t)] += t
-            peak = np.max(np.abs(mixed)) or 1.0
-            if peak > 1.0:
-                mixed /= peak
-        else:
-            mixed = np.zeros(TARGET_SR, dtype=np.float32)  # 1s silence placeholder
+        specs = []
+        for cap in captures:
+            try:
+                cap.close_spill()
+            except Exception:
+                log.exception("Spill finalize failed")
+            if cap.spill_path is not None:
+                specs.append({"path": str(cap.spill_path), "samplerate": cap.samplerate})
 
         path = RECORDINGS_DIR / f"{meeting_id}.wav"
-        touch_secure(path)  # 0600 before any audio bytes land (C5)
-        pcm = (mixed * 32767).astype(np.int16)
-        with wave.open(str(path), "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(TARGET_SR)
-            wf.writeframes(pcm.tobytes())
-        secure_file(path)
+        mix_tracks_to_wav(specs, path)
+        _cleanup_partial(meeting_id, {"captures": specs})
         hub.emit("recording_stopped", {"meeting_id": meeting_id, "path": str(path)})
         return path
 
