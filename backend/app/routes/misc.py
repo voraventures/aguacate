@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from ..config import (
+    CLAUDE_MODEL,
     DEFAULT_AI_PROVIDER,
     DEFAULT_GEMINI_MODEL,
     DEFAULT_OPENAI_MODEL,
@@ -190,7 +191,7 @@ def get_settings():
         "mic_device": get_setting("mic_device"),
         "system_device": get_setting("system_device"),
         "whisper_model": get_setting("whisper_model", "base"),
-        "claude_model": get_setting("claude_model", "claude-sonnet-4-6"),
+        "claude_model": get_setting("claude_model", CLAUDE_MODEL),
         "ai_provider": get_setting("ai_provider", DEFAULT_AI_PROVIDER),
         "openai_model": get_setting("openai_model", DEFAULT_OPENAI_MODEL),
         "gemini_model": get_setting("gemini_model", DEFAULT_GEMINI_MODEL),
@@ -212,11 +213,11 @@ def list_models():
     return {
         "anthropic": [
             # Haiku is the default: cheapest current model, accurate for notes
-            # extraction, and what the bundled-inference proxy serves. Sonnet is
+            # extraction, and what the bundled-inference proxy serves. Sonnet 5 is
             # also proxied; Opus requires the user's own API key.
             {"id": "claude-haiku-4-5", "name": "Claude Haiku 4.5", "default": True},
-            {"id": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "default": False},
-            {"id": "claude-opus-4-8", "name": "Claude Opus 4.8 (own key required)", "default": False},
+            {"id": "claude-sonnet-5", "name": "Claude Sonnet 5", "default": False},
+            {"id": "claude-opus-5", "name": "Claude Opus 5 (own key required)", "default": False},
         ],
         "openai": [
             {"id": "gpt-4o", "name": "GPT-4o", "default": True},
