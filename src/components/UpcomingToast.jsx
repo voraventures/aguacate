@@ -1,4 +1,4 @@
-// The 5-minute calendar heads-up — README section 6 / SPEC-calendar-autorecord.md.
+// The 1-minute calendar heads-up (spec originally said 5) — README section 6 / SPEC-calendar-autorecord.md.
 // Non-blocking and dismissible, unlike RecordPrompt's confirm modal at T-35s:
 // this is purely informational ("here's what's about to happen"), not a
 // decision the user has to make.
@@ -12,7 +12,7 @@ function fmtMinutes(sec) {
 
 export default function UpcomingToast() {
   const { t } = useTranslation();
-  const { upcomingWarning, setUpcomingWarning } = useStore();
+  const { upcomingWarning, setUpcomingWarning, joinMeeting } = useStore();
   const logoUrl = useLogo();
 
   if (!upcomingWarning) return null;
@@ -28,6 +28,14 @@ export default function UpcomingToast() {
           })}
         </div>
         <div className="upcoming-toast-sub">{t("upcomingToast.willTranscribe")}</div>
+        {upcomingWarning.join_url && (
+          <button
+            className="btn upcoming-toast-join"
+            onClick={() => joinMeeting(upcomingWarning.event_id)}
+          >
+            {t("upcomingToast.join")}
+          </button>
+        )}
       </div>
       <button
         className="upcoming-toast-dismiss"

@@ -7,7 +7,8 @@ from pathlib import Path
 
 import numpy as np
 
-from ..db import get_db, now_iso
+from ..config import RECORDINGS_DIR
+from ..db import close_db, get_db, now_iso
 from ..events import hub
 from . import intelligence, notes, transcriber
 
@@ -123,6 +124,42 @@ def _generate_and_index(meeting_id: str, transcript_text: str, segments: list[di
         log.exception("Conflict detection failed for %s", meeting_id)
 
 
+def _transcribe_fast(meeting_id: str, audio_path: Path) -> dict:
+    """Uses the live incremental transcription recorder.py already produced
+    during the call (see recorder._incremental_transcribe_loop) so only the
+    short tail after the last covered block needs transcribing now, instead
+    of re-running Whisper over the whole recording. Falls back to the old
+    whole-file pass if there's no progress sidecar or anything about using
+    it goes wrong."""
+    progress_path = RECORDINGS_DIR / f"{meeting_id}.transcript_partial.json"
+    try:
+        if not progress_path.exists():
+            return transcriber.transcribe(meeting_id, audio_path)
+
+        progress = json.loads(progress_path.read_text())
+        until = progress.get("transcribed_until", 0.0)
+        prior_segments = progress.get("segments", [])
+
+        with wave.open(str(audio_path), "rb") as wf:
+            duration = wf.getnframes() / wf.getframerate()
+
+        if until >= duration - 0.5:
+            tail_segments: list[dict] = []
+            language = None
+        else:
+            tail = transcriber.transcribe_tail(audio_path, until)
+            tail_segments = tail["segments"]
+            language = tail["language"]
+
+        all_segments = prior_segments + tail_segments
+        return transcriber.finish_from_segments(meeting_id, all_segments, language, duration)
+    except Exception:
+        log.exception(
+            "Fast transcription path failed for %s — falling back to full pass", meeting_id
+        )
+        return transcriber.transcribe(meeting_id, audio_path)
+
+
 def process_meeting(meeting_id: str, audio_path: Path) -> None:
     """Runs in a worker thread after recording stops."""
     db = get_db()
@@ -142,7 +179,7 @@ def process_meeting(meeting_id: str, audio_path: Path) -> None:
             return
 
         _set_status(meeting_id, "transcribing")
-        result = transcriber.transcribe(meeting_id, audio_path)
+        result = _transcribe_fast(meeting_id, audio_path)
         db.execute(
             "INSERT OR REPLACE INTO transcripts(meeting_id,text,language,duration_sec,segments) "
             "VALUES(?,?,?,?,?)",
@@ -166,12 +203,52 @@ def process_meeting(meeting_id: str, audio_path: Path) -> None:
     except Exception as exc:
         log.exception("Pipeline failed for meeting %s", meeting_id)
         _set_status(meeting_id, "error", _safe_error(exc))
+    finally:
+        (RECORDINGS_DIR / f"{meeting_id}.transcript_partial.json").unlink(missing_ok=True)
+        close_db()  # worker thread exits here; don't leak its connection
 
 
 def process_meeting_async(meeting_id: str, audio_path: Path) -> None:
     threading.Thread(
         target=process_meeting, args=(meeting_id, audio_path), daemon=True
     ).start()
+
+
+def recover_interrupted() -> None:
+    """Startup recovery. Meetings stuck mid-flight from a crashed session:
+    - status 'recording' with spilled partial audio → salvage the audio and run
+      the normal pipeline (the crash-loss fix — the meeting is NOT lost);
+    - status 'transcribing'/'generating' with a finished WAV → re-run;
+    - otherwise → mark error so the UI stops showing a phantom in-progress state.
+    """
+    from . import recorder as recorder_svc
+
+    db = get_db()
+    partials = set(recorder_svc.list_partial_meetings())
+    stuck = db.execute(
+        "SELECT id, status, audio_path FROM meetings "
+        "WHERE status IN ('recording','transcribing','generating')"
+    ).fetchall()
+    for row in stuck:
+        mid = row["id"]
+        if row["status"] == "recording":
+            salvaged = recorder_svc.finalize_partial(mid) if mid in partials else None
+            partials.discard(mid)
+            if salvaged is not None:
+                log.info("Recovered interrupted recording %s", mid)
+                db.execute("UPDATE meetings SET ended_at=? WHERE id=?", (now_iso(), mid))
+                db.commit()
+                process_meeting_async(mid, salvaged)
+            else:
+                _set_status(mid, "error", "Recording was interrupted before any audio was saved.")
+        elif row["audio_path"] and Path(row["audio_path"]).exists():
+            log.info("Re-running interrupted pipeline for %s", mid)
+            process_meeting_async(mid, Path(row["audio_path"]))
+        else:
+            _set_status(mid, "error", "Processing was interrupted.")
+    # Orphaned partial files with no matching stuck meeting: clean up quietly.
+    for mid in partials:
+        recorder_svc.finalize_partial(mid)
 
 
 def regenerate_notes_async(meeting_id: str, template_id: str | None = None) -> None:
@@ -200,5 +277,7 @@ def regenerate_notes_async(meeting_id: str, template_id: str | None = None) -> N
         except Exception as exc:
             log.exception("Regenerate failed for %s", meeting_id)
             _set_status(meeting_id, "error", _safe_error(exc))
+        finally:
+            close_db()  # worker thread exits here; don't leak its connection
 
     threading.Thread(target=_run, daemon=True).start()

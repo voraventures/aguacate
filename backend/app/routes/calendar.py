@@ -1,11 +1,12 @@
 """Calendar connection + sync routes. The Google OAuth callback is the only
 unauthenticated HTML route (the browser redirect can't carry our token); it is
 protected by the PKCE state token with TTL instead (C9)."""
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-from ..db import get_setting, set_setting
+from ..db import get_db, get_setting, set_setting
+from ..services import presence
 from ..services.calendars import apple_cal, google_cal, ms_cal, sync
 
 router = APIRouter(prefix="/api/calendar", tags=["calendar"])
@@ -62,6 +63,18 @@ def brief(event_id: str):
         "start": ev["start"],
         **meeting_brief(attendees, ev["title"]),
     }
+
+
+@router.post("/events/{event_id}/join")
+def join_event(event_id: str):
+    """Returns the meeting link for the renderer to open, and starts watching
+    live audio so recording is offered once people actually start talking."""
+    ev = get_db().execute(
+        "SELECT join_url, cancelled FROM calendar_events WHERE id=?", (event_id,)
+    ).fetchone()
+    if not ev or ev["cancelled"]:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {"join_url": ev["join_url"], "watching": presence.start_watch(event_id)}
 
 
 @router.post("/mode")

@@ -261,10 +261,11 @@
       "modelDesc": "选择用于撰写你笔记的 {{name}} 模型。",
       "loading": "加载中…",
       "keyLabel": {
-        "anthropic": "Anthropic API 密钥",
+        "anthropic": "Anthropic API 密钥（可选 — AI 笔记已包含在 Aguacate 中）",
         "openai": "OpenAI API 密钥",
         "google": "Google API 密钥"
-      }
+      },
+      "includedNote": "AI 笔记已包含在 Aguacate 中 — 无需 API 密钥。想使用自己的账户？添加你的 Anthropic、OpenAI 或 Google API 密钥即可。使用 OpenAI 和 Google 需要你自己的密钥。"
     },
     "calendars": {
       "connected": "已连接的日历",
@@ -286,7 +287,7 @@
       "intro": "连接日历后，Aguacate 会在你加入会议的那一刻自动转录——无需手动点击录制。",
       "autoTranscribe": "自动转录日历会议",
       "autoTranscribeDesc": "自动加入 Zoom、Meet 和 Teams，无需确认。",
-      "notify5min": "提前 5 分钟提醒",
+      "notify5min": "提前 1 分钟提醒",
       "notify5minDesc": "在自动录制的会议开始前，应用内会显示提醒横幅。"
     },
     "integrations": {
@@ -574,7 +575,9 @@
       "momentFlagged": "时刻已标记",
       "micDenied": "麦克风访问被拒绝 — 打开系统设置 → 隐私与安全性 → 麦克风",
       "processingFailed": "处理失败",
-      "recordingFailed": "录制失败"
+      "recordingFailed": "录制失败",
+      "joinWatching": "正在打开通话 — 有人开始说话后 Aguacate 会提示录制。",
+      "joinFailed": "无法打开会议链接"
     },
     "notify": {
       "recordingStartedTitle": "录制已开始",
@@ -875,6 +878,7 @@
   "upcomingToast": {
     "startsIn": "{{title}} 将在 {{minutes}} 分钟后开始",
     "willTranscribe": "加入通话后 Aguacate 会自动转录。",
+    "join": "加入",
     "dismiss": "关闭"
   },
   "pdf": {

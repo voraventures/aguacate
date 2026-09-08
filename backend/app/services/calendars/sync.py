@@ -14,7 +14,7 @@ log = logging.getLogger("aguacate.calsync")
 
 POLL_INTERVAL = 30  # seconds, per spec
 PROMPT_WINDOW = 35  # prompt when start is within this many seconds
-WARN_WINDOW = 5 * 60  # 5-minute heads-up banner, per SPEC-calendar-autorecord.md
+WARN_WINDOW = 60  # 1-minute heads-up banner with the Join button (was 5 min in the spec)
 
 _LINK_PATTERNS = [
     (re.compile(r"https?://[^\s<>\"]*zoom\.us/[^\s<>\"]+", re.I), "Zoom"),
@@ -50,6 +50,14 @@ def _parse_dt(value: str | None) -> datetime | None:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+
+
+def _norm_iso(value: str | None) -> str | None:
+    """Normalize provider timestamps (offsets, Z-suffix, date-only) to a single
+    UTC ISO format so SQL string comparison and ORDER BY sort correctly across
+    providers and timezones."""
+    dt = _parse_dt(value)
+    return dt.astimezone(timezone.utc).isoformat() if dt else value
 
 
 def dedup_key(title: str, start: str | None) -> str:
@@ -99,8 +107,8 @@ def sync_now() -> int:
                 "provider": ev["provider"],
                 "provider_ids": [f"{ev['provider']}:{ev['provider_id']}"],
                 "title": ev["title"],
-                "start": ev.get("start"),
-                "end": ev.get("end"),
+                "start": _norm_iso(ev.get("start")),
+                "end": _norm_iso(ev.get("end")),
                 "attendees": [a for a in ev.get("attendees", []) if a],
                 "cancelled": bool(ev.get("cancelled")),
                 "platform": platform,
@@ -246,6 +254,9 @@ def _check_auto_record() -> None:
     mode = get_setting("recording_mode", "confirm_30s")  # all|confirm_30s|manual|off
     if mode in ("manual", "off"):
         return
+    from .. import presence  # local import: presence imports this module
+
+    watching = presence.watching()
     db = get_db()
     now = datetime.now(timezone.utc)
     for row in db.execute(
@@ -256,6 +267,8 @@ def _check_auto_record() -> None:
             db.execute("UPDATE calendar_events SET prompted=1 WHERE id=?", (row["id"],))
             db.commit()
             continue
+        if row["id"] == watching:
+            continue  # user clicked Join: talk detection decides when to prompt, not the clock
         start = _parse_dt(row["start"])
         if not start:
             continue
@@ -280,9 +293,9 @@ def _check_auto_record() -> None:
 
 
 def _check_five_min_warning() -> None:
-    """Non-blocking 5-minute heads-up for calendar meetings with a real
-    video-call link — separate from the 35s auto-record prompt/start.
-    Per SPEC-calendar-autorecord.md: dismissible, informational only."""
+    """Non-blocking 1-minute heads-up (with a Join button) for calendar
+    meetings with a real video-call link — separate from the 35s auto-record
+    prompt/start. Dismissible; Join hands off to services/presence.py."""
     mode = get_setting("recording_mode", "confirm_30s")
     if mode in ("manual", "off") or not get_setting("notify_5min", True):
         return

@@ -2,6 +2,7 @@
 import logging
 
 from ..config import (
+    AI_PROXY_URL,
     CLAUDE_MODEL,
     DEFAULT_AI_PROVIDER,
     DEFAULT_GEMINI_MODEL,
@@ -23,19 +24,29 @@ _PROVIDER_KEYS = {
 
 
 def is_configured(provider: str | None = None) -> bool:
-    """True if the API key for the given provider (or the active provider) is set."""
+    """True if AI is usable for the given provider (or the active provider).
+    Anthropic is always usable: with no user key, calls route through the
+    bundled-inference proxy (subscription-covered)."""
     if provider is None:
         provider = get_setting("ai_provider", DEFAULT_AI_PROVIDER)
+    if provider == "anthropic":
+        return True
     return bool(get_secret(_PROVIDER_KEYS.get(provider, "anthropic_api_key")))
 
 
 def get_client():
-    api_key = get_secret("anthropic_api_key")
-    if not api_key:
-        raise RuntimeError("Anthropic API key not configured. Add it in Settings → AI.")
+    """Anthropic client. A user-supplied key calls the API directly (their own
+    account, their choice of model). Without one, calls go through the license
+    server's bundled-AI proxy, authenticated by this install's ID — the real key
+    never ships in the app."""
     import anthropic
 
-    return anthropic.Anthropic(api_key=api_key)
+    api_key = get_secret("anthropic_api_key")
+    if api_key:
+        return anthropic.Anthropic(api_key=api_key)
+    from ..routes.workspace import _install_id
+
+    return anthropic.Anthropic(api_key=_install_id(), base_url=AI_PROXY_URL)
 
 
 def get_openai_client():
@@ -61,10 +72,20 @@ def get_gemini_client():
     return genai
 
 
+# Models the bundled-inference proxy will serve. A user's own key can use any model.
+_PROXY_MODELS = {"claude-haiku-4-5", "claude-sonnet-4-6"}
+
+
+def _clamp_for_proxy(model: str) -> str:
+    if get_secret("anthropic_api_key"):
+        return model
+    return model if model in _PROXY_MODELS else CLAUDE_MODEL
+
+
 def current_model() -> str:
     # Anthropic model only — shared by ai.py / conflicts.py, which call the Anthropic
     # client. Per-provider note generation resolves its model via _model_for().
-    return get_setting("claude_model", CLAUDE_MODEL)
+    return _clamp_for_proxy(get_setting("claude_model", CLAUDE_MODEL))
 
 
 def _model_for(provider: str) -> str:
@@ -72,7 +93,7 @@ def _model_for(provider: str) -> str:
         return get_setting("openai_model", DEFAULT_OPENAI_MODEL)
     if provider == "google":
         return get_setting("gemini_model", DEFAULT_GEMINI_MODEL)
-    return get_setting("claude_model", CLAUDE_MODEL)
+    return _clamp_for_proxy(get_setting("claude_model", CLAUDE_MODEL))
 
 
 def generate_notes(

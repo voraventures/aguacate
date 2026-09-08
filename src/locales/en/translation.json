@@ -261,10 +261,11 @@
       "modelDesc": "Choose the {{name}} model used to write your notes.",
       "loading": "Loading…",
       "keyLabel": {
-        "anthropic": "Anthropic API key",
+        "anthropic": "Anthropic API key (optional — AI notes are included with Aguacate)",
         "openai": "OpenAI API key",
         "google": "Google API key"
-      }
+      },
+      "includedNote": "AI notes are included with Aguacate — no API key needed. Prefer your own account? Add your API key from Anthropic, OpenAI, or Google and Aguacate will use it instead. OpenAI and Google require your own key."
     },
     "calendars": {
       "connected": "Connected calendars",
@@ -286,7 +287,7 @@
       "intro": "Connect a calendar so Aguacate can auto-transcribe meetings the moment you join — no need to hit record.",
       "autoTranscribe": "Auto-transcribe calendar meetings",
       "autoTranscribeDesc": "Joins Zoom, Meet, and Teams automatically — no confirmation needed.",
-      "notify5min": "Notify 5 minutes before",
+      "notify5min": "Notify 1 minute before",
       "notify5minDesc": "In-app banner heads-up before an auto-recorded meeting starts."
     },
     "integrations": {
@@ -575,7 +576,9 @@
       "momentFlagged": "Moment flagged",
       "micDenied": "Microphone access denied — open System Settings → Privacy & Security → Microphone",
       "processingFailed": "Processing failed",
-      "recordingFailed": "Recording failed"
+      "recordingFailed": "Recording failed",
+      "joinWatching": "Opening the call — Aguacate will offer to record once people start talking.",
+      "joinFailed": "Couldn't open the meeting link"
     },
     "notify": {
       "recordingStartedTitle": "Recording started",
@@ -887,6 +890,7 @@
   "upcomingToast": {
     "startsIn": "{{title}} starts in {{minutes}} min",
     "willTranscribe": "Aguacate will auto-transcribe once you join the call.",
+    "join": "Join",
     "dismiss": "Dismiss"
   },
   "pdf": {

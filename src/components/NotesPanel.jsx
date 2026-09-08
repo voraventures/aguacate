@@ -466,9 +466,9 @@ export default function NotesPanel() {
                 )}
               </span>
             )}
-            <button className="ws-share-btn" onClick={shareMeeting}>
-              {t("notes.header.share")}
-            </button>
+            {/* Public share button removed: it minted aguacate:// URLs no recipient
+                could open (backend is loopback-only). Team sharing via the
+                workspace folder still works from the menu. */}
             <div className="row-menu" style={{ position: "relative", top: 0, right: 0 }} ref={menuRef}>
               <button
                 className="icon-btn"

@@ -168,7 +168,8 @@ def mobile_update_action(action_id: str, body: ActionUpdateBody):
 @router.get("/search", dependencies=mobile_authed)
 def mobile_search(q: str = Query(min_length=1, max_length=200)):
     """Full-text search for mobile."""
-    like = f"%{q}%"
+    escaped = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    like = f"%{escaped}%"
     db = get_db()
     rows = db.execute(
         """SELECT DISTINCT m.id, m.title, m.started_at,
@@ -176,7 +177,8 @@ def mobile_search(q: str = Query(min_length=1, max_length=200)):
            FROM meetings m
            LEFT JOIN notes n ON n.meeting_id = m.id
            LEFT JOIN transcripts t ON t.meeting_id = m.id
-           WHERE m.title LIKE ? OR n.content LIKE ? OR t.text LIKE ?
+           WHERE m.title LIKE ? ESCAPE '\\' OR n.content LIKE ? ESCAPE '\\'
+              OR t.text LIKE ? ESCAPE '\\'
            ORDER BY m.started_at DESC LIMIT 30""",
         (like, like, like),
     ).fetchall()

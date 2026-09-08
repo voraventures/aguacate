@@ -261,10 +261,11 @@
       "modelDesc": "노트 작성에 사용할 {{name}} 모델을 선택하세요.",
       "loading": "불러오는 중…",
       "keyLabel": {
-        "anthropic": "Anthropic API 키",
+        "anthropic": "Anthropic API 키 (선택 사항 — AI 노트는 Aguacate에 기본 포함)",
         "openai": "OpenAI API 키",
         "google": "Google API 키"
-      }
+      },
+      "includedNote": "AI 노트는 Aguacate에 기본 포함되어 있어 API 키가 필요 없습니다. 자신의 계정을 사용하고 싶다면 Anthropic, OpenAI 또는 Google API 키를 추가하세요. OpenAI와 Google은 본인의 키가 필요합니다."
     },
     "calendars": {
       "connected": "연결된 캘린더",
@@ -286,7 +287,7 @@
       "intro": "캘린더를 연결하면 회의에 참여하는 순간 Aguacate가 자동으로 전사를 시작해요 — 녹음 버튼을 누를 필요가 없어요.",
       "autoTranscribe": "캘린더 회의 자동 전사",
       "autoTranscribeDesc": "확인 없이 Zoom, Meet, Teams에 자동으로 참여해요.",
-      "notify5min": "5분 전에 알림",
+      "notify5min": "1분 전에 알림",
       "notify5minDesc": "자동 녹음될 회의가 시작되기 전 앱 내 배너로 알려드려요."
     },
     "integrations": {
@@ -574,7 +575,9 @@
       "momentFlagged": "순간 표시됨",
       "micDenied": "마이크 접근이 거부되었습니다 — 시스템 설정 → 개인정보 보호 및 보안 → 마이크를 여세요",
       "processingFailed": "처리 실패",
-      "recordingFailed": "녹음 실패"
+      "recordingFailed": "녹음 실패",
+      "joinWatching": "통화를 여는 중 — 대화가 시작되면 Aguacate가 녹음을 제안해요.",
+      "joinFailed": "회의 링크를 열 수 없어요"
     },
     "notify": {
       "recordingStartedTitle": "녹음 시작됨",
@@ -875,6 +878,7 @@
   "upcomingToast": {
     "startsIn": "{{title}}이(가) {{minutes}}분 후에 시작해요",
     "willTranscribe": "통화에 참여하면 Aguacate가 자동으로 전사를 시작해요.",
+    "join": "참여",
     "dismiss": "닫기"
   },
   "pdf": {

@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { api, connectWebSocket, initBackend } from "./api.js";
+import { api, connectWebSocket, initBackend, openExternal } from "./api.js";
 import i18n from "./i18n.js";
 import logoPrimary from "./assets/logo-primary.svg?no-inline";
 import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
@@ -185,20 +185,31 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     let cleanup = () => {};
     (async () => {
-      const info = await initBackend();
+      // If the backend process never emits its ready handshake (spawn error,
+      // port bind failure), getBackend would pend forever — time out instead.
+      const info = await Promise.race([
+        initBackend(),
+        new Promise((r) => setTimeout(() => r(null), 30000)),
+      ]);
       if (!info) {
         setConnectionFailed(true);
         return;
       }
       // wait for backend to accept requests
+      let healthy = false;
       for (let i = 0; i < 60; i++) {
         try {
           const h = await api.get("/api/health");
           setHealth(h);
+          healthy = true;
           break;
         } catch {
           await new Promise((r) => setTimeout(r, 500));
         }
+      }
+      if (!healthy) {
+        setConnectionFailed(true);
+        return;
       }
       await Promise.all([
         refreshMeetings(),
@@ -235,7 +246,9 @@ export function StoreProvider({ children }) {
             break;
           case "transcript_chunk":
             if (data.text) {
-              setLiveTranscriptChunks((prev) => [...prev, data.text]);
+              // Bound the buffer: a multi-hour meeting would otherwise grow an
+              // ever-longer array and re-render the full list on every chunk.
+              setLiveTranscriptChunks((prev) => [...prev.slice(-149), data.text]);
             }
             break;
           case "coach_update":
@@ -354,9 +367,15 @@ export function StoreProvider({ children }) {
 
   const selectedTemplateRef = useRef(selectedTemplate);
   selectedTemplateRef.current = selectedTemplate;
+  const startInFlightRef = useRef(false);
 
   const startRecording = useCallback(
     async (opts = {}) => {
+      // Device init can block /start for tens of seconds (e.g. first-run mic
+      // permission); guard so a second hotkey press or the auto-record prompt
+      // can't fire a concurrent duplicate start.
+      if (startInFlightRef.current) return;
+      startInFlightRef.current = true;
       try {
         const result = await api.post("/api/recording/start", {
           title: opts.title || "",
@@ -375,9 +394,25 @@ export function StoreProvider({ children }) {
           showToast(raw, "error");
         }
         throw err;
+      } finally {
+        startInFlightRef.current = false;
       }
     },
     [refreshMeetings, selectMeeting, showToast]
+  );
+
+  const joinMeeting = useCallback(
+    async (eventId) => {
+      try {
+        const result = await api.post(`/api/calendar/events/${encodeURIComponent(eventId)}/join`);
+        if (result.join_url) await openExternal(result.join_url);
+        setUpcomingWarning(null);
+        if (result.watching) showToast(i18n.t("store.toast.joinWatching"), "info");
+      } catch (err) {
+        showToast(err.message || i18n.t("store.toast.joinFailed"), "error");
+      }
+    },
+    [showToast]
   );
 
   const stopRecording = useCallback(async () => {
@@ -570,6 +605,7 @@ export function StoreProvider({ children }) {
     setPrompt,
     upcomingWarning,
     setUpcomingWarning,
+    joinMeeting,
     settings,
     setSettings,
     settingsOpen,
