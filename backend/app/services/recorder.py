@@ -16,6 +16,7 @@ Output WAV is 0600 from creation.
 """
 import json
 import logging
+import os
 import sys
 import threading
 import wave
@@ -36,6 +37,14 @@ IS_WINDOWS = sys.platform == "win32"
 TAIL_SECONDS = 45
 # How often the spiller thread flushes old chunks to disk.
 SPILL_INTERVAL = 2.0
+
+# Background full-quality transcription during the call, one block at a time,
+# so only a short tail is left to transcribe at stop time (see
+# _incremental_transcribe_loop). A block is only read once it's this far
+# behind the in-memory tail, guaranteeing it's fully flushed to disk.
+INCR_BLOCK_SEC = 60
+INCR_INTERVAL = 20.0
+INCR_SAFETY_MARGIN = TAIL_SECONDS + 10
 
 # Synthetic device indices >= WASAPI_BASE refer to Windows loopback captures.
 WASAPI_BASE = 1000
@@ -192,6 +201,10 @@ class _SpillCapture:
             self.base_index += take
         for chunk in to_write:
             _to_mono(chunk).astype(np.float32).tofile(self._spill_file)
+        # Flush so the incremental transcriber (a separate reader of this same
+        # path) never sees a shorter file than what spill_old_chunks has
+        # already committed to move out of memory.
+        self._spill_file.flush()
 
     def close_spill(self) -> None:
         """Flush every remaining chunk to disk and close the file."""
@@ -301,10 +314,9 @@ def _sidecar_path(meeting_id: str) -> Path:
     return RECORDINGS_DIR / f"{meeting_id}.partial.json"
 
 
-def mix_tracks_to_wav(track_specs: list[dict], out_path: Path) -> Path:
-    """Mix raw float32-mono track files (each {path, samplerate}) into a 16 kHz
-    mono int16 WAV, streaming in 60-second blocks so memory stays flat for
-    arbitrarily long meetings. Two passes: peak scan, then scaled write."""
+def _load_tracks(track_specs: list[dict]) -> list[dict]:
+    """Stats each raw float32-mono track file fresh (sizes grow during an
+    active recording), dropping any that don't exist yet or are empty."""
     tracks = []
     for spec in track_specs:
         p = Path(spec["path"])
@@ -313,6 +325,37 @@ def mix_tracks_to_wav(track_specs: list[dict], out_path: Path) -> Path:
         n = p.stat().st_size // 4  # float32
         if n > 0:
             tracks.append({"path": p, "sr": int(spec["samplerate"]), "n": n})
+    return tracks
+
+
+def _mix_window(tracks: list[dict], t0: float, t1: float) -> np.ndarray:
+    """Mixes all tracks over [t0, t1) seconds into 16 kHz mono float32,
+    resampling each track's native rate on the fly. Shared by the final WAV
+    assembly and the live incremental transcriber, so both see identical
+    audio content for the same time range."""
+    out_len = int(round((t1 - t0) * TARGET_SR))
+    if out_len <= 0:
+        return np.zeros(0, dtype=np.float32)
+    mixed = np.zeros(out_len, dtype=np.float32)
+    x_out = t0 + np.arange(out_len) / TARGET_SR
+    for t in tracks:
+        src_start = max(0, int(t0 * t["sr"]) - 1)
+        src_end = min(t["n"], int(np.ceil(t1 * t["sr"])) + 1)
+        if src_end <= src_start:
+            continue
+        seg = np.fromfile(
+            t["path"], dtype=np.float32, count=src_end - src_start, offset=src_start * 4
+        )
+        x_src = (src_start + np.arange(len(seg))) / t["sr"]
+        mixed += np.interp(x_out, x_src, seg, left=0.0, right=0.0).astype(np.float32)
+    return mixed
+
+
+def mix_tracks_to_wav(track_specs: list[dict], out_path: Path) -> Path:
+    """Mix raw float32-mono track files (each {path, samplerate}) into a 16 kHz
+    mono int16 WAV, streaming in 60-second blocks so memory stays flat for
+    arbitrarily long meetings. Two passes: peak scan, then scaled write."""
+    tracks = _load_tracks(track_specs)
 
     block_sec = 60
     if tracks:
@@ -320,30 +363,10 @@ def mix_tracks_to_wav(track_specs: list[dict], out_path: Path) -> Path:
     else:
         duration = 1.0  # 1s silence placeholder
 
-    def _mixed_block(i: int) -> np.ndarray:
-        t0 = i * block_sec
-        t1 = min(duration, t0 + block_sec)
-        out_len = int(round((t1 - t0) * TARGET_SR))
-        if out_len <= 0:
-            return np.zeros(0, dtype=np.float32)
-        mixed = np.zeros(out_len, dtype=np.float32)
-        x_out = t0 + np.arange(out_len) / TARGET_SR
-        for t in tracks:
-            src_start = max(0, int(t0 * t["sr"]) - 1)
-            src_end = min(t["n"], int(np.ceil(t1 * t["sr"])) + 1)
-            if src_end <= src_start:
-                continue
-            seg = np.fromfile(
-                t["path"], dtype=np.float32, count=src_end - src_start, offset=src_start * 4
-            )
-            x_src = (src_start + np.arange(len(seg))) / t["sr"]
-            mixed += np.interp(x_out, x_src, seg, left=0.0, right=0.0).astype(np.float32)
-        return mixed
-
     n_blocks = max(1, int(np.ceil(duration / block_sec)))
     peak = 0.0
     for i in range(n_blocks):
-        block = _mixed_block(i)
+        block = _mix_window(tracks, i * block_sec, min(duration, (i + 1) * block_sec))
         if len(block):
             peak = max(peak, float(np.max(np.abs(block))))
     scale = 1.0 / peak if peak > 1.0 else 1.0
@@ -354,10 +377,24 @@ def mix_tracks_to_wav(track_specs: list[dict], out_path: Path) -> Path:
         wf.setsampwidth(2)
         wf.setframerate(TARGET_SR)
         for i in range(n_blocks):
-            block = _mixed_block(i) * scale
+            block = _mix_window(tracks, i * block_sec, min(duration, (i + 1) * block_sec)) * scale
             wf.writeframes((block * 32767).astype(np.int16).tobytes())
     secure_file(out_path)
     return out_path
+
+
+def _transcript_progress_path(meeting_id: str) -> Path:
+    return RECORDINGS_DIR / f"{meeting_id}.transcript_partial.json"
+
+
+def _write_transcript_progress(meeting_id: str, until: float, segments: list[dict]) -> None:
+    """Atomically persists live-transcription progress so the pipeline can
+    pick it up after stop (and, for a crashed session, recovery can too)."""
+    path = _transcript_progress_path(meeting_id)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"transcribed_until": until, "segments": segments}))
+    secure_file(tmp)
+    os.replace(tmp, path)
 
 
 def finalize_partial(meeting_id: str) -> Path | None:
@@ -402,11 +439,17 @@ class Recorder:
         self._level_thread: threading.Thread | None = None
         self._live_transcript_thread: threading.Thread | None = None
         self._spill_thread: threading.Thread | None = None
+        self._incr_thread: threading.Thread | None = None
         self._stop_levels = threading.Event()
         self._started_at: float | None = None
         self.muted = False           # privacy mute zone: capture writes silence
         self.paused = False          # paused: captures drop frames entirely
         self.markers: list[float] = []  # flagged moments, seconds from start
+        # Background full-quality transcription progress (see
+        # _incremental_transcribe_loop) — read/written under _live_lock.
+        self._live_lock = threading.Lock()
+        self._live_segments: list[dict] = []
+        self._live_transcribed_until: float = 0.0
 
     @property
     def elapsed(self) -> float:
@@ -499,6 +542,8 @@ class Recorder:
             self.muted = False
             self.paused = False
             self.markers = []
+            self._live_segments = []
+            self._live_transcribed_until = 0.0
             self._stop_levels.clear()
             self._level_thread = threading.Thread(target=self._emit_levels, daemon=True)
             self._level_thread.start()
@@ -508,6 +553,10 @@ class Recorder:
             self._live_transcript_thread.start()
             self._spill_thread = threading.Thread(target=self._spill_loop, daemon=True)
             self._spill_thread.start()
+            self._incr_thread = threading.Thread(
+                target=self._incremental_transcribe_loop, args=(meeting_id,), daemon=True
+            )
+            self._incr_thread.start()
             hub.emit("recording_started", {"meeting_id": meeting_id})
 
     def _spill_loop(self):
@@ -563,6 +612,48 @@ class Recorder:
                     hub.emit("transcript_chunk", {"text": text, "is_partial": True})
             except Exception as exc:
                 log.debug("Live transcript emit failed: %s", exc)
+
+    def _incremental_transcribe_loop(self, meeting_id: str) -> None:
+        """Transcribes the meeting with the real (accuracy) model in the
+        background, one finalized 60s block at a time, while the meeting is
+        still going. At stop time the pipeline only has to transcribe the
+        short remaining tail instead of the whole recording — this is what
+        makes notes appear seconds after stop instead of minutes after.
+
+        A block is only read once it's INCR_SAFETY_MARGIN seconds behind the
+        live edge, guaranteeing spill_old_chunks has already flushed it to
+        disk. Runs independently of the live-preview thread above (which uses
+        a fast/low-quality tiny model on a rolling window, not suitable to
+        keep for the final transcript)."""
+        from . import transcriber as transcriber_svc
+
+        while not self._stop_levels.wait(INCR_INTERVAL):
+            try:
+                specs = [
+                    {"path": str(c.spill_path), "samplerate": c.samplerate}
+                    for c in self._captures
+                    if c.spill_path is not None
+                ]
+                if not specs:
+                    continue
+                elapsed = self.elapsed
+                with self._live_lock:
+                    until = self._live_transcribed_until
+                while (
+                    not self._stop_levels.is_set()
+                    and elapsed - (until + INCR_BLOCK_SEC) >= INCR_SAFETY_MARGIN
+                ):
+                    tracks = _load_tracks(specs)
+                    window = _mix_window(tracks, until, until + INCR_BLOCK_SEC)
+                    segs = transcriber_svc.transcribe_array(window, offset=until)
+                    until += INCR_BLOCK_SEC
+                    with self._live_lock:
+                        self._live_segments.extend(segs)
+                        self._live_transcribed_until = until
+                        snapshot = list(self._live_segments)
+                    _write_transcript_progress(meeting_id, until, snapshot)
+            except Exception:
+                log.exception("Incremental transcription failed")
 
     def stop(self) -> Path:
         with self._lock:
