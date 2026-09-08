@@ -73,10 +73,14 @@ def get_gemini_client():
 
 
 # Models the bundled-inference proxy will serve. A user's own key can use any model.
-_PROXY_MODELS = {"claude-haiku-4-5", "claude-sonnet-4-6"}
+_PROXY_MODELS = {"claude-haiku-4-5", "claude-sonnet-5"}
+# Saved preferences from earlier releases, upgraded in place to the newer (and
+# cheaper) generation so nobody is stranded on a model we no longer list.
+_LEGACY_MODELS = {"claude-sonnet-4-6": "claude-sonnet-5", "claude-opus-4-8": "claude-opus-5"}
 
 
 def _clamp_for_proxy(model: str) -> str:
+    model = _LEGACY_MODELS.get(model, model)
     if get_secret("anthropic_api_key"):
         return model
     return model if model in _PROXY_MODELS else CLAUDE_MODEL

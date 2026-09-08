@@ -31,7 +31,7 @@ ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 
 # Default to the cheapest current model that is accurate for structured notes
 # extraction (~$0.025/meeting-hour). Users with their own key can pick another
-# model in Settings; the bundled proxy allows haiku-4-5 and sonnet-4-6.
+# model in Settings; the bundled proxy allows haiku-4-5 and sonnet-5.
 CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-haiku-4-5")
 DEFAULT_AI_PROVIDER = os.environ.get("AGUACATE_AI_PROVIDER", "anthropic")
 DEFAULT_OPENAI_MODEL = os.environ.get("AGUACATE_OPENAI_MODEL", "gpt-4o")
