@@ -3184,6 +3184,11 @@ textarea.text-input {
   line-height: 1.45;
   margin-top: 3px;
 }
+.upcoming-toast-join {
+  margin-top: 10px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+}
 .upcoming-toast-dismiss {
   flex: none;
   color: var(--faintest);

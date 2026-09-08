@@ -575,7 +575,9 @@
       "momentFlagged": "순간 표시됨",
       "micDenied": "마이크 접근이 거부되었습니다 — 시스템 설정 → 개인정보 보호 및 보안 → 마이크를 여세요",
       "processingFailed": "처리 실패",
-      "recordingFailed": "녹음 실패"
+      "recordingFailed": "녹음 실패",
+      "joinWatching": "통화를 여는 중 — 대화가 시작되면 Aguacate가 녹음을 제안해요.",
+      "joinFailed": "회의 링크를 열 수 없어요"
     },
     "notify": {
       "recordingStartedTitle": "녹음 시작됨",
@@ -876,6 +878,7 @@
   "upcomingToast": {
     "startsIn": "{{title}}이(가) {{minutes}}분 후에 시작해요",
     "willTranscribe": "통화에 참여하면 Aguacate가 자동으로 전사를 시작해요.",
+    "join": "참여",
     "dismiss": "닫기"
   },
   "pdf": {

@@ -575,7 +575,9 @@
       "momentFlagged": "时刻已标记",
       "micDenied": "麦克风访问被拒绝 — 打开系统设置 → 隐私与安全性 → 麦克风",
       "processingFailed": "处理失败",
-      "recordingFailed": "录制失败"
+      "recordingFailed": "录制失败",
+      "joinWatching": "正在打开通话 — 有人开始说话后 Aguacate 会提示录制。",
+      "joinFailed": "无法打开会议链接"
     },
     "notify": {
       "recordingStartedTitle": "录制已开始",
@@ -876,6 +878,7 @@
   "upcomingToast": {
     "startsIn": "{{title}} 将在 {{minutes}} 分钟后开始",
     "willTranscribe": "加入通话后 Aguacate 会自动转录。",
+    "join": "加入",
     "dismiss": "关闭"
   },
   "pdf": {

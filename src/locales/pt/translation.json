@@ -576,7 +576,9 @@
       "momentFlagged": "Momento marcado",
       "micDenied": "Acesso ao microfone negado — abra Ajustes do Sistema → Privacidade e Segurança → Microfone",
       "processingFailed": "Falha no processamento",
-      "recordingFailed": "Falha na gravação"
+      "recordingFailed": "Falha na gravação",
+      "joinWatching": "Abrindo a chamada — o Aguacate vai oferecer gravar assim que começarem a falar.",
+      "joinFailed": "Não foi possível abrir o link da reunião"
     },
     "notify": {
       "recordingStartedTitle": "Gravação iniciada",
@@ -888,6 +890,7 @@
   "upcomingToast": {
     "startsIn": "{{title}} começa em {{minutes}} min",
     "willTranscribe": "O Aguacate vai transcrever automaticamente assim que você entrar na chamada.",
+    "join": "Entrar",
     "dismiss": "Dispensar"
   },
   "pdf": {

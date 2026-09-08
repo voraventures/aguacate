@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { api, connectWebSocket, initBackend } from "./api.js";
+import { api, connectWebSocket, initBackend, openExternal } from "./api.js";
 import i18n from "./i18n.js";
 import logoPrimary from "./assets/logo-primary.svg?no-inline";
 import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
@@ -401,6 +401,20 @@ export function StoreProvider({ children }) {
     [refreshMeetings, selectMeeting, showToast]
   );
 
+  const joinMeeting = useCallback(
+    async (eventId) => {
+      try {
+        const result = await api.post(`/api/calendar/events/${encodeURIComponent(eventId)}/join`);
+        if (result.join_url) await openExternal(result.join_url);
+        setUpcomingWarning(null);
+        if (result.watching) showToast(i18n.t("store.toast.joinWatching"), "info");
+      } catch (err) {
+        showToast(err.message || i18n.t("store.toast.joinFailed"), "error");
+      }
+    },
+    [showToast]
+  );
+
   const stopRecording = useCallback(async () => {
     try {
       await api.post("/api/recording/stop");
@@ -591,6 +605,7 @@ export function StoreProvider({ children }) {
     setPrompt,
     upcomingWarning,
     setUpcomingWarning,
+    joinMeeting,
     settings,
     setSettings,
     settingsOpen,

@@ -12,7 +12,7 @@ function fmtMinutes(sec) {
 
 export default function UpcomingToast() {
   const { t } = useTranslation();
-  const { upcomingWarning, setUpcomingWarning } = useStore();
+  const { upcomingWarning, setUpcomingWarning, joinMeeting } = useStore();
   const logoUrl = useLogo();
 
   if (!upcomingWarning) return null;
@@ -28,6 +28,14 @@ export default function UpcomingToast() {
           })}
         </div>
         <div className="upcoming-toast-sub">{t("upcomingToast.willTranscribe")}</div>
+        {upcomingWarning.join_url && (
+          <button
+            className="btn upcoming-toast-join"
+            onClick={() => joinMeeting(upcomingWarning.event_id)}
+          >
+            {t("upcomingToast.join")}
+          </button>
+        )}
       </div>
       <button
         className="upcoming-toast-dismiss"

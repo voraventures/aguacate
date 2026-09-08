@@ -576,7 +576,9 @@
       "momentFlagged": "Moment flagged",
       "micDenied": "Microphone access denied — open System Settings → Privacy & Security → Microphone",
       "processingFailed": "Processing failed",
-      "recordingFailed": "Recording failed"
+      "recordingFailed": "Recording failed",
+      "joinWatching": "Opening the call — Aguacate will offer to record once people start talking.",
+      "joinFailed": "Couldn't open the meeting link"
     },
     "notify": {
       "recordingStartedTitle": "Recording started",
@@ -888,6 +890,7 @@
   "upcomingToast": {
     "startsIn": "{{title}} starts in {{minutes}} min",
     "willTranscribe": "Aguacate will auto-transcribe once you join the call.",
+    "join": "Join",
     "dismiss": "Dismiss"
   },
   "pdf": {
