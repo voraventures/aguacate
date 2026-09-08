@@ -287,7 +287,7 @@
       "intro": "连接日历后，Aguacate 会在你加入会议的那一刻自动转录——无需手动点击录制。",
       "autoTranscribe": "自动转录日历会议",
       "autoTranscribeDesc": "自动加入 Zoom、Meet 和 Teams，无需确认。",
-      "notify5min": "提前 5 分钟提醒",
+      "notify5min": "提前 1 分钟提醒",
       "notify5minDesc": "在自动录制的会议开始前，应用内会显示提醒横幅。"
     },
     "integrations": {

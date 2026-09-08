@@ -1,4 +1,4 @@
-// The 5-minute calendar heads-up — README section 6 / SPEC-calendar-autorecord.md.
+// The 1-minute calendar heads-up (spec originally said 5) — README section 6 / SPEC-calendar-autorecord.md.
 // Non-blocking and dismissible, unlike RecordPrompt's confirm modal at T-35s:
 // this is purely informational ("here's what's about to happen"), not a
 // decision the user has to make.

@@ -287,7 +287,7 @@
       "intro": "Connectez un calendrier pour qu'Aguacate transcrive automatiquement les réunions dès que vous les rejoignez — pas besoin d'appuyer sur enregistrer.",
       "autoTranscribe": "Transcrire automatiquement les réunions du calendrier",
       "autoTranscribeDesc": "Rejoint Zoom, Meet et Teams automatiquement, sans confirmation.",
-      "notify5min": "Prévenir 5 minutes avant",
+      "notify5min": "Prévenir 1 minute avant",
       "notify5minDesc": "Bannière dans l'app avant le début d'une réunion enregistrée automatiquement."
     },
     "integrations": {

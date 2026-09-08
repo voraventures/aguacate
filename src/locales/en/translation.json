@@ -287,7 +287,7 @@
       "intro": "Connect a calendar so Aguacate can auto-transcribe meetings the moment you join — no need to hit record.",
       "autoTranscribe": "Auto-transcribe calendar meetings",
       "autoTranscribeDesc": "Joins Zoom, Meet, and Teams automatically — no confirmation needed.",
-      "notify5min": "Notify 5 minutes before",
+      "notify5min": "Notify 1 minute before",
       "notify5minDesc": "In-app banner heads-up before an auto-recorded meeting starts."
     },
     "integrations": {

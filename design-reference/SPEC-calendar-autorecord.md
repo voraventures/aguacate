@@ -8,10 +8,13 @@ no manual Record tap required. Manual Record remains for ad-hoc/unscheduled conv
 1. **Connect calendar** — Google / Apple / Outlook. Already exists in Settings; not
    redesigned in this pass.
 2. Aguacate reads upcoming events that carry a video-call link (Zoom/Meet/Teams).
-3. **5 minutes before start** — an in-app banner/toast appears (non-blocking, dismissible):
-   *"[Meeting title] starts in 5 min — Aguacate will auto-transcribe once you join."*
-4. **Join detection** — Aguacate detects the user joining the call natively
-   (Zoom/Meet/Teams integration). No confirmation step, no manual action.
+3. **1 minute before start** (shipped as 1 min, originally specced as 5) — an in-app
+   banner/toast appears (non-blocking, dismissible) with a **Join** button:
+   *"[Meeting title] starts in 1 min — Aguacate will auto-transcribe once you join."*
+4. **Join detection** — as shipped: clicking Join opens the call link and starts an
+   audio-activity watcher (services/presence.py); once sustained talking is heard the
+   normal record prompt / auto-start fires. Native Zoom/Meet/Teams join hooks remain
+   out of scope.
 5. Recording + transcription start automatically. The meeting behaves exactly like a
    manually captured one from here (processing → ready → Overview/Timeline/Transcript/Ask).
 6. **Manual "Record"** (sidebar) stays for ad-hoc meetings with no calendar event — same
@@ -20,7 +23,7 @@ no manual Record tap required. Manual Record remains for ad-hoc/unscheduled conv
 ## New states needed
 - **Scheduled/upcoming** meeting card — shown in the Meetings list *before* the event
   starts, so the user can see and trust what Aguacate is about to auto-capture.
-- **Banner/toast** — the 5-minute heads-up. Transient, dismissible, calm (not a modal).
+- **Banner/toast** — the 1-minute heads-up with Join. Transient, dismissible, calm (not a modal).
 - (Low priority) a subtle source indicator — calendar-triggered vs manually recorded —
   on the meeting card, if useful later.
 
