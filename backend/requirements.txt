@@ -6,6 +6,8 @@ anthropic>=0.40
 openai>=1.50
 google-generativeai>=0.8
 faster-whisper>=1.0
+sherpa-onnx==1.13.7
+sherpa-onnx-core==1.13.7
 sounddevice>=0.5
 numpy>=1.26
 keyring>=25

@@ -9,10 +9,11 @@ import React, {
 } from "react";
 import { api, connectWebSocket, initBackend, openExternal } from "./api.js";
 import i18n from "./i18n.js";
+import { normalizeSettingsSection } from "./navigation.js";
 import logoPrimary from "./assets/logo-primary.svg?no-inline";
 import logoPrimaryDark from "./assets/logo-primary-dark.svg?no-inline";
 
-const StoreContext = createContext(null);
+export const StoreContext = createContext(null);
 
 // Light is the default material system; dark is its own, not an inversion (HIG 21).
 export const THEMES = ["default", "dark"];
@@ -43,7 +44,16 @@ export function StoreProvider({ children }) {
   const [prompt, setPrompt] = useState(null); // auto-record prompt payload
   const [upcomingWarning, setUpcomingWarning] = useState(null); // 5-min heads-up toast payload
   const [settings, setSettings] = useState({});
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpenState] = useState(false);
+  const [settingsSection, setSettingsSection] = useState("general");
+  const openSettings = useCallback((section = "general") => {
+    setSettingsSection(normalizeSettingsSection(section));
+    setSettingsOpenState(true);
+  }, []);
+  const setSettingsOpen = useCallback((open) => {
+    if (open) openSettings();
+    else setSettingsOpenState(false);
+  }, [openSettings]);
   const [progress, setProgress] = useState({}); // meeting_id -> {stage, pct}
   const [toasts, setToasts] = useState([]); // [{id, message, kind, action}]
   const toastSeq = useRef(0);
@@ -326,6 +336,9 @@ export function StoreProvider({ children }) {
                   i18n.t("store.notify.notesReadyBody")
                 );
             }
+            break;
+          case "speaker_analysis":
+            setProgress(p => ({...p, [data.meeting_id]: {stage: data.status === 'processing' ? 'speaker_analysis' : 'generating', pct: null}}));
             break;
           case "transcription_progress":
             setProgress((p) => ({
@@ -610,6 +623,8 @@ export function StoreProvider({ children }) {
     setSettings,
     settingsOpen,
     setSettingsOpen,
+    settingsSection,
+    openSettings,
     progress,
     toasts,
     showToast,

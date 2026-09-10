@@ -7,7 +7,9 @@
 // fabricated chapter titles/timestamps we have no way to generate for real.
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { mediaUrl } from "../api.js";
+import { api, mediaUrl } from "../api.js";
+import { useStore } from '../store.jsx';
+import { transcriptText } from '../transcriptText.js';
 import { PauseIcon, PlayIcon, SearchIcon } from "./icons.jsx";
 
 const SPEEDS = [1, 1.25, 1.5, 2];
@@ -20,7 +22,7 @@ function fmtTs(sec) {
 }
 
 function speakerInitials(name) {
-  const m = /Speaker\s*(\d+)/i.exec(name || "");
+  const m = /Speaker[\s_]*(\d+)/i.exec(name || "");
   if (m) return `S${m[1]}`;
   return (name || "")
     .split(/\s+/)
@@ -39,6 +41,8 @@ function speakerColorIndex(name) {
 
 export default function TranscriptTab({ meeting }) {
   const { t } = useTranslation();
+  const { refreshDetail, showToast } = useStore();
+  const [retrying, setRetrying] = useState(false);
   const segments = meeting.transcript?._segments || [];
   const markers = meeting.markers || [];
   const hasAudio = !!meeting.audio_path;
@@ -135,6 +139,26 @@ export default function TranscriptTab({ meeting }) {
   return (
     <div className="ws-split">
       <div className="ws-split-main">
+        <div className="transcript-actions">
+          <button className="btn secondary" onClick={async () => {
+            try { await navigator.clipboard.writeText(transcriptText(meeting.transcript, t('timeline.speakerFallback'))); showToast(t('speakers.copied')); }
+            catch { showToast(t('notes.toast.copyFailed'), 'error'); }
+          }}>{t('speakers.copy')}</button>
+          <button className="btn secondary" onClick={() => {
+            const url = URL.createObjectURL(new Blob([transcriptText(meeting.transcript, t('timeline.speakerFallback'))], {type: 'text/plain;charset=utf-8'}));
+            const link = document.createElement('a'); link.href = url; link.download = 'Aguacate-transcript.txt'; link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+          }}>{t('speakers.save')}</button>
+        </div>
+        {['failed', 'models_missing'].includes(meeting.transcript?.speaker_analysis?.status) && <div className="speaker-notice" role="status">
+          <p>{t('speakers.analysisWarning')}</p><p>{t('speakers.retryNote')}</p>
+          <button className="btn secondary" disabled={retrying || !hasAudio} onClick={async () => {
+            setRetrying(true);
+            try { const result = await api.post(`/api/speakers/${meeting.id}/retry`, {}); await refreshDetail(); if (result.status !== 'ready') showToast(t('speakers.error'), 'error'); }
+            catch { showToast(t('speakers.error'), 'error'); } finally { setRetrying(false); }
+          }}>{t(retrying ? 'speakers.processing' : 'speakers.retryAnalysis')}</button>
+        </div>}
+        {meeting.transcript?.speaker_analysis?.named_speakers > 0 && <div className="speaker-notice">{t('speakers.displayNames')}</div>}
         {src && (
           <>
             <audio ref={audioRef} src={src} preload="metadata" />
@@ -181,11 +205,11 @@ export default function TranscriptTab({ meeting }) {
                   role={src ? "button" : undefined}
                   tabIndex={src ? 0 : undefined}
                   onClick={src ? () => seek(seg.start ?? 0) : undefined}
-                  onKeyDown={src ? (e) => e.key === "Enter" && seek(seg.start ?? 0) : undefined}
+                  onKeyDown={src ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); seek(seg.start ?? 0); } } : undefined}
                 >
                   <span
                     className="tr-avatar"
-                    style={{ background: AVATAR_COLORS[speakerColorIndex(seg.speaker)] }}
+                    style={{ background: AVATAR_COLORS[speakerColorIndex((seg.speaker_id || seg.speaker)?.replace('_', ' '))] }}
                   >
                     {speakerInitials(seg.speaker || t("timeline.speakerFallback"))}
                   </span>

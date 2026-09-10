@@ -11,7 +11,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore, useLogo } from "../store.jsx";
-import { MicIcon, PauseIcon, PlayIcon, RefreshIcon, StopIcon, CheckIcon } from "./icons.jsx";
+import { MicIcon, PauseIcon, PlayIcon, RefreshIcon, StopIcon, CheckIcon, XIcon } from "./icons.jsx";
 
 const BASE_H = [42, 74, 104, 120, 104, 74, 42];
 const BAR_X = [52.5, 70.5, 88.5, 106.5, 124.5, 142.5, 160.5];
@@ -74,8 +74,18 @@ export default function CaptureFlow() {
     selectMeeting,
     setNav,
     progress,
+    settings,
   } = useStore();
   const logoUrl = useLogo();
+  const [systemReducedMotion, setSystemReducedMotion] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!query) return;
+    const update = () => setSystemReducedMotion(query.matches);
+    update(); query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  const reducedMotion = settings?.reduce_motion || systemReducedMotion;
 
   const phase = recording.active
     ? "recording"
@@ -147,6 +157,7 @@ export default function CaptureFlow() {
       setTyped("");
       return undefined;
     }
+    if (reducedMotion) { setTyped(summary); return undefined; }
     let i = 0;
     setTyped("");
     const id = setInterval(() => {
@@ -155,7 +166,7 @@ export default function CaptureFlow() {
       if (i >= summary.length) clearInterval(id);
     }, TYPE_MS);
     return () => clearInterval(id);
-  }, [phase, summary]);
+  }, [phase, summary, reducedMotion]);
 
   // Every hook must run unconditionally (before the `if (!phase)` bailout
   // below), including this one — it only *acts* when a dismissible phase
@@ -205,7 +216,7 @@ export default function CaptureFlow() {
       : phase === "recording"
         ? t("capture.recordingTitle")
         : phase === "processing"
-          ? t("processing.growing")
+          ? t(progress[processingId]?.stage === 'speaker_analysis' ? 'speakers.processing' : "processing.growing")
           : readyMeeting?.title || "";
   const subtitle =
     phase === "idle"
@@ -226,8 +237,9 @@ export default function CaptureFlow() {
       <div className="capture-card" role="dialog" aria-modal="true" aria-label={title}>
         <div className="capture-header">
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" />
-          <span className="capture-wordmark">Aguacate</span>
+          <span className="capture-wordmark brand-wordmark">Aguacate</span>
           <div style={{ flex: 1 }} />
+          {dismissible && <button className="icon-btn" aria-label={t("common.close")} onClick={close}><XIcon size={20} /></button>}
           {phase === "recording" && (
             <span className="capture-rec">
               <span className="capture-rec-dot" />

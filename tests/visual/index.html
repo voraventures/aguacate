@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Aguacate · Design preview</title>
+<style>body{margin:0;background:#dbe4de;font:14px -apple-system,sans-serif;color:#18241f}form{display:flex;gap:14px;align-items:center;padding:12px;flex-wrap:wrap}select,button{font:inherit;padding:6px;border:1px solid #a8bdae;border-radius:6px}iframe{border:0;display:block;margin:0 12px 20px;box-shadow:0 8px 32px #18241f22}label{display:flex;gap:5px;align-items:center}</style></head><body>
+<form><strong>Synthetic preview · no backend</strong>
+<label>Window <select name="viewport"><option>1320x860</option><option>900x600</option><option>1600x1000</option></select></label>
+<label>Theme <select name="theme"><option>default</option><option>dark</option></select></label>
+<label>Type <select name="size"><option>medium</option><option>small</option><option>large</option></select></label>
+<label>State <select name="state"><option>meeting</option><option>speakers</option><option>speakers-failed</option><option>banners</option><option>boot-loading</option><option>boot-error</option><option>cards</option><option>no-today</option><option>empty</option><option>loading</option><option>error</option><option>recording</option><option>processing</option><option>ready</option><option>onboarding</option></select></label>
+<label>Panel <select name="panel"><option>300</option><option>260</option><option>480</option></select></label>
+<button>Apply preview</button><a href="./matrix.html">Layout matrix</a><a href="./speaker-matrix.html">Speaker settings matrix</a><a href="./states.html">State gallery</a></form><iframe title="Aguacate synthetic app"></iframe>
+<script type="module">
+const params = new URLSearchParams(location.search);
+document.querySelectorAll('select').forEach(s=>{if(params.has(s.name))s.value=params.get(s.name)});
+const [width,height]=(params.get('viewport')||'1320x860').split('x').map(Number);
+const frame=document.querySelector('iframe');frame.width=width;frame.height=height;frame.src='./frame.html?'+params;
+</script></body></html>

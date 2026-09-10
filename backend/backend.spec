@@ -16,11 +16,13 @@ hiddenimports = []
 # read at runtime via sys._MEIPASS (see services/exporter.py).
 import os
 datas += [(os.path.join(SPECPATH, "..", "electron", "assets", "icon.png"), "assets")]
+datas += [(os.path.join(SPECPATH, 'app', 'speaker_notices'), 'app/speaker_notices')]
 
 # Native-library-heavy packages: pull in their binaries, data files, and
 # submodules wholesale so faster-whisper / ctranslate2 / torch load at runtime.
 for pkg in (
     "faster_whisper",
+    "sherpa_onnx",
     "ctranslate2",
     "torch",
     "torchaudio",

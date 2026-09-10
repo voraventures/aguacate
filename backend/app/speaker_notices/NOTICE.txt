@@ -1,0 +1,21 @@
+Aguacate speaker analysis model set: sherpa-onnx-1.13.7-pyannote3-eres2net-v1
+
+sherpa-onnx / sherpa-onnx-core 1.13.7: Apache License 2.0.
+https://github.com/k2-fsa/sherpa-onnx
+
+3D-Speaker ERes2Net-base, trained on 3D-Speaker; upstream ONNX conversion
+provided by sherpa-onnx. Apache License 2.0 (see APACHE-2.0.txt).
+https://github.com/modelscope/3D-Speaker
+https://modelscope.cn/models/iic/speech_eres2net_base_sv_zh-cn_3dspeaker_16k
+https://github.com/k2-fsa/sherpa-onnx/blob/master/scripts/3dspeaker/export-onnx.py
+Conversion copyright 2023-2024 Xiaomi Corp. (author Fangjun Kuang).
+The weights are unchanged by Aguacate. Verify model distribution notices
+against the pinned release before shipping a commercial installer.
+
+pyannote segmentation 3.0: MIT License, copyright (c) 2022 CNRS.
+The complete upstream license is extracted to segmentation.LICENSE alongside
+the model at installation. The official tarball and both ONNX files are
+SHA-256 verified; digests and download URLs are in speaker_models.py.
+https://huggingface.co/pyannote/segmentation-3.0
+
+The models run on-device. No reusable voice profiles or embeddings are saved.

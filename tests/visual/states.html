@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Aguacate · State gallery</title>
+<style>body{background:#dbe4de;color:#18241f;font:14px -apple-system,sans-serif;margin:18px}main{display:grid;grid-template-columns:1fr 1fr;gap:18px}article{min-width:0}h2{font-size:16px}iframe{border:0;display:block;transform-origin:top left}section{overflow:hidden;border-radius:10px}a{color:#145d3d}</style></head><body><h1>State gallery · synthetic fixtures</h1><a href="./index.html">Back to preview</a><main></main><script type="module">
+const cases=['banners','boot-loading','boot-error','cards','no-today','empty','loading','error','recording','processing','ready','onboarding',...['ai','recording','templates','calendars','integrations','privacy','export','workspace','license'].map(s=>'section='+s)];
+for(const [i,state] of cases.entries()){
+  const a=document.createElement('article'),h=document.createElement('h2');h.textContent=state+' · 900×600 · large text';a.append(h);
+  const wrap=document.createElement('section'),frame=document.createElement('iframe');frame.width=900;frame.height=600;frame.title=h.textContent;
+  frame.src='./frame.html?size=large&theme='+(i%2?'dark':'default')+'&'+(state.startsWith('section=')?state:'state='+state);wrap.append(frame);a.append(wrap);document.querySelector('main').append(a);
+  const resize=()=>{const scale=a.clientWidth/900;frame.style.transform=`scale(${scale})`;wrap.style.height=600*scale+'px'};resize();new ResizeObserver(resize).observe(a);
+}
+</script></body></html>

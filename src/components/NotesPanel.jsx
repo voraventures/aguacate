@@ -588,7 +588,7 @@ export default function NotesPanel() {
             {tab === "overview" && ready && (
               <div className="ws-tabbody">
                 {headsUp.length > 0 && (
-                  <div className="callout">
+                  <div className="callout heads-up-callout">
                     <WarnIcon size={15} />
                     <div className="callout-body">
                       <div className="callout-title">{t("notes.bar.headsUp")}</div>

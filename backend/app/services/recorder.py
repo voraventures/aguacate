@@ -176,6 +176,7 @@ class _SpillCapture:
         self.chunks: list[np.ndarray] = []
         self.samplerate = TARGET_SR
         self.base_index = 0
+        self.total_frames = 0
         self.lock = threading.Lock()
         self.spill_path: Path | None = None
         self._spill_file = None
@@ -235,6 +236,7 @@ class _DeviceCapture(_SpillCapture):
         def callback(indata, frames, time_info, status):
             if recorder.paused:
                 return  # paused: drop frames entirely, the timeline stops
+            self.total_frames += frames
             if recorder.muted:
                 # privacy mute zone: keep the timeline, drop the content
                 self.chunks.append(np.zeros_like(indata))
@@ -281,7 +283,8 @@ class _WasapiLoopbackCapture(_SpillCapture):
                         data = rec.record(numframes=self.samplerate // 10)
                         if recorder.paused:
                             continue
-                        self.chunks.append(np.asarray(data, dtype=np.float32))
+                        self.total_frames += len(data)
+                        self.chunks.append(np.zeros_like(data) if recorder.muted else np.asarray(data, dtype=np.float32))
             except Exception as exc:  # pragma: no cover
                 log.error("WASAPI loopback capture failed: %s", exc)
 
@@ -457,20 +460,27 @@ class Recorder:
 
         return time.monotonic() - self._started_at if self._started_at else 0.0
 
+    @property
+    def audio_elapsed(self) -> float:
+        return max((cap.total_frames / cap.samplerate for cap in self._captures), default=0.0)
+
     def set_muted(self, muted: bool) -> None:
         self.muted = muted
+        from .speaker_capture import capture
+        capture.boundary()
         hub.emit("recording_muted", {"muted": muted})
 
-    # elapsed/markers keep counting wall-clock while paused; only the audio
-    # timeline stops. Track pause offsets if marker precision matters.
+    # UI elapsed time stays wall-clock; markers/attribution use saved frames.
     def set_paused(self, paused: bool) -> None:
         self.paused = paused
+        from .speaker_capture import capture
+        capture.boundary()
         hub.emit("recording_paused", {"paused": paused})
 
     def add_marker(self) -> float | None:
         if self._meeting_id is None:
             return None
-        t = self.elapsed
+        t = self.audio_elapsed
         self.markers.append(round(t, 1))
         hub.emit("marker_added", {"at": round(t, 1), "count": len(self.markers)})
         return t
@@ -636,7 +646,7 @@ class Recorder:
                 ]
                 if not specs:
                     continue
-                elapsed = self.elapsed
+                elapsed = self.audio_elapsed
                 with self._live_lock:
                     until = self._live_transcribed_until
                 while (
@@ -656,6 +666,8 @@ class Recorder:
                 log.exception("Incremental transcription failed")
 
     def stop(self) -> Path:
+        from .speaker_capture import capture
+        capture.reset()
         with self._lock:
             if self._meeting_id is None:
                 raise RuntimeError("No recording in progress")

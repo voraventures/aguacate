@@ -60,6 +60,10 @@ let backendProc = null;
 let backendInfo = null; // { port, token }
 let isQuitting = false;
 const pendingBackendWaiters = [];
+// Preserve the backend's existing data location, including its legacy Windows path.
+const speakerDataDir = process.env.AGUACATE_DATA_DIR || path.join(app.getPath('home'), 'Library', 'Application Support', 'Aguacate');
+const speakerIntegration = require('./speakers.cjs')({app, systemPreferences, shell, getInfo: () => backendInfo, resolveBackend, dataDir: speakerDataDir});
+app.on('before-quit', () => speakerIntegration.stop());
 
 // ---------- single instance (also delivers win32 protocol deep links) ----------
 const gotLock = app.requestSingleInstanceLock();
@@ -112,7 +116,8 @@ function startBackend() {
       try {
         const msg = JSON.parse(line);
         if (msg.event === "ready" && msg.port && msg.token) {
-          backendInfo = { port: msg.port, token: msg.token };
+          backendInfo = { port: msg.port, token: msg.token, speakerToken: msg.speaker_token };
+          speakerIntegration.start();
           pendingBackendWaiters.splice(0).forEach((resolve) => resolve(backendInfo));
         }
       } catch {
@@ -343,6 +348,12 @@ ipcMain.handle("aguacate:recording-state", (_event, recording) => {
   if (typeof recording !== "boolean") return { ok: false };
   setTrayRecording(recording);
   return { ok: true };
+});
+
+ipcMain.handle('aguacate:speaker-setup', (_event, action) => {
+  if (!['status', 'zoom', 'meet'].includes(action)) return {error: 'invalid_action'};
+  try { return action === 'status' ? speakerIntegration.status() : speakerIntegration.setup(action); }
+  catch { return {error: 'setup_failed'}; }
 });
 
 function registerShortcuts() {

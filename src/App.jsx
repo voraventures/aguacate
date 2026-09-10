@@ -12,14 +12,14 @@ import OnboardingTour from "./components/OnboardingTour.jsx";
 import PdfPrintRoot from "./components/PdfPrintRoot.jsx";
 import RecordPrompt from "./components/RecordPrompt.jsx";
 import Settings from "./components/Settings.jsx";
-import Sidebar from "./components/Sidebar.jsx";
+import AppHeader from "./components/AppHeader.jsx";
+import Dock from "./components/Dock.jsx";
 import Titlebar from "./components/Titlebar.jsx";
 import UpcomingToast from "./components/UpcomingToast.jsx";
 import { DigestView, MeetingZeroView, SearchView, TodayView } from "./components/Views.jsx";
 
 const platform = window.aguacate?.platform || "darwin";
-const RAIL_WIDTH = 210;
-const MIN_LIST = 236;
+const MIN_LIST = 260;
 const MAX_LIST = 480;
 
 class ErrorBoundary extends React.Component {
@@ -41,7 +41,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="boot">
           <div className="logo">
-            <img className="logo-img" src={this.props.logoUrl} alt="" aria-hidden="true" /> Aguacate
+            <img className="logo-img" src={this.props.logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Aguacate</span>
           </div>
           <h2 style={{ margin: "16px 0 4px", fontSize: 18, fontWeight: 600, color: "var(--text)" }}>
             {i18n.t("app.error.title")}
@@ -63,7 +63,7 @@ export default function App() {
   const logoUrl = useLogo();
   const [listWidth, setListWidth] = useState(() => {
     const saved = Number(localStorage.getItem("aguacate_list_width"));
-    return saved >= MIN_LIST && saved <= MAX_LIST ? saved : MIN_LIST;
+    return saved >= MIN_LIST && saved <= MAX_LIST ? saved : 300;
   });
   const [dragging, setDragging] = useState(false);
   const [tourActive, setTourActive] = useState(false);
@@ -119,7 +119,7 @@ export default function App() {
     return (
       <div className="boot">
         <div className="logo">
-          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> Aguacate
+          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Aguacate</span>
         </div>
         <div className="boot-sub">{t("app.engine.unreachable")}</div>
       </div>
@@ -130,7 +130,7 @@ export default function App() {
     return (
       <div className="boot">
         <div className="logo">
-          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> Aguacate
+          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Aguacate</span>
         </div>
         <div className="processing-ring" />
         <div className="boot-sub">{t("app.engine.starting")}</div>
@@ -138,13 +138,13 @@ export default function App() {
     );
   }
 
-  const columns = nav === "meetings" ? `${RAIL_WIDTH}px ${listWidth}px 1fr` : `${RAIL_WIDTH}px 1fr 1fr`;
+  const columns = nav === "meetings" ? `${listWidth}px minmax(0, 1fr)` : "minmax(0, 1fr)";
 
   return (
     <ErrorBoundary logoUrl={logoUrl}>
       {platform === "win32" && <Titlebar />}
-      <div className={`app ${platform}`} style={{ gridTemplateColumns: columns }}>
-        <Sidebar />
+      <div className={`app green-glass ${platform}`} style={{ gridTemplateColumns: columns }}>
+        <AppHeader />
         {nav === "meetings" && (
           <>
             <MeetingList>
@@ -164,6 +164,7 @@ export default function App() {
         {nav === "zero" && <MeetingZeroView />}
         {nav === "digest" && <DigestView />}
         <Settings />
+        <Dock />
         <RecordPrompt />
         <UpcomingToast />
         <CoachPanel />

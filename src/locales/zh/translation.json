@@ -1,4 +1,69 @@
 {
+  "speakers": {
+    "copy": "复制转录",
+    "save": "下载转录",
+    "copied": "已复制转录",
+    "title": "说话人识别",
+    "enable": "在此设备上分离说话人",
+    "description": "一次性下载 47 MB 模型后即可在本地分离声音。只有录音期间平台发言活动一致时才会显示姓名。不保存声纹档案。",
+    "models": "本地说话人模型",
+    "cancel": "取消下载",
+    "retry": "重试下载",
+    "download": "下载模型 · 47 MB",
+    "runtimeMissing": "缺少本地语音运行环境，需要配置源码环境。",
+    "zoomSetup": "设置辅助功能",
+    "meetSetup": "设置配套扩展程序",
+    "experimental": "平台姓名归属仍处于实验阶段，尚未通过受控通话验证。完成设置并不保证显示姓名。不确定的声音保持匿名。",
+    "error": "无法完成设置，请重试。",
+    "analysisWarning": "说话人分析不可用。转录已保留。请检查录音设置中的说话人识别，然后重试本地分析。",
+    "displayNames": "姓名是会议平台的显示名称，并非已验证的身份。共享会议室名称代表房间或设备。",
+    "processing": "正在识别说话人",
+    "retryAnalysis": "重试说话人分析",
+    "retryNote": "仅在本地运行，不会重新生成现有笔记。",
+    "states": {
+      "inactive": "未收集",
+      "connected": "正在接收活动",
+      "unavailable": "活动指示器不可用",
+      "disconnected": "没有关联的通话连接",
+      "loading": "正在检查…",
+      "missing": "未下载",
+      "ready": "就绪",
+      "downloading": "下载中…",
+      "error": "下载失败",
+      "unsupported": "不支持此系统",
+      "helper_missing": "尚未构建辅助程序",
+      "experimental": "实验性",
+      "permission_required": "需要辅助功能权限",
+      "host_registered": "主机已注册 · 需要扩展程序",
+      "setup_required": "需要设置"
+    }
+  },
+  "dock": {
+    "navigation": "主导航",
+    "account": "账户与订阅",
+    "closeSettings": "关闭设置",
+    "labels": {
+      "Meetings": "会议",
+      "Meeting library": "会议库",
+      "Digest": "摘要",
+      "Record": "录音",
+      "Start recording": "开始录音",
+      "Recording settings": "录音设置",
+      "AI": "AI",
+      "Provider & model": "服务商与模型",
+      "Templates": "模板",
+      "Connections": "连接",
+      "Calendars": "日历",
+      "Integrations": "集成",
+      "Workspace": "工作区",
+      "Settings": "设置",
+      "General": "常规",
+      "Appearance": "外观",
+      "Privacy": "隐私",
+      "Export & backup": "导出与备份",
+      "Subscription": "订阅"
+    }
+  },
   "sidebar": {
     "nav": {
       "meetings": "会议",
@@ -609,6 +674,17 @@
     "loading": "加载中…"
   },
   "list": {
+    "cards": {
+      "failed": "失败",
+      "upNext": "即将开始",
+      "recordedToday": "今日录音",
+      "noRecordingsToday": "今天暂无录音",
+      "yesterday": "昨天",
+      "unknownDate": "日期不可用",
+      "searchResults": "搜索结果",
+      "recording": "录音中",
+      "processing": "处理中"
+    },
     "title": "会议",
     "searchPlaceholder": "搜索会议",
     "noMatch": "没有会议匹配“{{query}}”。试试搜索人名、主题或行动项。",

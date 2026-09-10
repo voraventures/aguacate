@@ -1,4 +1,69 @@
 {
+  "speakers": {
+    "copy": "대본 복사",
+    "save": "대본 다운로드",
+    "copied": "대본 복사됨",
+    "title": "화자 식별",
+    "enable": "이 기기에서 화자 분리",
+    "description": "47 MB 모델을 한 번 다운로드하면 기기에서 음성을 분리합니다. 이름은 녹음 중 일관된 플랫폼 발언 활동이 있을 때만 표시합니다. 음성 프로필은 저장하지 않습니다.",
+    "models": "로컬 화자 모델",
+    "cancel": "다운로드 취소",
+    "retry": "다운로드 재시도",
+    "download": "모델 다운로드 · 47 MB",
+    "runtimeMissing": "로컬 음성 엔진이 없습니다. 소스 환경 설정이 필요합니다.",
+    "zoomSetup": "손쉬운 사용 설정",
+    "meetSetup": "동반 확장 프로그램 설정",
+    "experimental": "플랫폼 이름 표시는 실험적이며 통제된 통화에서 아직 검증되지 않았습니다. 설정해도 이름이 보장되지는 않습니다. 모호한 음성은 익명으로 유지합니다.",
+    "error": "설정을 완료할 수 없습니다. 다시 시도하세요.",
+    "analysisWarning": "화자 분석을 사용할 수 없었습니다. 대본은 보존되었습니다. 녹음 설정의 화자 식별을 확인한 후 로컬 분석을 다시 시도하세요.",
+    "displayNames": "이름은 회의 플랫폼의 표시 이름이며 확인된 신원이 아닙니다. 공용 회의실 이름은 방이나 기기를 식별합니다.",
+    "processing": "화자 식별 중",
+    "retryAnalysis": "화자 분석 재시도",
+    "retryNote": "로컬에서 실행되며 기존 노트를 다시 생성하지 않습니다.",
+    "states": {
+      "inactive": "수집 안 함",
+      "connected": "활동 수신 중",
+      "unavailable": "활동 표시를 사용할 수 없음",
+      "disconnected": "연결된 통화 없음",
+      "loading": "확인 중…",
+      "missing": "다운로드 안 됨",
+      "ready": "준비됨",
+      "downloading": "다운로드 중…",
+      "error": "다운로드 실패",
+      "unsupported": "지원되지 않는 시스템",
+      "helper_missing": "도우미 빌드 필요",
+      "experimental": "실험적",
+      "permission_required": "손쉬운 사용 권한 필요",
+      "host_registered": "호스트 등록됨 · 확장 프로그램 필요",
+      "setup_required": "설정 필요"
+    }
+  },
+  "dock": {
+    "navigation": "주 탐색",
+    "account": "계정 및 구독",
+    "closeSettings": "설정 닫기",
+    "labels": {
+      "Meetings": "회의",
+      "Meeting library": "회의 라이브러리",
+      "Digest": "요약",
+      "Record": "녹음",
+      "Start recording": "녹음 시작",
+      "Recording settings": "녹음 설정",
+      "AI": "AI",
+      "Provider & model": "제공업체 및 모델",
+      "Templates": "템플릿",
+      "Connections": "연결",
+      "Calendars": "캘린더",
+      "Integrations": "연동",
+      "Workspace": "워크스페이스",
+      "Settings": "설정",
+      "General": "일반",
+      "Appearance": "화면",
+      "Privacy": "개인정보 보호",
+      "Export & backup": "내보내기 및 백업",
+      "Subscription": "구독"
+    }
+  },
   "sidebar": {
     "nav": {
       "meetings": "회의",
@@ -609,6 +674,17 @@
     "loading": "로딩 중…"
   },
   "list": {
+    "cards": {
+      "failed": "실패",
+      "upNext": "다음 일정",
+      "recordedToday": "오늘 녹음",
+      "noRecordingsToday": "오늘 녹음이 없습니다",
+      "yesterday": "어제",
+      "unknownDate": "날짜 정보 없음",
+      "searchResults": "검색 결과",
+      "recording": "녹음 중",
+      "processing": "처리 중"
+    },
     "title": "회의",
     "searchPlaceholder": "회의 검색",
     "noMatch": "“{{query}}”와 일치하는 회의가 없습니다. 사람, 주제 또는 작업으로 검색해 보세요.",

@@ -74,32 +74,27 @@ def apply_redaction(text: str) -> str:
     return text
 
 
-def diarize_segments(segments: list[dict], silence_threshold: float = 1.5) -> list[dict]:
-    """Assign speaker labels to segments using silence-gap heuristic.
+def serialize_segment(segment):
+    raw = segment.text.strip()
+    text = apply_redaction(raw)
+    # Redaction may span multiple words. Never persist unredacted word copies.
+    words = [] if text != raw else [
+        {"start": round(w.start, 2), "end": round(w.end, 2), "word": w.word}
+        for w in (getattr(segment, "words", None) or [])
+    ]
+    # Some ASR outputs omit punctuation/text in word alignment. Preserve the
+    # authoritative segment verbatim rather than losing it during splitting.
+    if ''.join(w['word'] for w in words).strip() != text:
+        words = []
+    return {"start": round(segment.start, 2), "end": round(segment.end, 2), "text": text, "words": words}
 
-    When there is a gap >= silence_threshold seconds between two segments the
-    speaker is assumed to have changed.  Speakers are labelled sequentially:
-    Speaker 1, Speaker 2, etc.  We cap at 10 distinct speakers to avoid
-    pathological fragmentation on noisy audio.
-    """
-    if not segments:
-        return segments
 
-    MAX_SPEAKERS = 10
-    diarized = []
-    speaker_idx = 0
-    prev_end = segments[0]["start"]
-
-    for seg in segments:
-        gap = seg["start"] - prev_end
-        if gap >= silence_threshold and speaker_idx < MAX_SPEAKERS - 1:
-            speaker_idx += 1
-        seg_copy = dict(seg)
-        seg_copy["speaker"] = f"Speaker {speaker_idx + 1}"
-        diarized.append(seg_copy)
-        prev_end = seg["end"]
-
-    return diarized
+def offset_segment(segment, offset):
+    segment["start"] = round(segment["start"] + offset, 2)
+    segment["end"] = round(segment["end"] + offset, 2)
+    for word in segment.get("words", []):
+        word["start"] = round(word["start"] + offset, 2)
+        word["end"] = round(word["end"] + offset, 2)
 
 
 def transcribe_chunk(audio_array) -> str:
@@ -119,8 +114,7 @@ def transcribe_chunk(audio_array) -> str:
 
 def transcribe(meeting_id: str, audio_path: Path) -> dict:
     """Run Whisper on the wav, emitting progress events. Returns transcript info
-    including timestamped segments (for Flagged Moments provenance) and diarized
-    text with speaker labels."""
+    including word-aligned segments. Voice analysis follows in the pipeline."""
     hub.emit("transcription_started", {"meeting_id": meeting_id})
     if not is_available():
         raise RuntimeError(
@@ -132,15 +126,17 @@ def transcribe(meeting_id: str, audio_path: Path) -> dict:
             str(audio_path),
             vad_filter=True,
             vad_parameters=VAD_PARAMS,
+            word_timestamps=True,
         )
 
         parts = []
         seg_data = []
         duration = info.duration or 1.0
         for seg in segments:
-            seg_text = apply_redaction(seg.text.strip())
+            serialized = serialize_segment(seg)
+            seg_text = serialized["text"]
             parts.append(seg_text)
-            seg_data.append({"start": round(seg.start, 2), "end": round(seg.end, 2), "text": seg_text})
+            seg_data.append(serialized)
             hub.emit(
                 "transcription_progress",
                 {
@@ -150,17 +146,8 @@ def transcribe(meeting_id: str, audio_path: Path) -> dict:
             )
     text = "\n".join(p for p in parts if p)
 
-    # Speaker diarization via silence-gap heuristic
-    diarized = diarize_segments(seg_data)
-    has_multiple_speakers = len({s.get("speaker") for s in diarized}) > 1
-
-    if has_multiple_speakers:
-        diarized_lines = []
-        for seg in diarized:
-            diarized_lines.append(f"{seg['speaker']}: {seg['text']}")
-        diarized_text = "\n".join(diarized_lines)
-    else:
-        diarized_text = text
+    # Voice analysis happens once on the complete audio in the pipeline.
+    diarized, diarized_text, has_multiple_speakers = seg_data, text, False
 
     out_path = TRANSCRIPTS_DIR / f"{meeting_id}.txt"
     write_secure_text(out_path, diarized_text)
@@ -184,15 +171,8 @@ def _transcribe_ndarray(audio: np.ndarray) -> tuple[list[dict], str]:
     timeline. Shared by the live incremental pass and the post-stop tail pass."""
     model = _load_model()
     with transcribe_lock:
-        segments, info = model.transcribe(audio, vad_filter=True, vad_parameters=VAD_PARAMS)
-        seg_data = [
-            {
-                "start": round(s.start, 2),
-                "end": round(s.end, 2),
-                "text": apply_redaction(s.text.strip()),
-            }
-            for s in segments
-        ]
+        segments, info = model.transcribe(audio, vad_filter=True, vad_parameters=VAD_PARAMS, word_timestamps=True)
+        seg_data = [serialize_segment(s) for s in segments]
     return seg_data, info.language
 
 
@@ -205,8 +185,7 @@ def transcribe_array(audio: np.ndarray, offset: float = 0.0) -> list[dict]:
     try:
         segs, _lang = _transcribe_ndarray(audio)
         for s in segs:
-            s["start"] = round(s["start"] + offset, 2)
-            s["end"] = round(s["end"] + offset, 2)
+            offset_segment(s, offset)
         return [s for s in segs if s["text"]]
     except Exception as exc:
         log.warning("Incremental block transcription failed: %s", exc)
@@ -229,8 +208,7 @@ def transcribe_tail(audio_path: Path, start_sec: float) -> dict:
         return {"segments": [], "language": None}
     segs, language = _transcribe_ndarray(audio)
     for s in segs:
-        s["start"] = round(s["start"] + start_sec, 2)
-        s["end"] = round(s["end"] + start_sec, 2)
+        offset_segment(s, start_sec)
     return {"segments": [s for s in segs if s["text"]], "language": language}
 
 
@@ -241,8 +219,8 @@ def finish_from_segments(
     assembled out of live incremental blocks plus a short tail pass, instead
     of running the model over the whole file. See pipeline._transcribe_fast."""
     hub.emit("transcription_started", {"meeting_id": meeting_id})
-    diarized = diarize_segments(segments)
-    has_multiple_speakers = len({s.get("speaker") for s in diarized}) > 1
+    diarized = segments
+    has_multiple_speakers = False
     text = "\n".join(s["text"] for s in segments if s["text"])
     if has_multiple_speakers:
         diarized_text = "\n".join(f"{s['speaker']}: {s['text']}" for s in diarized)

@@ -7,10 +7,10 @@ from pathlib import Path
 
 import numpy as np
 
-from ..config import RECORDINGS_DIR
+from ..config import RECORDINGS_DIR, write_secure_text
 from ..db import close_db, get_db, now_iso
 from ..events import hub
-from . import intelligence, notes, transcriber
+from . import intelligence, notes, transcriber, speakers
 
 log = logging.getLogger("aguacate.pipeline")
 
@@ -180,15 +180,24 @@ def process_meeting(meeting_id: str, audio_path: Path) -> None:
 
         _set_status(meeting_id, "transcribing")
         result = _transcribe_fast(meeting_id, audio_path)
+        result = speakers.analyze(meeting_id, audio_path, result)
+        # A user may delete this meeting during the local worker run. Do not
+        # resurrect its transcript file or metadata after analysis completes.
+        db.execute('BEGIN IMMEDIATE')
+        if not db.execute('SELECT 1 FROM meetings WHERE id=?', (meeting_id,)).fetchone():
+            db.rollback()
+            return
+        write_secure_text(result["path"], result["text"])
         db.execute(
-            "INSERT OR REPLACE INTO transcripts(meeting_id,text,language,duration_sec,segments) "
-            "VALUES(?,?,?,?,?)",
+            "INSERT OR REPLACE INTO transcripts(meeting_id,text,language,duration_sec,segments,speaker_analysis) "
+            "VALUES(?,?,?,?,?,?)",
             (
                 meeting_id,
                 result["text"],
                 result["language"],
                 result["duration_sec"],
                 json.dumps(result["segments"]),
+                json.dumps(result["speaker_analysis"]),
             ),
         )
         db.execute(
@@ -201,6 +210,7 @@ def process_meeting(meeting_id: str, audio_path: Path) -> None:
         _generate_and_index(meeting_id, result["text"], result["segments"])
         _set_status(meeting_id, "ready")
     except Exception as exc:
+        db.rollback()
         log.exception("Pipeline failed for meeting %s", meeting_id)
         _set_status(meeting_id, "error", _safe_error(exc))
     finally:

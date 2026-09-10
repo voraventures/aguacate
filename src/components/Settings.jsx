@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import SettingsPanel from "./SettingsPanel.jsx";
+import SpeakerSettings from "./SpeakerSettings.jsx";
+import { settingsLabel } from "../navigation.js";
 import { useTranslation } from "react-i18next";
 import i18n, { setLanguage } from "../i18n.js";
 import { api, openExternal } from "../api.js";
@@ -263,8 +266,8 @@ function ToggleSwitch({ checked, onChange, label }) {
 }
 
 const THEME_PREVIEW = {
-  default: ["#fcfbf8", "#6ba368", "#1d1d1f"],
-  dark: ["#1a1a18", "#82ae7f", "#edece6"],
+  default: ["#f3f6f5", "#176b46", "#18241f"],
+  dark: ["#111916", "#91d5ac", "#edf5ef"],
 };
 
 const SECRET_FIELDS = [
@@ -424,6 +427,8 @@ export default function Settings() {
   const {
     settingsOpen,
     setSettingsOpen,
+    settingsSection,
+    openSettings,
     theme,
     setTheme,
     settings,
@@ -441,7 +446,7 @@ export default function Settings() {
     refreshWorkspace,
   } = useStore();
   const { t } = useTranslation();
-  const [tab, setTab] = useState("general");
+  const tab = settingsSection || "general";
   const [tplDetailId, setTplDetailId] = useState(null);
   const [secrets, setSecrets] = useState({});
   const [devices, setDevices] = useState({ devices: [] });
@@ -572,41 +577,10 @@ export default function Settings() {
       .catch((e) => showToast(e.message, "error"));
   };
 
-  const TABS = [
-    ["general", "General"],
-    ["appearance", "Appearance"],
-    ["recording", "Recording"],
-    ["templates", "Templates"],
-    ["ai", "AI"],
-    ["calendars", "Calendars"],
-    ["integrations", "Integrations"],
-    ["privacy", "Privacy"],
-    ["export", "Export"],
-    ["workspace", "Workspace"],
-    ["license", "License"],
-  ];
-
   return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setSettingsOpen(false)}>
-      <div className="modal settings-modal">
-        <div className="modal-header">
-          <div className="modal-title">{t('settings.title')}</div>
-          <button className="icon-btn" onClick={() => setSettingsOpen(false)}>
-            <XIcon size={15} />
-          </button>
-        </div>
+    <div className="settings-layer">
+      <SettingsPanel section={tab} title={t(`dock.labels.${settingsLabel(tab)}`, { defaultValue: settingsLabel(tab) })} onClose={() => setSettingsOpen(false)}>
         <div className="settings-layout">
-          <nav className="settings-nav" aria-label={t('settings.title')}>
-            {TABS.map(([key]) => (
-              <button
-                key={key}
-                className={`settings-nav-item${tab === key ? " active" : ""}`}
-                onClick={() => setTab(key)}
-              >
-                {t('settings.tabs.' + key)}
-              </button>
-            ))}
-          </nav>
           <div className="modal-body">
           {tab === "general" && (
             <>
@@ -863,6 +837,7 @@ export default function Settings() {
                 </div>
               </div>
 
+              <SpeakerSettings enabled={settings.speaker_identification === true} onSaved={value => setSettings(s => ({...s, speaker_identification: value}))} />
               <div className="set-section-label">{t('settings.recording.transcription')}</div>
               <div className="set-card">
                 <div className="set-card-icon"><CpuIcon size={14} /></div>
@@ -1154,7 +1129,7 @@ export default function Settings() {
                         {t('settings.integrations.googleNote')}
                       </div>
                     ) : (
-                      <button className="btn" onClick={() => setTab("calendars")}>
+                      <button className="btn" onClick={() => openSettings("calendars")}>
                         {t('settings.integrations.connectGoogle')}
                       </button>
                     )
@@ -1765,7 +1740,7 @@ export default function Settings() {
           )}
           </div>
         </div>
-      </div>
+      </SettingsPanel>
       {setupModal && (
         <div
           className="modal-backdrop"

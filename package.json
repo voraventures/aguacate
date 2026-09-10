@@ -9,6 +9,8 @@
     "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "dev:renderer": "vite",
     "build": "vite build",
+    "build:speaker-host": "backend/.venv/bin/pyinstaller backend/speaker-host.spec --clean --distpath backend/dist --workpath backend/build --noconfirm",
+    "build:zoom-helper": "mkdir -p native/bin && swiftc -O native/ZoomSpeakers.swift -o native/bin/aguacate-zoom-speakers",
     "start": "npm run build && electron .",
     "clean:mac": "rm -rf release/mac release/mac-arm64 release/Aguacate*.dmg release/Aguacate*.dmg.blockmap release/latest-mac.yml",
     "build:backend": "backend/.venv/bin/pyinstaller backend/backend.spec --clean --distpath backend/dist --workpath backend/build --noconfirm",
@@ -98,7 +100,11 @@
       {
         "from": "backend/dist/aguacate-backend",
         "to": "backend/dist/aguacate-backend"
-      }
+      },
+      { "from": "backend/dist/aguacate-speaker-host", "to": "speaker-host" },
+      { "from": "native/bin", "to": "native/bin" },
+      { "from": "extensions/meet", "to": "extensions/meet" },
+      { "from": "backend/app/speaker_notices", "to": "speaker-notices" }
     ],
     "linux": {
       "icon": "electron/assets/icon.png",

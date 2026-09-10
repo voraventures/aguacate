@@ -1,291 +1,200 @@
-// Meeting list — recreated from AguacateChrome.dc.html: a "Search meetings"
-// field (search lives here now, not as a separate nav destination), an
-// "Upcoming" group for real calendar events about to be auto-captured (per
-// SPEC-calendar-autorecord.md), then a calendar date-badge per row (month
-// strip + day number), title + duration, grouped "Today" / "Earlier". The
-// active row is a white card with a hairline and a green check.
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../api.js";
 import { useStore } from "../store.jsx";
-import { CheckIcon, ChevronDownIcon, DotsIcon, MicIcon, SearchIcon } from "./icons.jsx";
+import { calendarDate, eligibleUpcoming, groupRecordings, localDayKey, meetingDuration, scheduledTime } from "../meetingCards.js";
+import { DotsIcon, MicIcon, SearchIcon } from "./icons.jsx";
 import { Confirm } from "./ui.jsx";
 
-function minutesUntil(iso, now) {
-  return Math.round((new Date(iso) - now) / 60000);
-}
-
-function UpcomingRow({ e, now }) {
+function MeetingOptions({ target, onClose, onDelete }) {
   const { t } = useTranslation();
-  const mins = minutesUntil(e.start, now);
-  const when =
-    mins <= 1 ? t("list.upcoming.startingNow") : t("list.upcoming.inMinutes", { count: mins });
-  return (
-    <div className="upcoming-row">
-      <span className="upcoming-row-dot" aria-hidden="true" />
-      <div className="upcoming-row-main">
-        <div className="row-title">{e.title}</div>
-        <div className="row-meta">
-          <span>{when}</span>
-          {e.join_url && (
-            <span className="upcoming-row-tag">{t("list.upcoming.autoTranscribe")}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-
-function durationLabel(m) {
-  if (!m.started_at || !m.ended_at) return "";
-  const mins = Math.round((new Date(m.ended_at) - new Date(m.started_at)) / 60000);
-  if (mins < 1) return "";
-  if (mins < 60) return `${mins}m`;
-  const h = Math.floor(mins / 60);
-  return `${h}h ${mins % 60 ? `${mins % 60}m` : ""}`.trim();
-}
-
-function timeOfDay(iso) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
-
-function daysAgo(iso, now) {
-  const d = new Date(iso);
-  if (isNaN(d)) return null;
-  const startOfDay = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
-  return Math.round((startOfDay(now) - startOfDay(d)) / 86400000);
-}
-
-function DateBadge({ iso, isToday }) {
-  const d = iso ? new Date(iso) : new Date();
-  return (
-    <div className="date-badge">
-      <div className={`date-badge-month${isToday ? " today" : ""}`}>{MONTHS[d.getMonth()]}</div>
-      <div className="date-badge-day">{d.getDate()}</div>
-    </div>
-  );
-}
-
-function MeetingRow({ m, selected, onSelect, progress, onDeleteRequest, now }) {
-  const { t } = useTranslation();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-
+  const ref = useRef(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  useLayoutEffect(() => {
+    const rect = target.trigger.getBoundingClientRect();
+    const menu = ref.current.getBoundingClientRect();
+    setPosition({
+      left: Math.max(8, Math.min(rect.right - menu.width, window.innerWidth - menu.width - 8)),
+      top: rect.bottom + menu.height + 8 > window.innerHeight ? Math.max(8, rect.top - menu.height - 6) : rect.bottom + 6,
+    });
+    ref.current.querySelector("button").focus();
+  }, [target]);
   useEffect(() => {
-    if (!menuOpen) return;
-    const onDocMouseDown = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    const outside = e => {
+      if (!ref.current?.contains(e.target) && !target.trigger.contains(e.target)) onClose(false);
     };
-    document.addEventListener("mousedown", onDocMouseDown);
-    return () => document.removeEventListener("mousedown", onDocMouseDown);
-  }, [menuOpen]);
-
-  const stage = progress[m.id]?.stage || m.status;
-  const busy = ["recording", "transcribing", "generating"].includes(stage);
-  const isToday = daysAgo(m.started_at, now) === 0;
-  const dur = durationLabel(m);
-  const when = isToday ? timeOfDay(m.started_at) : dur;
-
-  return (
-    <button className={`meeting-row${selected ? " active" : ""}`} onClick={() => onSelect(m.id)}>
-      <DateBadge iso={m.started_at} isToday={isToday} />
-      <div className="meeting-row-main">
-        <div className="row-title">
-          {m.title}
-          {!!m.is_demo && <span className="demo-badge">{t("list.demoBadge")}</span>}
-        </div>
-        <div className="row-meta">
-          {when && <span>{when}</span>}
-          {isToday && dur && <span>{" · " + dur}</span>}
-          {busy && <span className="row-status">{t("list.status.growing")}</span>}
-          {stage === "error" && <span className="row-status error">{t("list.status.failed")}</span>}
-        </div>
-      </div>
-      {selected && stage === "ready" && (
-        <span className="row-ready" aria-hidden="true">
-          <CheckIcon size={10} />
-        </span>
-      )}
-      <span className={`row-menu${menuOpen ? " open" : ""}`} ref={menuRef}>
-        <span
-          className="row-menu-btn"
-          role="button"
-          tabIndex={0}
-          aria-label={t("list.menu.options")}
-          onClick={(e) => {
-            e.stopPropagation();
-            setMenuOpen((v) => !v);
-          }}
-        >
-          <DotsIcon size={14} />
-        </span>
-        {menuOpen && (
-          <span className="card-menu-dropdown" role="menu">
-            <span
-              className="delete-menu-item"
-              role="menuitem"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuOpen(false);
-                onDeleteRequest(m);
-              }}
-            >
-              {t("list.menu.delete")}
-            </span>
-          </span>
-        )}
-      </span>
-    </button>
+    const reposition = () => onClose(true);
+    document.addEventListener("pointerdown", outside);
+    // A scroll would detach the menu from its card; dismiss without hiding controls.
+    document.addEventListener("scroll", reposition, true);
+    window.addEventListener("resize", reposition);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("scroll", reposition, true);
+      window.removeEventListener("resize", reposition);
+    };
+  }, [target, onClose]);
+  return createPortal(
+    <div ref={ref} id="meeting-options" className="meeting-options-menu" role="menu" aria-label={t("list.menu.options")}
+      style={position} onKeyDown={e => {
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); onClose(true); }
+        if (["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) { e.preventDefault(); ref.current.querySelector("button").focus(); }
+        if (e.key === "Tab") { e.preventDefault(); onClose(true); }
+      }}>
+      <button role="menuitem" onClick={() => onDelete(target)}>{t("list.menu.delete")}</button>
+    </div>, document.body
   );
+}
+
+function MeetingCard({ meeting, selected, onSelect, progress, showDate, onOptions, menuId }) {
+  const { t, i18n } = useTranslation();
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!selected || !ref.current) return;
+    const list = ref.current.closest(".meeting-card-list");
+    const reveal = () => {
+      const card = ref.current.getBoundingClientRect(), bounds = list.getBoundingClientRect();
+      if (card.top < bounds.top) list.scrollTop += card.top - bounds.top - 8;
+      else if (card.bottom > bounds.bottom) list.scrollTop += card.bottom - bounds.bottom + 8;
+    };
+    reveal();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(reveal);
+    observer.observe(list);
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [selected]);
+  const stage = progress[meeting.id]?.stage || meeting.status;
+  const status = stage === "recording" ? t("list.cards.recording")
+    : ["transcribing", "generating", "processing"].includes(stage) ? t("list.cards.processing")
+      : ["error", "failed"].includes(stage) ? t("list.cards.failed") : "";
+  const metadata = [scheduledTime(meeting.started_at, i18n.language, showDate), meetingDuration(meeting, i18n.language)].filter(Boolean).join(" · ");
+  return (
+    <article ref={ref} className={`meeting-card${selected ? " is-selected" : ""}`}>
+      <button className="meeting-card-main" aria-label={meeting.title} aria-current={selected ? "true" : undefined}
+        title={meeting.title} onClick={() => onSelect(meeting.id)}>
+        <span className="meeting-card-title">{meeting.title}</span>
+        {metadata && <span className="meeting-card-meta">{metadata}</span>}
+        {(status || !!meeting.is_demo) && <span className="meeting-card-details">
+          {status && <span className={`meeting-card-status${["error", "failed"].includes(stage) ? " is-error" : ""}`} role="status">{status}</span>}
+          {!!meeting.is_demo && <span className="meeting-sample">{t("list.demoBadge")}</span>}
+        </span>}
+      </button>
+      <button className="meeting-card-overflow" aria-label={`${t("list.menu.options")} — ${meeting.title}`}
+        aria-haspopup="menu" aria-expanded={menuId === meeting.id} aria-controls={menuId === meeting.id ? "meeting-options" : undefined}
+        onClick={e => onOptions(meeting, e.currentTarget)}
+        onKeyDown={e => { if (["ArrowDown", "ArrowUp"].includes(e.key)) { e.preventDefault(); onOptions(meeting, e.currentTarget); } }}>
+        <DotsIcon size={16} />
+      </button>
+    </article>
+  );
+}
+
+function UpcomingCard({ event, featured, now }) {
+  const { t, i18n } = useTranslation();
+  return <article className={`upcoming-card${featured ? " is-featured" : ""}`}>
+    {featured && <h3 className="up-next-label">{t("list.cards.upNext")}</h3>}
+    <div className="meeting-card-title" title={event.title}>{event.title}</div>
+    <div className="meeting-card-meta">{scheduledTime(event.start, i18n.language, localDayKey(event.start) !== localDayKey(now))}</div>
+  </article>;
 }
 
 export default function MeetingList({ children }) {
-  const { t } = useTranslation();
-  const {
-    meetings,
-    selectedId,
-    selectMeeting,
-    progress,
-    startRecording,
-    recording,
-    deleteMeeting,
-    upcoming,
-  } = useStore();
+  const { t, i18n } = useTranslation();
+  const { meetings, selectedId, selectMeeting, progress, startRecording, recording, deleteMeeting, upcoming } = useStore();
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [menuTarget, setMenuTarget] = useState(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
-  const now = new Date();
+  const [now, setNow] = useState(() => new Date());
+  const searchRef = useRef(null);
 
   useEffect(() => {
-    if (!query.trim()) {
-      setResults(null);
-      return undefined;
-    }
-    const tmr = setTimeout(() => {
-      api
-        .get(`/api/meetings/search?q=${encodeURIComponent(query.trim())}`)
-        .then(setResults)
-        .catch(() => setResults([]));
+    const refresh = () => setNow(new Date());
+    const timer = window.setInterval(refresh, 60000);
+    window.addEventListener("focus", refresh);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", refresh); };
+  }, []);
+  useEffect(() => {
+    let active = true;
+    setResults(null);
+    if (!query.trim()) return undefined;
+    const timer = setTimeout(() => {
+      api.get(`/api/meetings/search?q=${encodeURIComponent(query.trim())}`)
+        .then(data => { if (active) setResults(data); })
+        .catch(() => { if (active) setResults([]); });
     }, 250);
-    return () => clearTimeout(tmr);
+    return () => { active = false; clearTimeout(timer); };
   }, [query]);
-
-  const { today, earlier } = useMemo(() => {
-    const t0 = [];
-    const e0 = [];
-    for (const m of meetings) (daysAgo(m.started_at, now) === 0 ? t0 : e0).push(m);
-    return { today: t0, earlier: e0 };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meetings]);
-
-  const upcomingEvents = useMemo(
-    () => upcoming.filter((e) => !e.cancelled && !e.recorded_meeting_id),
-    [upcoming]
-  );
-
+  const { today, older } = useMemo(() => groupRecordings(meetings, now), [meetings, now]);
+  const upcomingEvents = useMemo(() => eligibleUpcoming(upcoming, now), [upcoming, now]);
+  // Search is a snapshot; the library remains authoritative during delete/Undo.
+  const libraryById = useMemo(() => new Map(meetings.map(m => [m.id, m])), [meetings]);
+  const visibleResults = results?.filter(m => libraryById.has(m.id)).map(m => libraryById.get(m.id));
   const searching = query.trim().length > 0;
+  const closeMenu = (restore = false) => {
+    if (restore) menuTarget?.trigger.focus({ preventScroll: true });
+    setMenuTarget(null);
+  };
+  const renderMeeting = m => <MeetingCard key={m.id} meeting={m} selected={selectedId === m.id}
+    onSelect={id => { setMenuTarget(null); selectMeeting(id); }} progress={progress} showDate={searching}
+    menuId={menuTarget?.meeting.id} onOptions={(meeting, trigger) => setMenuTarget(current => current?.meeting.id === meeting.id ? null : { meeting, trigger })} />;
+  const dismissDelete = () => {
+    deleteTarget?.trigger.focus({ preventScroll: true });
+    setDeleteTarget(null);
+  };
 
   return (
     <div className="list-panel" data-tour="meeting-list">
       <div className="list-top">
+        <div className="meeting-day-header">
+          <h2>{t(searching ? "list.cards.searchResults" : "list.scopeToday")}</h2>
+          {!searching && <p>{calendarDate(now, i18n.language, { weekday: "long", year: undefined })}</p>}
+        </div>
         <div className="list-search">
           <SearchIcon size={15} />
-          <input
-            placeholder={t("list.searchPlaceholder")}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            spellCheck={false}
-          />
+          <input ref={searchRef} aria-label={t("list.searchPlaceholder")} placeholder={t("list.searchPlaceholder")}
+            value={query} onChange={e => { setMenuTarget(null); setQuery(e.target.value); }} spellCheck={false} />
         </div>
-
-        {!searching && (
-          <div className="list-head">
-            <span className="list-scope">{t("list.scopeToday")}</span>
-            <ChevronDownIcon size={14} />
-          </div>
-        )}
       </div>
-
-      <div className="list-scroll">
-        {searching ? (
-          <>
-            {results === null && <div className="list-no-match">{t("common.loading")}</div>}
-            {results?.length === 0 && <div className="list-no-match">{t("list.noMatch", { query })}</div>}
-            {results?.map((m) => (
-              <MeetingRow
-                key={m.id}
-                m={m}
-                selected={selectedId === m.id}
-                onSelect={selectMeeting}
-                progress={progress}
-                onDeleteRequest={setDeleteTarget}
-                now={now}
-              />
-            ))}
-          </>
-        ) : (
-          <>
-            {meetings.length === 0 && upcomingEvents.length === 0 && (
-              <div className="empty-state">
-                <div className="empty-title">{t("list.empty.allHead")}</div>
-                <div className="empty-sub">{t("list.empty.allSub")}</div>
-                {!recording.active && (
-                  <button className="empty-cta" onClick={() => startRecording()}>
-                    <MicIcon size={14} /> {t("list.startRecording")}
-                  </button>
-                )}
-              </div>
-            )}
-            {upcomingEvents.length > 0 && (
-              <>
-                <div className="group-label">{t("list.group.upcoming")}</div>
-                {upcomingEvents.map((e) => (
-                  <UpcomingRow key={e.id} e={e} now={now} />
-                ))}
-              </>
-            )}
-            {today.map((m) => (
-              <MeetingRow
-                key={m.id}
-                m={m}
-                selected={selectedId === m.id}
-                onSelect={selectMeeting}
-                progress={progress}
-                onDeleteRequest={setDeleteTarget}
-                now={now}
-              />
-            ))}
-            {earlier.length > 0 && <div className="group-label">{t("list.group.earlier")}</div>}
-            {earlier.map((m) => (
-              <MeetingRow
-                key={m.id}
-                m={m}
-                selected={selectedId === m.id}
-                onSelect={selectMeeting}
-                progress={progress}
-                onDeleteRequest={setDeleteTarget}
-                now={now}
-              />
-            ))}
-          </>
-        )}
+      <div className="list-scroll meeting-card-list">
+        {searching ? <>
+          {results === null && <div className="list-no-match" role="status">{t("common.loading")}</div>}
+          {visibleResults?.length === 0 && <div className="list-no-match">{t("list.noMatch", { query })}</div>}
+          {visibleResults?.map(renderMeeting)}
+        </> : <>
+          {upcomingEvents[0] && <UpcomingCard event={upcomingEvents[0]} featured now={now} />}
+          {upcomingEvents.length > 1 && <section className="meeting-day-group" aria-label={t("list.group.upcoming")}>
+            <h3>{t("list.group.upcoming")}</h3>
+            {upcomingEvents.slice(1).map(e => <UpcomingCard key={e.id} event={e} now={now} />)}
+          </section>}
+          <section className="meeting-day-group" aria-label={t("list.cards.recordedToday")}>
+            <h3>{t("list.cards.recordedToday")}</h3>
+            {today.length ? today.map(renderMeeting) : <p className="no-recordings-today">{t("list.cards.noRecordingsToday")}</p>}
+          </section>
+          {older.map(group => {
+            const label = group.kind === "yesterday" ? t("list.cards.yesterday") : group.kind === "unknown" ? t("list.cards.unknownDate") : calendarDate(group.date, i18n.language);
+            return <section className="meeting-day-group" key={group.key} aria-label={label}>
+              <h3>{label}</h3>{group.meetings.map(renderMeeting)}
+            </section>;
+          })}
+          {meetings.length === 0 && upcomingEvents.length === 0 && <div className="empty-state">
+            <div className="empty-title">{t("list.empty.allHead")}</div>
+            <div className="empty-sub">{t("list.empty.allSub")}</div>
+            {!recording.active && <button className="empty-cta" onClick={() => startRecording()}>
+              <MicIcon size={14} /> {t("list.startRecording")}
+            </button>}
+          </div>}
+        </>}
       </div>
-      {deleteTarget && (
-        <Confirm
-          title={t("list.deleteTitle")}
-          body={t("list.deleteBody", { title: deleteTarget.title })}
-          confirmLabel={t("common.delete")}
-          danger
-          onConfirm={() => {
-            deleteMeeting(deleteTarget.id);
-            setDeleteTarget(null);
-          }}
-          onCancel={() => setDeleteTarget(null)}
-        />
-      )}
+      {menuTarget && <MeetingOptions target={menuTarget} onClose={closeMenu} onDelete={target => { setMenuTarget(null); setDeleteTarget(target); }} />}
+      {deleteTarget && <Confirm title={t("list.deleteTitle")} body={t("list.deleteBody", { title: deleteTarget.meeting.title })}
+        confirmLabel={t("common.delete")} danger onConfirm={() => {
+          deleteMeeting(deleteTarget.meeting.id);
+          setDeleteTarget(null);
+          searchRef.current?.focus({ preventScroll: true });
+        }} onCancel={dismissDelete} />}
       {children}
     </div>
   );

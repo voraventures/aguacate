@@ -24,6 +24,10 @@ export const MicIcon = (p) => (
     <line x1="12" y1="19" x2="12" y2="22" />
   </I>
 );
+export const SlidersIcon = (p) => <I {...p}>
+  <path d="M4 7h5m4 0h7M4 17h9m4 0h3" />
+  <circle cx="11" cy="7" r="2" /><circle cx="15" cy="17" r="2" />
+</I>;
 export const StopIcon = (p) => (
   <I {...p}>
     <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" stroke="none" />

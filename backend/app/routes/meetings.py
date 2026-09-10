@@ -132,11 +132,15 @@ def get_meeting(meeting_id: str):
         else None
     )
     transcript = db.execute(
-        "SELECT text, language, duration_sec, segments FROM transcripts WHERE meeting_id=?",
+        "SELECT text, language, duration_sec, segments, speaker_analysis FROM transcripts WHERE meeting_id=?",
         (meeting_id,),
     ).fetchone()
     meeting["transcript"] = dict(transcript) if transcript else None
     if meeting["transcript"]:
+        try:
+            meeting["transcript"]["speaker_analysis"] = json.loads(meeting["transcript"].get("speaker_analysis") or "{}")
+        except (TypeError, ValueError):
+            meeting["transcript"]["speaker_analysis"] = {}
         # Parse segments JSON for the diarized transcript view in the UI
         raw_segs = meeting["transcript"].pop("segments", None)
         if raw_segs:

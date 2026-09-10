@@ -6,11 +6,11 @@ import { useStore } from "../store.jsx";
 // Steps spotlight elements tagged with data-tour="..." across the app.
 // Titles/descriptions live under tour.steps.<key> in the locale files.
 const STEPS = [
-  { sel: "record-btn", place: "right", key: "record" },
+  { sel: "record-btn", place: "above", key: "record" },
   { sel: "meeting-list", place: "right", key: "list" },
   { sel: "notes-panel", place: "left", key: "notes" },
   { sel: "action-items", fallback: "notes-panel", place: "left", key: "actions" },
-  { sel: "nav-section", place: "right", key: "intel" },
+  { sel: "nav-section", place: "above", key: "intel" },
 ];
 
 const PAD = 6;
@@ -136,6 +136,10 @@ export default function OnboardingTour({ onComplete }) {
     let left = place === "right" ? rect.right + 16 : rect.left - 16 - TT_W;
     left = Math.max(16, Math.min(left, window.innerWidth - TT_W - 16));
     let top = Math.max(16, Math.min(rect.top, window.innerHeight - ttH - 16));
+    if (place === "above") {
+      left = Math.max(16, Math.min(rect.left + rect.width / 2 - TT_W / 2, window.innerWidth - TT_W - 16));
+      top = Math.max(16, rect.top - ttH - 16);
+    }
     ttStyle = { left, top };
   }
 

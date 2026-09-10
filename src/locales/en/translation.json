@@ -1,4 +1,69 @@
 {
+  "speakers": {
+    "copy": "Copy transcript",
+    "save": "Download transcript",
+    "copied": "Transcript copied",
+    "title": "Speaker identification",
+    "enable": "Separate speakers on this device",
+    "description": "A one-time 47 MB download enables local voice separation. Names come only from consistent platform activity during recording. No saved voice profiles.",
+    "models": "Local speaker models",
+    "cancel": "Cancel download",
+    "retry": "Retry download",
+    "download": "Download models · 47 MB",
+    "runtimeMissing": "The local speaker runtime is missing. A source setup is required.",
+    "zoomSetup": "Set up Accessibility",
+    "meetSetup": "Set up companion extension",
+    "experimental": "Platform naming is experimental and not yet validated in controlled calls. Setup does not guarantee names. Ambiguous voices stay anonymous.",
+    "error": "Unable to complete setup. Please try again.",
+    "analysisWarning": "Speaker analysis was unavailable. Your transcript is preserved. Check Speaker identification in Recording settings, then retry local analysis.",
+    "displayNames": "Names are meeting-platform display names, not verified identities. A shared-room name identifies the room or device.",
+    "processing": "Identifying speakers",
+    "retryAnalysis": "Retry speaker analysis",
+    "retryNote": "This runs locally and does not regenerate existing notes.",
+    "states": {
+      "inactive": "Not collecting",
+      "connected": "Receiving activity",
+      "unavailable": "Activity indicators unavailable",
+      "disconnected": "No associated call connected",
+      "loading": "Checking…",
+      "missing": "Not downloaded",
+      "ready": "Ready",
+      "downloading": "Downloading…",
+      "error": "Download failed",
+      "unsupported": "Not supported on this system",
+      "helper_missing": "Helper not built",
+      "experimental": "Experimental",
+      "permission_required": "Accessibility required",
+      "host_registered": "Host registered · extension required",
+      "setup_required": "Setup required"
+    }
+  },
+  "dock": {
+    "navigation": "Main navigation",
+    "account": "Account and subscription",
+    "closeSettings": "Close settings",
+    "labels": {
+      "Meetings": "Meetings",
+      "Meeting library": "Meeting library",
+      "Digest": "Digest",
+      "Record": "Record",
+      "Start recording": "Start recording",
+      "Recording settings": "Recording settings",
+      "AI": "AI",
+      "Provider & model": "Provider & model",
+      "Templates": "Templates",
+      "Connections": "Connections",
+      "Calendars": "Calendars",
+      "Integrations": "Integrations",
+      "Workspace": "Workspace",
+      "Settings": "Settings",
+      "General": "General",
+      "Appearance": "Appearance",
+      "Privacy": "Privacy",
+      "Export & backup": "Export & backup",
+      "Subscription": "Subscription"
+    }
+  },
   "sidebar": {
     "nav": {
       "meetings": "Meetings",
@@ -610,6 +675,17 @@
     "loading": "Loading…"
   },
   "list": {
+    "cards": {
+      "failed": "Failed",
+      "upNext": "Up next",
+      "recordedToday": "Recorded today",
+      "noRecordingsToday": "No recordings today",
+      "yesterday": "Yesterday",
+      "unknownDate": "Date unavailable",
+      "searchResults": "Search results",
+      "recording": "Recording",
+      "processing": "Processing"
+    },
     "title": "Meetings",
     "searchPlaceholder": "Search meetings",
     "noMatch": "No meetings match “{{query}}”. Try a person, topic, or action item.",
@@ -729,7 +805,7 @@
     "steps": {
       "record": {
         "title": "Record any meeting",
-        "desc": "No bot joins your call. No audio leaves this Mac. Hit Record and Aguacate captures everything locally with Whisper AI."
+        "desc": "Open Record in the bottom dock, then choose Start recording. Recording settings are in the same menu."
       },
       "list": {
         "title": "Your meetings, organized",
@@ -744,8 +820,8 @@
         "desc": "Every action item is pulled out automatically with owner and due date. Mark them complete to track accountability."
       },
       "intel": {
-        "title": "Cross-meeting intelligence",
-        "desc": "Actions, Decisions, Topics, and People views surface patterns across all your meetings automatically."
+        "title": "Everything within reach",
+        "desc": "Use the bottom dock for meetings, recording, AI, connections, and settings. Click an item to see its options; settings open alongside your meeting."
       }
     }
   },

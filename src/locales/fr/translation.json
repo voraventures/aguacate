@@ -1,4 +1,69 @@
 {
+  "speakers": {
+    "copy": "Copier la transcription",
+    "save": "Télécharger la transcription",
+    "copied": "Transcription copiée",
+    "title": "Identification des voix",
+    "enable": "Séparer les voix sur cet appareil",
+    "description": "Un téléchargement unique de 47 Mo permet de séparer les voix localement. Les noms exigent une activité cohérente de la plateforme pendant l'enregistrement. Aucun profil vocal conservé.",
+    "models": "Modèles vocaux locaux",
+    "cancel": "Annuler le téléchargement",
+    "retry": "Réessayer le téléchargement",
+    "download": "Télécharger les modèles · 47 Mo",
+    "runtimeMissing": "Le moteur vocal local est absent. Une configuration du code source est nécessaire.",
+    "zoomSetup": "Configurer l’accessibilité",
+    "meetSetup": "Configurer l’extension",
+    "experimental": "L’attribution des noms est expérimentale et n’a pas encore été validée lors d’appels contrôlés. La configuration ne garantit pas les noms. Les voix ambiguës restent anonymes.",
+    "error": "Configuration impossible. Veuillez réessayer.",
+    "analysisWarning": "L’analyse des voix était indisponible. Votre transcription est conservée. Vérifiez Identification des voix dans Enregistrement, puis relancez l’analyse locale.",
+    "displayNames": "Ces noms sont affichés par la plateforme, pas des identités vérifiées. Un nom de salle désigne la salle ou l’appareil.",
+    "processing": "Identification des voix",
+    "retryAnalysis": "Relancer l’analyse des voix",
+    "retryNote": "Cette analyse locale ne régénère pas les notes existantes.",
+    "states": {
+      "inactive": "Aucune collecte",
+      "connected": "Réception de l’activité",
+      "unavailable": "Indicateurs indisponibles",
+      "disconnected": "Aucun appel associé connecté",
+      "loading": "Vérification…",
+      "missing": "Non téléchargés",
+      "ready": "Prêts",
+      "downloading": "Téléchargement…",
+      "error": "Échec du téléchargement",
+      "unsupported": "Système non compatible",
+      "helper_missing": "Assistant non compilé",
+      "experimental": "Expérimental",
+      "permission_required": "Accessibilité requise",
+      "host_registered": "Hôte enregistré · extension requise",
+      "setup_required": "Configuration requise"
+    }
+  },
+  "dock": {
+    "navigation": "Navigation principale",
+    "account": "Compte et abonnement",
+    "closeSettings": "Fermer les réglages",
+    "labels": {
+      "Meetings": "Réunions",
+      "Meeting library": "Bibliothèque de réunions",
+      "Digest": "Synthèse",
+      "Record": "Enregistrer",
+      "Start recording": "Démarrer l’enregistrement",
+      "Recording settings": "Réglages d’enregistrement",
+      "AI": "IA",
+      "Provider & model": "Fournisseur et modèle",
+      "Templates": "Modèles",
+      "Connections": "Connexions",
+      "Calendars": "Calendriers",
+      "Integrations": "Intégrations",
+      "Workspace": "Espace de travail",
+      "Settings": "Réglages",
+      "General": "Général",
+      "Appearance": "Apparence",
+      "Privacy": "Confidentialité",
+      "Export & backup": "Export et sauvegarde",
+      "Subscription": "Abonnement"
+    }
+  },
   "sidebar": {
     "nav": {
       "meetings": "Réunions",
@@ -610,6 +675,17 @@
     "loading": "Chargement…"
   },
   "list": {
+    "cards": {
+      "failed": "Échec",
+      "upNext": "À suivre",
+      "recordedToday": "Enregistrements du jour",
+      "noRecordingsToday": "Aucun enregistrement aujourd’hui",
+      "yesterday": "Hier",
+      "unknownDate": "Date indisponible",
+      "searchResults": "Résultats de recherche",
+      "recording": "Enregistrement en cours",
+      "processing": "Traitement en cours"
+    },
     "title": "Réunions",
     "searchPlaceholder": "Rechercher des réunions",
     "noMatch": "Aucune réunion ne correspond à “{{query}}”. Essayez une personne, un sujet ou une action.",

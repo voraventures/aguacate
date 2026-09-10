@@ -6,6 +6,7 @@ from fastapi import HTTPException, Request
 
 # path-prefix -> (capacity, refill_per_second)
 LIMITS = [
+    ("/speaker-bridge", (120, 30)),       # bounded local snapshots, not audio
     ("/api/license", (5, 5 / 60)),        # 5/min: license refresh is remote
     ("/api/recording/start", (6, 6 / 60)),
     ("/api/calendar/sync", (10, 10 / 60)),

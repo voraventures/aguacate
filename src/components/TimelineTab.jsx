@@ -24,12 +24,14 @@ export default function TimelineTab({ meeting }) {
     const turns = [];
     for (const seg of segments) {
       const last = turns[turns.length - 1];
-      if (last && last.kind === "turn" && last.speaker === (seg.speaker || last.speaker)) {
+      const identity = seg.speaker_id || seg.speaker || "unknown";
+      if (last && last.kind === "turn" && last.identity === identity) {
         last.texts.push(seg.text);
         last.end = seg.end;
       } else {
         turns.push({
           kind: "turn",
+          identity,
           at: seg.start ?? 0,
           end: seg.end,
           speaker: seg.speaker || t("timeline.speakerFallback"),

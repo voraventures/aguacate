@@ -12,7 +12,7 @@ from .auth import SESSION_TOKEN, check_ws_auth, require_token
 from .config import ALLOWED_HOSTS, ALLOWED_ORIGINS, DEV_MODE, ensure_dirs
 from .events import hub
 from .ratelimit import check_rate_limit
-from .routes import calendar, intelligence, meetings, misc, mobile, recording, share, system, workspace
+from .routes import calendar, intelligence, meetings, misc, mobile, recording, share, system, workspace, speakers
 
 log = logging.getLogger("aguacate")
 logging.basicConfig(
@@ -43,6 +43,19 @@ def create_app() -> FastAPI:
         return await call_next(request)
 
     @app.middleware("http")
+    async def bound_speaker_messages(request: Request, call_next):
+        if request.url.path.startswith('/speaker-bridge/'):
+            size = 0
+            chunks = []
+            async for chunk in request.stream():
+                size += len(chunk)
+                if size > 16384:
+                    return JSONResponse({'detail': 'Message too large'}, status_code=413)
+                chunks.append(chunk)
+            request._body = b''.join(chunks)
+        return await call_next(request)
+
+    @app.middleware("http")
     async def rate_limit(request: Request, call_next):
         try:
             check_rate_limit(request)
@@ -59,6 +72,8 @@ def create_app() -> FastAPI:
 
     authed = [Depends(require_token)]
     app.include_router(recording.router, dependencies=authed)
+    app.include_router(speakers.router, dependencies=authed)
+    app.include_router(speakers.bridge_router)
     app.include_router(meetings.router, dependencies=authed)
     app.include_router(intelligence.router, dependencies=authed)
     app.include_router(calendar.router, dependencies=authed)

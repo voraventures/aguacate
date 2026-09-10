@@ -44,7 +44,7 @@ export function Select({ value, onChange, options, className = "", ariaLabel }) 
       }
       return;
     }
-    if (e.key === "Escape") setOpen(false);
+    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); setOpen(false); }
     else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       commit(hi);
@@ -54,8 +54,8 @@ export function Select({ value, onChange, options, className = "", ariaLabel }) 
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setHi((h) => Math.max(0, h - 1));
-    } else if (e.key === "Home") setHi(0);
-    else if (e.key === "End") setHi(options.length - 1);
+    } else if (e.key === "Home") { e.preventDefault(); setHi(0); }
+    else if (e.key === "End") { e.preventDefault(); setHi(options.length - 1); }
   };
 
   return (

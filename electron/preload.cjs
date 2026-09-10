@@ -7,6 +7,7 @@ const VALID_WINDOW_ACTIONS = new Set(["minimize", "maximize", "close"]);
 
 contextBridge.exposeInMainWorld("aguacate", {
   platform: process.platform, // 'darwin' | 'win32' | 'linux'
+  speakerSetup: action => ['status', 'zoom', 'meet'].includes(action) ? ipcRenderer.invoke('aguacate:speaker-setup', action) : Promise.resolve({error: 'invalid_action'}),
 
   getBackend: () => ipcRenderer.invoke("aguacate:get-backend"),
 

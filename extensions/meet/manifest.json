@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Aguacate speaker names — development preview",
+  "version": "0.1.0",
+  "description": "Reads Google Meet speaking activity only while Aguacate is recording. Experimental; platform validation pending.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsJn4yB4Z6lsFBUPWK9IjyUXpCJ2FhW7bJ/9VyzFsSQDQ85HztkTlBBAud2Gw31WdPoWgy/sXTr06V8A1/GTqaE1mZDtbDz/GsioAUw6BDykO3RZctaU5+Wvuz1qdjRQI4SOibtld7sxHrkdjZmCi67PGjVVzgWoIVnMbXuV7EMzmcs8ox6XvOBWDDO1E1lrMdsKNfTKLaj64O3mmpOS3Hey8JNVjDTtlbM8X4cNNSdU4HECvFc0F28xEtviPFBpAbvbu2dKzQknwi0QDMJ8yJzjLbk41Q1n7p+810wpG9Xc1vRdCt3Rywn9TXoiu8zT2ce0LQo2zqK2mWKzjR0oJEwIDAQAB",
+  "permissions": ["nativeMessaging", "storage"],
+  "host_permissions": ["https://meet.google.com/*"],
+  "background": {"service_worker": "worker.js"},
+  "content_scripts": [{"matches": ["https://meet.google.com/*"], "js": ["adapter.js", "content.js"], "run_at": "document_idle"}]
+}

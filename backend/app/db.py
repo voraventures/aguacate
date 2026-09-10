@@ -29,6 +29,14 @@ CREATE TABLE IF NOT EXISTS transcripts (
     language TEXT,
     duration_sec REAL
 );
+CREATE TABLE IF NOT EXISTS speaker_events (
+    meeting_id TEXT NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
+    sequence INTEGER NOT NULL,
+    audio_time REAL NOT NULL,
+    source TEXT NOT NULL,
+    participants TEXT NOT NULL,
+    PRIMARY KEY(meeting_id, sequence)
+);
 CREATE TABLE IF NOT EXISTS notes (
     meeting_id TEXT PRIMARY KEY REFERENCES meetings(id) ON DELETE CASCADE,
     content TEXT NOT NULL,                    -- full markdown
@@ -137,7 +145,9 @@ _MIGRATIONS = {
         ("starred", "INTEGER NOT NULL DEFAULT 0"),
         ("is_demo", "INTEGER NOT NULL DEFAULT 0"),  # onboarding sample meeting, not real AI output
     ],
-    "transcripts": [("segments", "TEXT NOT NULL DEFAULT '[]'")],
+    "speaker_events": [("connection", "TEXT NOT NULL DEFAULT 'connected'")],
+    "transcripts": [("segments", "TEXT NOT NULL DEFAULT '[]'"),
+                    ("speaker_analysis", "TEXT NOT NULL DEFAULT '{}'" )],
     "decisions": [("status", "TEXT NOT NULL DEFAULT 'active'")],
     "calendar_events": [
         ("briefed", "INTEGER NOT NULL DEFAULT 0"),

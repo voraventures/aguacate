@@ -1,0 +1,62 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Aguacate · Layout matrix</title>
+<style>body{background:#dbe4de;color:#18241f;font:14px -apple-system,sans-serif;margin:18px}#matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}article{min-width:0}h2{font-size:14px;margin:8px 0}iframe{border:0;transform-origin:top left;display:block}.frame{overflow:hidden;border-radius:8px;background:white}output{display:block;line-height:1.6}strong{font-size:18px}</style></head><body><strong>18-case layout matrix · isolated synthetic data</strong> · <a href="./index.html">Back to preview</a><p id="result">Checking both themes, all three text sizes, and three window sizes…</p><div id="matrix"></div>
+<script type="module">
+let finished=0,failed=0;
+const panel=Number(new URLSearchParams(location.search).get('panel'))||300;
+const sizes=document.createElement('p');sizes.innerHTML='Panel width: <a href="?panel=260">260px minimum</a> · <a href="?panel=300">300px default</a> · <a href="?panel=480">480px maximum</a>';document.querySelector('#result').before(sizes);
+for(const theme of ['default','dark']) for(const viewport of ['900x600','1320x860','1600x1000']) for(const size of ['small','medium','large']) {
+  const [w,h]=viewport.split('x').map(Number), article=document.createElement('article'), title=document.createElement('h2');
+  title.textContent=`${theme} · ${viewport} · ${size} · ${panel}px panel`;article.append(title);
+  const wrap=document.createElement('div');wrap.className='frame';article.append(wrap);
+  const frame=document.createElement('iframe');frame.width=w;frame.height=h;frame.title=title.textContent;frame.src=`./frame.html?theme=${theme}&size=${size}&panel=${panel}&state=banners`;wrap.append(frame);
+  const output=document.createElement('output');article.append(output);document.querySelector('#matrix').append(article);
+  const resize=()=>{const scale=article.clientWidth/w;frame.style.transform=`scale(${scale})`;wrap.style.height=h*scale+'px'};resize();new ResizeObserver(resize).observe(article);
+  frame.addEventListener('load',()=>{
+    let attempts=0;
+    const timer=setInterval(async ()=>{
+      const doc=frame.contentDocument,dock=doc.querySelector('.bottom-dock'),workspace=doc.querySelector('.workspace');
+      if((!dock||!workspace)&&attempts++<50)return;
+      clearInterval(timer);const issues=[];
+      if(!dock||!workspace)issues.push('Missing rendered app');
+      else {
+        await doc.fonts.ready;
+        const style=el=>frame.contentWindow.getComputedStyle(el),brand=doc.querySelector('.app-brand'),wordmark=brand.querySelector('.brand-wordmark'),header=doc.querySelector('.app-header');
+        if(![...doc.fonts].some(f=>f.family==='Hanken Grotesk'&&f.status==='loaded'))issues.push('Local wordmark font not loaded');
+        if(!style(wordmark).fontFamily.includes('Hanken Grotesk')||style(wordmark).fontWeight!=='600')issues.push('Incorrect wordmark face');
+        const expectedSize={small:13,medium:15,large:17}[size]*20/15;
+        if(Math.abs(parseFloat(style(wordmark).fontSize)-expectedSize)>.05)issues.push('Incorrect wordmark scaling');
+        if(header.scrollWidth>header.clientWidth||brand.getBoundingClientRect().right>doc.querySelector('.header-account').getBoundingClientRect().left)issues.push('Crowded header');
+        const banner=doc.querySelector('.heads-up-callout'),risk=doc.querySelector('.callout.risk');
+        if(style(banner).backgroundColor!==(theme==='dark'?'rgb(32, 45, 54)':'rgb(237, 243, 247)'))issues.push('Incorrect Heads up color');
+        if(style(banner).color!==style(doc.documentElement).getPropertyValue('--text').trim()&&style(banner).color!==(theme==='dark'?'rgb(237, 245, 239)':'rgb(24, 36, 31)'))issues.push('Incorrect banner text color');
+        if(style(risk).backgroundColor===style(banner).backgroundColor)issues.push('Risk banner styling leaked');
+        const sample=style(doc.querySelector('.demo-badge')),cardSample=style(doc.querySelector('.meeting-sample'));
+        for(const property of ['color','backgroundColor','borderColor','borderRadius','fontSize','fontWeight','textTransform','letterSpacing']) {
+          if(sample[property]!==cardSample[property])issues.push('Sample badge mismatch: '+property);
+        }
+        if(sample.backgroundColor!=='rgba(0, 0, 0, 0)'||sample.textTransform!=='none')issues.push('Sample badge is not neutral sentence case');
+        if(frame.contentWindow.performance.getEntriesByType('resource').some(r=>r.name.includes('.woff2')&&new URL(r.name).origin!==location.origin))issues.push('Remote font request');
+        const d=dock.getBoundingClientRect(),content=workspace.getBoundingClientRect();
+        if(d.left<0||d.right>w||d.bottom>h)issues.push('Dock outside viewport');
+        if(content.bottom>d.top)issues.push('Dock overlaps content');
+        if(workspace.scrollWidth>workspace.clientWidth+1)issues.push('Horizontal workspace overflow');
+        if(doc.documentElement.scrollWidth>w)issues.push('Horizontal page overflow');
+        if(frame.contentWindow.getComputedStyle(doc.querySelector('.ws-meta')).fontSize.replace('px','')<13)issues.push('Metadata below 13px');
+        const list=doc.querySelector('.meeting-card-list'),bounds=list.getBoundingClientRect();
+        if(list.scrollWidth>list.clientWidth+1)issues.push('Horizontal card overflow');
+        if(Math.round(doc.querySelector('.list-panel').getBoundingClientRect().width)!==panel)issues.push('Incorrect panel width');
+        if(bounds.bottom>d.top)issues.push('Dock overlaps list');
+        for(const card of doc.querySelectorAll('.meeting-card')) {
+          const r=card.getBoundingClientRect(),main=card.querySelector('.meeting-card-main'),options=card.querySelector('.meeting-card-overflow');
+          if(r.left<bounds.left||r.right>bounds.right)issues.push('Card outside panel');
+          if(main.contains(options)||!options.getAttribute('aria-label'))issues.push('Invalid options control');
+          if(parseFloat(frame.contentWindow.getComputedStyle(card.querySelector('.meeting-card-meta')).fontSize)<13)issues.push('Small card metadata');
+          if(card.classList.contains('is-selected')&&(r.top<bounds.top-1||r.bottom>bounds.bottom+1))issues.push('Selected card not visible');
+        }
+      }
+      output.textContent=issues.length?'FAIL: '+issues.join('; '):'PASS · layout, cards, blue-gray banner, local wordmark';
+      if(issues.length)failed++;finished++;document.querySelector('#result').textContent=`${finished}/18 checked · ${failed} failures`;
+    },100);
+  });
+}
+</script></body></html>

@@ -114,6 +114,8 @@ def start(body: StartBody):
     if get_setting("coach_enabled", True):
         coach.start(meeting_id, templates_svc.section_names(template))
 
+    from ..services.speaker_capture import capture
+    capture.start(meeting_id, ev["join_url"] if body.calendar_event_id and ev else None)
     license_svc.record_meeting_created()
     return {
         "meeting_id": meeting_id,

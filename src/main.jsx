@@ -5,6 +5,8 @@ import { StoreProvider } from "./store.jsx";
 import "./i18n.js";
 import "./fonts.css";
 import "./styles.css";
+import "./screen-type.css";
+import "./green-glass.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -49,6 +49,7 @@ def _is_word_list(v):
 
 
 SETTING_VALIDATORS = {
+    "speaker_identification": lambda v: isinstance(v, bool),
     "theme": lambda v: v in ("default", "dark", "purple", "navy", "warm", "neon"),
     "recording_mode": lambda v: v in ("all", "confirm_30s", "manual", "off"),
     "mic_device": _is_device,
@@ -186,6 +187,7 @@ def remove_secret(name: str):
 @router.get("/settings")
 def get_settings():
     return {
+        "speaker_identification": get_setting("speaker_identification", False),
         "theme": get_setting("theme", "default"),
         "recording_mode": get_setting("recording_mode", "confirm_30s"),
         "mic_device": get_setting("mic_device"),
@@ -240,6 +242,9 @@ def save_setting(body: SettingBody):
     if not validator(body.value):
         raise HTTPException(status_code=422, detail="Invalid value for setting")
     set_setting(body.key, body.value)
+    if body.key == 'speaker_identification':
+        from ..services.speaker_capture import capture
+        capture.boundary()
     return {"ok": True}
 
 
