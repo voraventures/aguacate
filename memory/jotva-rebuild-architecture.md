@@ -1,11 +1,11 @@
 ---
-name: aguacate-rebuild-architecture
+name: jotva-rebuild-architecture
 description: Stack, Python 3.11 venv, BlackHole-only audio testing, run commands, and premium features added June 2026
 metadata:
   type: project
 ---
 
-Aguacate is an Electron app with a FastAPI Python backend. The renderer is React + Vite.
+Jotva is an Electron app with a FastAPI Python backend. The renderer is React + Vite.
 
 **Run backend:** `cd backend && .venv/bin/uvicorn app.main:app --port 8765`
 **Run frontend (dev):** `npm run dev` from project root
@@ -43,7 +43,7 @@ Aguacate is an Electron app with a FastAPI Python backend. The renderer is React
 **F5 - Mobile API**
 - `backend/app/db.py`: added `mobile_sessions` table.
 - `backend/app/routes/mobile.py`: `/api/mobile/auth`, `/api/mobile/meetings`, `/api/mobile/actions`, `/api/mobile/search`, session management.
-- CORS: `aguacate-ios://app` added to allowed origins.
+- CORS: `jotva-ios://app` added to allowed origins.
 - `src/components/Settings.jsx`: Mobile section in Export tab (connect + revoke sessions).
 - `MOBILE_API.md`: full API documentation at project root.
 

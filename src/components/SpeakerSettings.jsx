@@ -13,7 +13,7 @@ export default function SpeakerSettings({ enabled, onSaved }) {
     let live = true;
     const refresh = async () => {
       try {
-        const [data, native] = await Promise.all([api.get('/api/speakers/status'), window.aguacate?.speakerSetup?.('status')]);
+        const [data, native] = await Promise.all([api.get('/api/speakers/status'), window.jotva?.speakerSetup?.('status')]);
         if (live) { setStatus(data.models); setPlatforms(native || {}); setActivity(data.activity || {}); }
       } catch { if (live) setError(true); }
     };
@@ -26,7 +26,7 @@ export default function SpeakerSettings({ enabled, onSaved }) {
     try { await fn(); } catch { setError(true); } finally { setBusy(false); }
   };
   const setup = platform => action(async () => {
-    const result = await window.aguacate?.speakerSetup?.(platform);
+    const result = await window.jotva?.speakerSetup?.(platform);
     if (!result || result.error) throw new Error('Setup unavailable');
     setPlatforms(result);
   });

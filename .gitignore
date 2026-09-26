@@ -4,7 +4,7 @@ release/
 backend/.venv/
 backend/build/
 native/bin/
-backend/dist/aguacate-speaker-host/
+backend/dist/jotva-speaker-host/
 __pycache__/
 *.pyc
 .DS_Store

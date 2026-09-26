@@ -7,7 +7,7 @@ import httpx
 
 from .keychain import get_secret
 
-log = logging.getLogger("aguacate.integrations")
+log = logging.getLogger("jotva.integrations")
 
 TIMEOUT = 15
 
@@ -218,7 +218,7 @@ def send_google_drive(title: str, markdown: str) -> str:
     metadata = {"name": f"{title}.md", "mimeType": "text/markdown"}
     import json as _json
 
-    boundary = "aguacate_boundary"
+    boundary = "jotva_boundary"
     body = (
         f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"
         f"{_json.dumps(metadata)}\r\n"

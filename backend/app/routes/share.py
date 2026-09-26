@@ -2,7 +2,7 @@
 
 Returns only the human-facing notes (title, date, attendees, note sections) —
 never transcripts or audio. The standalone HTML endpoint renders a clean,
-chrome-free page with Aguacate branding.
+chrome-free page with Jotva branding.
 """
 import html as _html
 import json
@@ -146,7 +146,7 @@ def _render_html(payload: dict) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} — Aguacate</title>
+<title>{title} — Jotva</title>
 <style>
   :root {{ color-scheme: light; }}
   * {{ box-sizing: border-box; }}
@@ -175,11 +175,11 @@ def _render_html(payload: dict) -> str:
 </head>
 <body>
   <div class="wrap">
-    <div class="brand"><span class="dot"></span> Aguacate</div>
+    <div class="brand"><span class="dot"></span> Jotva</div>
     <h1 class="title">{title}</h1>
     <div class="meta">{date}{(" · " + attendees) if attendees else ""}</div>
     <div class="card">{body_html}</div>
-    <footer>Shared from Aguacate — AI meeting notes. No bot. No cloud.</footer>
+    <footer>Shared from Jotva — AI meeting notes. No bot. No cloud.</footer>
   </div>
 </body>
 </html>"""

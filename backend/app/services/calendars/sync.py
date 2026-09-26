@@ -10,7 +10,7 @@ from ...db import get_db, get_setting, new_id
 from ...events import hub
 from . import apple_cal, google_cal, ms_cal
 
-log = logging.getLogger("aguacate.calsync")
+log = logging.getLogger("jotva.calsync")
 
 POLL_INTERVAL = 30  # seconds, per spec
 PROMPT_WINDOW = 35  # prompt when start is within this many seconds

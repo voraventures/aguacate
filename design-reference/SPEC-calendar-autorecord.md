@@ -7,10 +7,10 @@ no manual Record tap required. Manual Record remains for ad-hoc/unscheduled conv
 ## Flow
 1. **Connect calendar** — Google / Apple / Outlook. Already exists in Settings; not
    redesigned in this pass.
-2. Aguacate reads upcoming events that carry a video-call link (Zoom/Meet/Teams).
+2. Jotva reads upcoming events that carry a video-call link (Zoom/Meet/Teams).
 3. **1 minute before start** (shipped as 1 min, originally specced as 5) — an in-app
    banner/toast appears (non-blocking, dismissible) with a **Join** button:
-   *"[Meeting title] starts in 1 min — Aguacate will auto-transcribe once you join."*
+   *"[Meeting title] starts in 1 min — Jotva will auto-transcribe once you join."*
 4. **Join detection** — as shipped: clicking Join opens the call link and starts an
    audio-activity watcher (services/presence.py); once sustained talking is heard the
    normal record prompt / auto-start fires. Native Zoom/Meet/Teams join hooks remain
@@ -22,7 +22,7 @@ no manual Record tap required. Manual Record remains for ad-hoc/unscheduled conv
 
 ## New states needed
 - **Scheduled/upcoming** meeting card — shown in the Meetings list *before* the event
-  starts, so the user can see and trust what Aguacate is about to auto-capture.
+  starts, so the user can see and trust what Jotva is about to auto-capture.
 - **Banner/toast** — the 1-minute heads-up with Join. Transient, dismissible, calm (not a modal).
 - (Low priority) a subtle source indicator — calendar-triggered vs manually recorded —
   on the meeting card, if useful later.

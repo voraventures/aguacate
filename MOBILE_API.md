@@ -1,19 +1,19 @@
-# Aguacate Mobile API
+# Jotva Mobile API
 
-The mobile API lets the upcoming **Aguacate for iOS** app securely access meeting data from the desktop app running on the same machine or local network.
+The mobile API lets the upcoming **Jotva for iOS** app securely access meeting data from the desktop app running on the same machine or local network.
 
 ## Authentication
 
 All mobile endpoints require two layers of auth:
 
-1. **Desktop token** (`X-Aguacate-Token` header) — issued at launch, required to mint a mobile token.
+1. **Desktop token** (`X-Jotva-Token` header) — issued at launch, required to mint a mobile token.
 2. **Mobile token** (`X-Mobile-Token` header) — 30-day token issued per device, used for all subsequent calls.
 
 ### Mint a mobile token
 
 ```
 POST /api/mobile/auth
-X-Aguacate-Token: <desktop-token>
+X-Jotva-Token: <desktop-token>
 Content-Type: application/json
 
 {
@@ -96,7 +96,7 @@ Full-text search. Returns `id`, `title`, `started_at`, and a short `excerpt` aro
 
 ```
 GET /api/mobile/sessions
-X-Aguacate-Token: <desktop-token>
+X-Jotva-Token: <desktop-token>
 ```
 
 Returns all mobile sessions with `revoked` flag.
@@ -105,14 +105,14 @@ Returns all mobile sessions with `revoked` flag.
 
 ```
 POST /api/mobile/sessions/{session_id}/revoke
-X-Aguacate-Token: <desktop-token>
+X-Jotva-Token: <desktop-token>
 ```
 
 ---
 
 ## CORS
 
-Requests from `aguacate-ios://app` are allowed.
+Requests from `jotva-ios://app` are allowed.
 
 ## Notes
 

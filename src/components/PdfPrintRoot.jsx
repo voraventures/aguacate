@@ -103,7 +103,7 @@ export default function PdfPrintRoot() {
 
         <div className="pdf-masthead">
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" />
-          <span className="pdf-wordmark">Aguacate</span>
+          <span className="pdf-wordmark">Jotva</span>
         </div>
 
         <h1 className="pdf-title">{m.title}</h1>

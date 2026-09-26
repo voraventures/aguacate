@@ -9,7 +9,7 @@ setInterval(async () => {
     const state = await chrome.runtime.sendMessage({action: 'offer'});
     if (!state?.collect) return;
     const observed_at = Date.now() / 1000;
-    const participants = AguacateMeetAdapter.read();
+    const participants = JotvaMeetAdapter.read();
     const connection = document.querySelector('[data-participant-id][data-is-speaking]') ? 'connected' : 'unavailable';
     await chrome.runtime.sendMessage({action: 'activity', session: state.session, observed_at, participants, connection});
   } catch { /* fail closed on disconnect */ }

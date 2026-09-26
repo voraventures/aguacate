@@ -2,9 +2,9 @@
 import logging
 import os
 
-log = logging.getLogger("aguacate.keychain")
+log = logging.getLogger("jotva.keychain")
 
-SERVICE = "Aguacate"
+SERVICE = "Jotva"
 
 KNOWN_SECRETS = [
     "anthropic_api_key",

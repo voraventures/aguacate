@@ -13,7 +13,7 @@ import httpx
 from ...config import load_oauth_credentials
 from ...events import hub
 
-log = logging.getLogger("aguacate.mscal")
+log = logging.getLogger("jotva.mscal")
 
 AUTHORITY = "https://login.microsoftonline.com/common/oauth2/v2.0"
 SCOPES = "Calendars.Read offline_access"
@@ -23,7 +23,7 @@ try:
 except Exception:  # pragma: no cover
     keyring = None
 
-_KC = "Aguacate"
+_KC = "Jotva"
 
 
 def _save_tokens(tokens: dict) -> None:

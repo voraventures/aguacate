@@ -1,4 +1,4 @@
-// Transcript tab — recreated from Aguacate Meeting.dc.html #5d: a player bar
+// Transcript tab — recreated from Jotva Meeting.dc.html #5d: a player bar
 // (dark play button, mm:ss, green progress + handle, speed), avatar +
 // name + timestamp + paragraph turns, the "now playing" turn lit with a
 // green keyline while past turns dim. The mockup's right rail ("search +
@@ -146,7 +146,7 @@ export default function TranscriptTab({ meeting }) {
           }}>{t('speakers.copy')}</button>
           <button className="btn secondary" onClick={() => {
             const url = URL.createObjectURL(new Blob([transcriptText(meeting.transcript, t('timeline.speakerFallback'))], {type: 'text/plain;charset=utf-8'}));
-            const link = document.createElement('a'); link.href = url; link.download = 'Aguacate-transcript.txt'; link.click();
+            const link = document.createElement('a'); link.href = url; link.download = 'Jotva-transcript.txt'; link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
           }}>{t('speakers.save')}</button>
         </div>

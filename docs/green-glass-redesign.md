@@ -40,9 +40,9 @@ The harness uses a temporary Electron profile, without the production main proce
 The DOM tests use jsdom without altering the pre-existing dirty package lock:
 
 ```sh
-test_deps=$(mktemp -d /tmp/aguacate-ui-tests.XXXXXX)
+test_deps=$(mktemp -d /tmp/jotva-ui-tests.XXXXXX)
 npm install --prefix "$test_deps" --no-audit --no-fund jsdom@26
-AGUACATE_TEST_DEPS="$test_deps" node --test --test-force-exit tests/ui.test.mjs tests/meeting-cards.test.mjs
+JOTVA_TEST_DEPS="$test_deps" node --test --test-force-exit tests/ui.test.mjs tests/meeting-cards.test.mjs
 ```
 
 The force-exit option prevents retained test-runtime handles from keeping Node alive after the DOM fixture is unmounted. The test suite completes all assertions before exit. The test runner requires a Node version supporting that flag.

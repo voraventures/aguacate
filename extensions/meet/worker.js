@@ -8,7 +8,7 @@ const identity = chrome.storage.local.get('bridgeIdentity').then(async data => {
 });
 function rpc(action, payload) {
   if (!port) {
-    port = chrome.runtime.connectNative('app.aguacate.speakers');
+    port = chrome.runtime.connectNative('app.jotva.speakers');
     port.onMessage.addListener(message => {
       const request = pending.get(message.id);
       if (!request) return;

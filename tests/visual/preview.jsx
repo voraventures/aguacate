@@ -20,15 +20,15 @@ Object.defineProperty(window, "localStorage", { configurable: true, value: stora
 if (globalThis !== window) Object.defineProperty(globalThis, "localStorage", { configurable: true, value: storage });
 const params = new URLSearchParams(location.search);
 const state = params.get("state") || "meeting";
-if (params.has("panel")) localStorage.setItem("aguacate_list_width", params.get("panel"));
-localStorage.setItem("aguacate_onboarded", state === "onboarding" ? "false" : "true");
-localStorage.setItem("aguacate_tour_done", "true");
-localStorage.setItem("aguacate_language", "en");
+if (params.has("panel")) localStorage.setItem("jotva_list_width", params.get("panel"));
+localStorage.setItem("jotva_onboarded", state === "onboarding" ? "false" : "true");
+localStorage.setItem("jotva_tour_done", "true");
+localStorage.setItem("jotva_language", "en");
 const noop = async () => ({});
 // Fail closed even for legacy code that bypasses api.js: preview never contacts a service.
 window.fetch = async () => { throw new Error("Network disabled in synthetic preview"); };
 window.open = () => null;
-window.aguacate = { platform: "darwin", getAutoLaunch: async () => ({ enabled: false }), setAutoLaunch: noop, openExternal: noop, speakerSetup: async () => ({zoom: 'experimental', meet: 'host_registered', qualified: false}) };
+window.jotva = { platform: "darwin", getAutoLaunch: async () => ({ enabled: false }), setAutoLaunch: noop, openExternal: noop, speakerSetup: async () => ({zoom: 'experimental', meet: 'host_registered', qualified: false}) };
 const date = new Date(); date.setHours(9, 0, 0, 0);
 const meeting = {
   id: "synthetic-design-meeting", title: "Making room for what matters", status: "ready", is_demo: 1, audio_path: "synthetic-not-playable.wav",

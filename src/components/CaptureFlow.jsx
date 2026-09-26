@@ -1,5 +1,5 @@
 // The signature capture flow — recreated from
-// design_handoff_aguacate_workspace/CaptureFlow.dc.html: a single 560×640
+// design_handoff_jotva_workspace/CaptureFlow.dc.html: a single 560×640
 // card that moves through idle → recording → processing → ready. Recording
 // and processing lock the card (no dismissal, matching the "full-app
 // takeover" product rule); idle and ready allow backdrop/Escape dismissal.
@@ -237,7 +237,7 @@ export default function CaptureFlow() {
       <div className="capture-card" role="dialog" aria-modal="true" aria-label={title}>
         <div className="capture-header">
           <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" />
-          <span className="capture-wordmark brand-wordmark">Aguacate</span>
+          <span className="capture-wordmark brand-wordmark">Jotva</span>
           <div style={{ flex: 1 }} />
           {dismissible && <button className="icon-btn" aria-label={t("common.close")} onClick={close}><XIcon size={20} /></button>}
           {phase === "recording" && (

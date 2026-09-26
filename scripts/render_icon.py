@@ -1,4 +1,4 @@
-"""Render the Aguacate app icon (same geometry + lighting as icon-master.svg)
+"""Render the Jotva app icon (same geometry + lighting as icon-master.svg)
 with a true alpha channel, then produce icon.icns inputs, icon.ico, icon.png.
 
 Design: flat warm off-white #F7F5F0 squircle (25% radius), baked bottom

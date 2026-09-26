@@ -9,11 +9,11 @@ const SvgBtn = ({ children }) => (
 );
 
 export default function Titlebar() {
-  const control = (action) => window.aguacate?.windowControl?.(action);
+  const control = (action) => window.jotva?.windowControl?.(action);
 
   return (
     <div className="titlebar">
-      <span className="titlebar-title">AGUACATE</span>
+      <span className="titlebar-title">JOTVA</span>
       <div className="titlebar-controls">
         <button
           className="titlebar-btn"

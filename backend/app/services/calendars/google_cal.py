@@ -1,6 +1,6 @@
 """Google Calendar via OAuth 2.0 PKCE (public client, no secret on device — C1/C9).
 
-Requires user-supplied client_id in ~/Library/Application Support/Aguacate/credentials.json
+Requires user-supplied client_id in ~/Library/Application Support/Jotva/credentials.json
 (see credentials.example.json). Tokens are stored in the OS keychain.
 """
 import base64
@@ -15,14 +15,14 @@ import httpx
 
 from ...config import GOOGLE_CLIENT_ID, load_oauth_credentials
 
-log = logging.getLogger("aguacate.google")
+log = logging.getLogger("jotva.google")
 
 SCOPES = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/drive.file"
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 # Token exchange/refresh are brokered server-side so the client_secret never
-# lives on the device — the broker holds it. See vora-aguacate-license.
-OAUTH_BROKER = "https://license.aguacatenotes.com/api/oauth/google"
+# lives on the device — the broker holds it. See vora-jotva-license.
+OAUTH_BROKER = "https://license.jotva.com/api/oauth/google"
 
 # CSRF state tokens with TTL (C9)
 _pending: dict[str, dict] = {}
@@ -33,7 +33,7 @@ try:
 except Exception:  # pragma: no cover
     keyring = None
 
-_KC = "Aguacate"
+_KC = "Jotva"
 
 
 def _save_tokens(tokens: dict) -> None:

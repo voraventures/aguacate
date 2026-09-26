@@ -17,7 +17,7 @@ from ..events import hub
 from . import recorder as recorder_svc
 from .calendars import sync as cal_sync
 
-log = logging.getLogger("aguacate.presence")
+log = logging.getLogger("jotva.presence")
 
 # Initial estimates — tune from real calls. Raw float RMS of the input stream;
 # recorder._emit_levels scales this by 8 for the UI meter, so 0.015 ≈ 12% on

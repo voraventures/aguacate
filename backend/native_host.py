@@ -12,8 +12,8 @@ MAX_MESSAGE = 16_384
 
 def data_dir():
     # Match the backend's existing default; do not migrate Windows user data.
-    default = Path.home() / "Library/Application Support/Aguacate"
-    return Path(os.environ.get("AGUACATE_DATA_DIR", default))
+    default = Path.home() / "Library/Application Support/Jotva"
+    return Path(os.environ.get("JOTVA_DATA_DIR", default))
 
 
 def forward(message):

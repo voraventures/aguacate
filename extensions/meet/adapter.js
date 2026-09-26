@@ -1,7 +1,7 @@
 // Conservative adapter contract. No CSS-class inference or roster-order guesses.
 // Platform qualification must verify these semantic attributes on supported Meet
 // versions. If Meet changes/exposes no explicit activity, return no names.
-globalThis.AguacateMeetAdapter = {
+globalThis.JotvaMeetAdapter = {
   read(root = document) {
     const people = new Map();
     for (const tile of root.querySelectorAll('[data-participant-id]')) {

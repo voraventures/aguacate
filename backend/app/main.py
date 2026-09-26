@@ -1,4 +1,4 @@
-"""Aguacate backend: FastAPI app with token auth, CORS allowlist, host-header
+"""Jotva backend: FastAPI app with token auth, CORS allowlist, host-header
 allowlist, rate limiting, and generic external error messages (C2/C3/C7/C8)."""
 import asyncio
 import logging
@@ -14,7 +14,7 @@ from .events import hub
 from .ratelimit import check_rate_limit
 from .routes import calendar, intelligence, meetings, misc, mobile, recording, share, system, workspace, speakers
 
-log = logging.getLogger("aguacate")
+log = logging.getLogger("jotva")
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(name)s %(levelname)s %(message)s",
@@ -24,14 +24,14 @@ logging.basicConfig(
 
 def create_app() -> FastAPI:
     ensure_dirs()
-    app = FastAPI(title="Aguacate", docs_url=None, redoc_url=None, openapi_url=None)
+    app = FastAPI(title="Jotva", docs_url=None, redoc_url=None, openapi_url=None)
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=ALLOWED_ORIGINS,  # explicit list; no wildcards, no file:// (C3)
         allow_credentials=False,
         allow_methods=["GET", "POST", "PATCH", "DELETE"],
-        allow_headers=["Authorization", "Content-Type", "X-Aguacate-Token"],
+        allow_headers=["Authorization", "Content-Type", "X-Jotva-Token"],
     )
 
     @app.middleware("http")

@@ -468,7 +468,7 @@ export default function Settings() {
   const [wsSharePath, setWsSharePath] = useState("");
   // Mobile state
   const [mobileSessions, setMobileSessions] = useState([]);
-  const isWin = (window.aguacate?.platform || "darwin") === "win32";
+  const isWin = (window.jotva?.platform || "darwin") === "win32";
 
   const loadSecrets = () =>
     api.get("/api/integrations/status").then((r) => setSecrets(r.secrets)).catch(() => {});
@@ -484,7 +484,7 @@ export default function Settings() {
       api.get("/api/models").then(setModels).catch(() => {});
       refreshCalendar();
       loadMobileSessions();
-      window.aguacate
+      window.jotva
         ?.getAutoLaunch?.()
         .then((r) => setAutoLaunch(!!r?.enabled))
         .catch(() => {});
@@ -498,7 +498,7 @@ export default function Settings() {
   const toggleAutoLaunch = () => {
     const next = !autoLaunch;
     setAutoLaunch(next);
-    window.aguacate?.setAutoLaunch?.(next);
+    window.jotva?.setAutoLaunch?.(next);
     api.post("/api/settings", { key: "auto_launch", value: next }).catch(() => {});
   };
 
@@ -530,7 +530,7 @@ export default function Settings() {
     setCheckoutLoading(true);
     try {
       const { install_id } = await api.get("/api/install-id");
-      const resp = await fetch("https://license.aguacatenotes.com/api/checkout", {
+      const resp = await fetch("https://license.jotva.com/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ install_id }),
@@ -1404,7 +1404,7 @@ export default function Settings() {
                     onClick={() =>
                       api.post("/api/export/pack/actions_csv").then(({ path }) => {
                         showToast(t('settings.export.csvExported'));
-                        window.aguacate?.showInFolder?.(path);
+                        window.jotva?.showInFolder?.(path);
                       }).catch((e) => showToast(e.message, "error"))
                     }
                   >
@@ -1424,7 +1424,7 @@ export default function Settings() {
                     onClick={() =>
                       api.post("/api/export/pack/timeline_pdf").then(({ path }) => {
                         showToast(t('settings.export.timelineExported'));
-                        window.aguacate?.showInFolder?.(path);
+                        window.jotva?.showInFolder?.(path);
                       }).catch((e) => showToast(e.message, "error"))
                     }
                   >
@@ -1505,7 +1505,7 @@ export default function Settings() {
                           .then(({ path }) => {
                             setVaultPassword("");
                             showToast(t('settings.export.vaultExported'));
-                            window.aguacate?.showInFolder?.(path);
+                            window.jotva?.showInFolder?.(path);
                           })
                           .catch((e) => showToast(e.message, "error"))
                           .finally(() => setBusy(false));
@@ -1769,8 +1769,8 @@ export default function Settings() {
                   onClick={() =>
                     openExternal(
                       setupModal === "google"
-                        ? "https://docs.aguacatenotes.com/setup/google-calendar"
-                        : "https://docs.aguacatenotes.com/setup/microsoft-calendar"
+                        ? "https://docs.jotva.com/setup/google-calendar"
+                        : "https://docs.jotva.com/setup/microsoft-calendar"
                     )
                   }
                 >

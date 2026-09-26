@@ -1,4 +1,4 @@
-"""Aguacate backend launcher.
+"""Jotva backend launcher.
 
 Binds to a free loopback port, then prints a single JSON handshake line to
 stdout so the Electron main process can read {port, token}. The token is never

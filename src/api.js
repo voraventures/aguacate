@@ -5,8 +5,8 @@ let backend = null; // { port, token }
 
 export async function initBackend() {
   if (backend) return backend;
-  if (window.aguacate?.getBackend) {
-    backend = await window.aguacate.getBackend();
+  if (window.jotva?.getBackend) {
+    backend = await window.jotva.getBackend();
   } else {
     const params = new URLSearchParams(window.location.search);
     const port = params.get("port");
@@ -26,7 +26,7 @@ async function request(method, path, body) {
     method,
     headers: {
       "Content-Type": "application/json",
-      "X-Aguacate-Token": backend.token,
+      "X-Jotva-Token": backend.token,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -103,12 +103,12 @@ export function connectWebSocket(onEvent) {
 }
 
 export function openExternal(url) {
-  if (window.aguacate?.openExternal) return window.aguacate.openExternal(url);
+  if (window.jotva?.openExternal) return window.jotva.openExternal(url);
   window.open(url, "_blank", "noopener,noreferrer");
   return Promise.resolve({ ok: true });
 }
 
 export function showInFolder(path) {
-  if (window.aguacate?.showInFolder) return window.aguacate.showInFolder(path);
+  if (window.jotva?.showInFolder) return window.jotva.showInFolder(path);
   return Promise.resolve({ ok: false, error: "Not available in browser" });
 }

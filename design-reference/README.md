@@ -1,7 +1,7 @@
-# Handoff: Aguacate — Meeting Workspace UI
+# Handoff: Jotva — Meeting Workspace UI
 
 ## Overview
-Aguacate is a desktop conversation workspace: it records meetings, transcribes them, and
+Jotva is a desktop conversation workspace: it records meetings, transcribes them, and
 auto-generates knowledge (title, summary, actions, decisions, topics, questions, timeline,
 highlights). This package covers the redesigned workspace: the **capture flow**
 (record → grow → ready), the **Meeting detail** (Overview / Timeline / Transcript / Ask),
@@ -17,7 +17,7 @@ the "Ready" stage.
 The files in this bundle are **design references authored in HTML** (a streaming
 "Design Component" format) — prototypes showing intended look and behavior, **not**
 production code to copy verbatim. The task is to **recreate these designs in the existing
-Aguacate codebase**, using its established framework, component library, and patterns.
+Jotva codebase**, using its established framework, component library, and patterns.
 If a component library exists, map these to it; only the visual spec (tokens, layout,
 type, motion) below is authoritative.
 
@@ -72,7 +72,7 @@ Window traffic lights: `#F0655A` / `#F5BE4F` / `#61C554`
 ### Typography
 - **Newsreader** (serif): weights 400/500/600 + italics.
   - Meeting title: 32–34px / 500 / letter-spacing −.015em
-  - Wordmark "Aguacate": 20px / 500
+  - Wordmark "Jotva": 20px / 500
   - AI summary body: 22–23px / 400 / line-height 1.5 (italic green for the key phrase)
 - **Hanken Grotesk** (sans): 400/500/600/700.
   - Nav items 14px; body 13.5–15px / line-height 1.6–1.7; buttons 13.5–15px/500
@@ -106,7 +106,7 @@ list: 1 Recording, 2 Processing, 3 Ready. Pull-quote in italic serif. Not a nav 
 ### 2. Capture flow (state machine — see `CaptureFlow.dc.html`)
 560 × 640 card. Phases:
 - **idle** → title "Ready to capture", big dark "Start recording" (mic) button.
-- **recording** → REC pill (pulsing), title "New recording", subtitle "Aguacate is
+- **recording** → REC pill (pulsing), title "New recording", subtitle "Jotva is
   listening · 10:30 AM". The **logo's black waveform bars animate to the live audio
   amplitude**. Controls: mic / pause / red Stop.
 - **processing** → two counter-rotating dashed rings around the mark, "Growing your
@@ -125,7 +125,7 @@ list: 1 Recording, 2 Processing, 3 Ready. Pull-quote in italic serif. Not a nav 
 Overview / Timeline / Transcript / Ask (active = ink text + 2px `#6FA83C` underline).
 Body:
 - **Summary hero** — soft green gradient card, faint avocado watermark, row of
-  [primary logo mark 26px] + mono eyebrow "SUMMARY BY AGUACATE", then the serif summary
+  [primary logo mark 26px] + mono eyebrow "SUMMARY BY JOTVA", then the serif summary
   with the key phrase in italic green.
 - Two columns (left 1.5 / right 1, divided by a hairline):
   - Left: **Actions** (mono eyebrow + count) — rows: check-circle · task · owner · due(mono);
@@ -146,7 +146,7 @@ Same shell + header, tab active accordingly.
   grounded answer, "Sources" with clickable timestamp chips, thumbs up/down). Bottom:
   suggested-question chips + "Ask a question…" input with dark send button.
 
-### 5. Sidebar + meeting list (shared chrome — `AguacateChrome.dc.html`)
+### 5. Sidebar + meeting list (shared chrome — `JotvaChrome.dc.html`)
 Nav is intentionally minimal — every item has a defined purpose (an earlier pass had
 stubbed Library/Meeting Zero/a bare Search destination/a separate Today view; all were
 cut as redundant or undefined; do not recreate them):
@@ -168,7 +168,7 @@ cut as redundant or undefined; do not recreate them):
 
 ### 6. Calendar auto-record (see `SPEC-calendar-autorecord.md` for the full plan)
 Extends zero-manual-labor to scheduled meetings: user connects a calendar in Settings;
-Aguacate detects the upcoming event (must carry a Zoom/Meet/Teams link) and, 5 minutes
+Jotva detects the upcoming event (must carry a Zoom/Meet/Teams link) and, 5 minutes
 before start, shows an in-app **banner/toast** — dismissible, non-blocking — saying it
 will auto-transcribe once the user joins. **Join detection is automatic** (no confirm
 step). The chosen row treatment (screenshot `autorecord.png`) lives **in the sidebar**,
@@ -178,14 +178,14 @@ directly below the Record button, not in the meeting list:
   remaining** in `#5F9E2B` bold + "MIN" in mono below it.
 - Title + "Zoom · auto-transcribe on" in `#5F9E2B`.
 - The toast: white card, green-tinted border/shadow, the primary logo mark (22px) +
-  "[Title] starts in 5 min" + "Aguacate will auto-transcribe once you join the call." +
+  "[Title] starts in 5 min" + "Jotva will auto-transcribe once you join the call." +
   a dismiss ✕.
 
 ### 7. Digest (`#5j`)
 Auto-generated rollup across all meetings (daily/weekly toggle, weekly shown). Same shell
 + chrome. Header: serif "Digest" + date range + meeting count/duration, Weekly/Daily
 segmented control top-right. Body: a **summary hero** identical in construction to the
-Overview's (green-wash gradient card, watermark, logo + "DIGEST BY AGUACATE" eyebrow,
+Overview's (green-wash gradient card, watermark, logo + "DIGEST BY JOTVA" eyebrow,
 serif rollup sentence with italic-green key phrase) — reuse that same recipe here. Below:
 two columns — left = **Meetings** this period (green dot · title · duration · mono day)
 and **Recurring topics** (pill chips with counts); right = **Open actions** (aggregated,
@@ -261,11 +261,11 @@ of truth; screenshots are for look/color/type/motion end-states.
   into the sidebar — see section 6 above.
 
 ## Files
-- `Aguacate Meeting.dc.html` — main canvas. Anchors: `#5g` capture flow, `#5i` Overview
+- `Jotva Meeting.dc.html` — main canvas. Anchors: `#5g` capture flow, `#5i` Overview
   (canonical), `#5c` Timeline, `#5d` Transcript, `#5e` Ask, `#5j` Digest, `#5k` Settings,
   `#5f` Home, `#5b` moments, `#6a`/`#6b`/`#6c`/`#6d` auto-record row explorations (6b is final).
   (`#5a` tinted + `#5h` white are earlier **comparison** variants — ignore; `#5i` is final.)
-- `AguacateChrome.dc.html` — shared sidebar + meeting list (Record button, auto-record
+- `JotvaChrome.dc.html` — shared sidebar + meeting list (Record button, auto-record
   card, Meetings/Digest/Settings nav, search field, calendar date badges).
 - `CaptureFlow.dc.html` — animated capture state machine (logic + template).
 - `SPEC-calendar-autorecord.md` — the calendar-linked auto-record plan (flow, states,

@@ -23,7 +23,7 @@
   <!-- header -->
   <div style="height:56px;flex:none;display:flex;align-items:center;gap:9px;padding:0 22px;border-bottom:1px solid #F0F0EC;">
     <svg width="22" height="26" viewBox="0 0 220 256"><path d="M110 24 C 92 24 74 40 66 70 C 56 104 30 130 30 168 C 30 208 66 236 110 236 C 154 236 190 208 190 168 C 190 130 164 104 154 70 C 146 40 128 24 110 24 Z" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#7DBE3A" stroke-width="16" stroke-linejoin="round"></path><g fill="#111111"><rect x="86.5" y="118" width="11" height="84" rx="5.5"></rect><rect x="104.5" y="108" width="11" height="104" rx="5.5"></rect><rect x="122.5" y="118" width="11" height="84" rx="5.5"></rect></g></svg>
-    <span style="font-size:17px;font-weight:500;letter-spacing:-.01em;color:#232320;font-family:'Newsreader',serif;">Aguacate</span>
+    <span style="font-size:17px;font-weight:500;letter-spacing:-.01em;color:#232320;font-family:'Newsreader',serif;">Jotva</span>
     <div style="flex:1;"></div>
     <sc-if value="{{ isRec }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:7px;background:#FCEBEA;border:1px solid #F4CFCC;border-radius:20px;padding:5px 11px 5px 10px;"><span style="width:8px;height:8px;border-radius:50%;background:#EF5A4E;animation:cfPulse 1.3s ease-in-out infinite;"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#D8453A;letter-spacing:.05em;">REC</span></div>
@@ -137,7 +137,7 @@ class Component extends DCLogic {
       checkScale: phase === 'ready' ? 'scale(1)' : 'scale(0)',
       readyShift: phase === 'ready' ? 'translateY(0)' : 'translateY(14px)',
       title: phase === 'idle' ? 'Ready to capture' : phase === 'recording' ? 'New recording' : phase === 'processing' ? 'Growing your meeting…' : 'Product Strategy Sync',
-      subtitle: phase === 'idle' ? 'Start a recording and Aguacate will listen.' : phase === 'recording' ? 'Aguacate is listening · 10:30 AM' : phase === 'processing' ? 'This usually takes about 30 seconds.' : this.state.typed,
+      subtitle: phase === 'idle' ? 'Start a recording and Jotva will listen.' : phase === 'recording' ? 'Jotva is listening · 10:30 AM' : phase === 'processing' ? 'This usually takes about 30 seconds.' : this.state.typed,
       caretOn: (phase === 'ready' && this.state.typed.length < this.SUMMARY.length) ? 1 : 0,
       start: () => this.start(), stop: () => this.stop(), reset: () => this.reset(),
     };

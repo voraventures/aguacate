@@ -5,7 +5,7 @@ import logging
 
 from fastapi import WebSocket
 
-log = logging.getLogger("aguacate.events")
+log = logging.getLogger("jotva.events")
 
 
 class EventHub:

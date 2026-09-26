@@ -141,7 +141,7 @@
       },
       "series": {
         "head": "Aún no hay reuniones recurrentes",
-        "sub": "Cuando la misma reunión ocurre dos veces, Aguacate empieza a rastrear la serie"
+        "sub": "Cuando la misma reunión ocurre dos veces, Jotva empieza a rastrear la serie"
       },
       "conflicts": {
         "head": "No se detectaron conflictos",
@@ -286,15 +286,15 @@
     },
     "recording": {
       "startup": "Inicio",
-      "launchLogin": "Abrir Aguacate al iniciar sesión",
+      "launchLogin": "Abrir Jotva al iniciar sesión",
       "launchLoginDesc": "No te pierdas ninguna reunión grabada automáticamente.",
       "on": "Activado",
       "off": "Desactivado",
       "globalShortcut": "Atajo global",
-      "globalShortcutDesc": "Inicia o detén la grabación desde cualquier lugar, incluso cuando Aguacate está en la bandeja.",
+      "globalShortcutDesc": "Inicia o detén la grabación desde cualquier lugar, incluso cuando Jotva está en la bandeja.",
       "capture": "Captura",
       "autoMode": "Modo de grabación automática",
-      "autoModeDesc": "Cómo decide Aguacate cuándo empezar a grabar.",
+      "autoModeDesc": "Cómo decide Jotva cuándo empezar a grabar.",
       "modeAll": "Grabar todas las reuniones automáticamente",
       "mode30": "Preguntarme 30 segundos antes de cada reunión",
       "modeManual": "Solo manual (mostrar calendario, nunca preguntar)",
@@ -305,8 +305,8 @@
       "micLoopbackWarning": "⚠ Este es un dispositivo virtual/de bucle, no un micrófono real — las grabaciones estarán en silencio a menos que se enrute audio explícitamente a él. Elige tu micrófono real.",
       "systemDefault": "Predeterminado del sistema",
       "systemAudio": "Dispositivo de audio del sistema",
-      "winHint": "Windows: elige la entrada \"(loopback)\" que coincida con tus altavoces; Aguacate capta el audio del sistema vía WASAPI, sin necesidad de controladores.",
-      "macHint": "macOS: instala BlackHole (gratis) y selecciónalo aquí para capturar el audio de las reuniones de Zoom/Meet. Aguacate lo mezcla con tu micrófono localmente.",
+      "winHint": "Windows: elige la entrada \"(loopback)\" que coincida con tus altavoces; Jotva capta el audio del sistema vía WASAPI, sin necesidad de controladores.",
+      "macHint": "macOS: instala BlackHole (gratis) y selecciónalo aquí para capturar el audio de las reuniones de Zoom/Meet. Jotva lo mezcla con tu micrófono localmente.",
       "none": "Ninguno",
       "loopbackSuffix": "  ← loopback",
       "transcription": "Transcripción",
@@ -326,11 +326,11 @@
       "modelDesc": "Elige el modelo de {{name}} que se usa para escribir tus notas.",
       "loading": "Cargando…",
       "keyLabel": {
-        "anthropic": "Clave de API de Anthropic (opcional — las notas con IA están incluidas en Aguacate)",
+        "anthropic": "Clave de API de Anthropic (opcional — las notas con IA están incluidas en Jotva)",
         "openai": "Clave de API de OpenAI",
         "google": "Clave de API de Google"
       },
-      "includedNote": "Las notas con IA están incluidas en Aguacate — no se necesita clave de API. ¿Prefieres tu propia cuenta? Añade tu clave de API de Anthropic, OpenAI o Google y Aguacate la usará. OpenAI y Google requieren tu propia clave."
+      "includedNote": "Las notas con IA están incluidas en Jotva — no se necesita clave de API. ¿Prefieres tu propia cuenta? Añade tu clave de API de Anthropic, OpenAI o Google y Jotva la usará. OpenAI y Google requieren tu propia clave."
     },
     "calendars": {
       "connected": "Calendarios conectados",
@@ -348,8 +348,8 @@
       "accessDenied": "Acceso al calendario denegado. Concede el acceso en Ajustes del Sistema → Privacidad y seguridad → Calendarios.",
       "disable": "Desactivar",
       "enable": "Activar",
-      "pollNote": "Aguacate consulta los calendarios conectados cada 30 segundos y fusiona automáticamente los eventos duplicados entre calendarios. macOS pedirá permiso de Calendario la primera vez que se active Apple Calendar.",
-      "intro": "Conecta un calendario para que Aguacate transcriba automáticamente las reuniones en cuanto te unas — sin necesidad de pulsar grabar.",
+      "pollNote": "Jotva consulta los calendarios conectados cada 30 segundos y fusiona automáticamente los eventos duplicados entre calendarios. macOS pedirá permiso de Calendario la primera vez que se active Apple Calendar.",
+      "intro": "Conecta un calendario para que Jotva transcriba automáticamente las reuniones en cuanto te unas — sin necesidad de pulsar grabar.",
       "autoTranscribe": "Auto-transcribir reuniones del calendario",
       "autoTranscribeDesc": "Se une a Zoom, Meet y Teams automáticamente, sin confirmación.",
       "notify5min": "Avisar 1 minuto antes",
@@ -433,7 +433,7 @@
       "timelinePdfDesc": "Registro cronológico de decisiones.",
       "timelineExported": "Cronología exportada",
       "mobile": "Móvil",
-      "iosSoon": "Aguacate para iOS — próximamente",
+      "iosSoon": "Jotva para iOS — próximamente",
       "mobileBlurb": "La aplicación complementaria para móvil te permite revisar notas, completar acciones y buscar reuniones en tu iPhone. Los dispositivos conectados se enumeran a continuación y se pueden revocar en cualquier momento.",
       "qrToken": "Token de configuración QR",
       "connectMobile": "Conectar la aplicación móvil",
@@ -472,7 +472,7 @@
       "joinedDate": "se unió el {{date}}",
       "syncFolder": "Carpeta de sincronización",
       "sharedPath": "Ruta de la carpeta compartida",
-      "syncNote": "Apunta a una unidad de red compartida o carpeta de Dropbox a la que puedan acceder todos los miembros. Aguacate escribe aquí los archivos JSON de las reuniones cuando compartes con el equipo.",
+      "syncNote": "Apunta a una unidad de red compartida o carpeta de Dropbox a la que puedan acceder todos los miembros. Jotva escribe aquí los archivos JSON de las reuniones cuando compartes con el equipo.",
       "syncPlaceholder": "/Volumes/SharedDrive  o  ~/Dropbox/team",
       "syncSaved": "Ruta de sincronización guardada",
       "savePath": "Guardar ruta"
@@ -514,8 +514,8 @@
     },
     "oauth": {
       "connectCalendar": "Conectar {{provider}} Calendar",
-      "explain": "Aguacate se conecta a tu calendario con el inicio de sesión oficial de {{provider}} (OAuth): tú apruebas el acceso en tu navegador y tu contraseña nunca se comparte con Aguacate.",
-      "setupNote": "Primero se necesita una configuración rápida y única: Aguacate debe registrarse como una aplicación en tu cuenta de {{provider}} para que pueda solicitar acceso al calendario. La guía de abajo te lo explica en unos dos minutos; luego vuelve aquí y pulsa Conectar de nuevo.",
+      "explain": "Jotva se conecta a tu calendario con el inicio de sesión oficial de {{provider}} (OAuth): tú apruebas el acceso en tu navegador y tu contraseña nunca se comparte con Jotva.",
+      "setupNote": "Primero se necesita una configuración rápida y única: Jotva debe registrarse como una aplicación en tu cuenta de {{provider}} para que pueda solicitar acceso al calendario. La guía de abajo te lo explica en unos dos minutos; luego vuelve aquí y pulsa Conectar de nuevo.",
       "learnMore": "Más información",
       "close": "Cerrar"
     }
@@ -611,7 +611,7 @@
       "discussions": "Discusiones clave",
       "nextSteps": "Próximos pasos",
       "compliance": "Alertas de cumplimiento",
-      "summaryBy": "Resumen de Aguacate",
+      "summaryBy": "Resumen de Jotva",
       "noSummary": "Aún no hay resumen.",
       "highlight": "Destacado",
       "flaggedMoment": "Momento marcado"
@@ -642,12 +642,12 @@
       "micDenied": "Acceso al micrófono denegado — abre Ajustes del Sistema → Privacidad y seguridad → Micrófono",
       "processingFailed": "El procesamiento falló",
       "recordingFailed": "La grabación falló",
-      "joinWatching": "Abriendo la llamada — Aguacate ofrecerá grabar cuando empiecen a hablar.",
+      "joinWatching": "Abriendo la llamada — Jotva ofrecerá grabar cuando empiecen a hablar.",
       "joinFailed": "No se pudo abrir el enlace de la reunión"
     },
     "notify": {
       "recordingStartedTitle": "Grabación iniciada",
-      "recordingStartedBody": "Aguacate está capturando esta reunión localmente.",
+      "recordingStartedBody": "Jotva está capturando esta reunión localmente.",
       "briefReadyTitle": "Resumen de la reunión listo",
       "briefReadyBody": "{{title}} comienza en {{minutes}} min — tienes historial con este grupo.",
       "pulseTitle": "Pulso de acciones",
@@ -769,7 +769,7 @@
     "previousMeetings": "Reuniones anteriores"
   },
   "onboarding": {
-    "title": "Bienvenido a Aguacate",
+    "title": "Bienvenido a Jotva",
     "sub": "Notas de reuniones con IA. Sin bot. Sin nube.",
     "loadDemo": "Cargar reunión de demostración",
     "loading": "Cargando…",
@@ -805,7 +805,7 @@
     "steps": {
       "record": {
         "title": "Graba cualquier reunión",
-        "desc": "Ningún bot se une a tu llamada. El audio no sale de este Mac. Pulsa Grabar y Aguacate lo captura todo localmente con Whisper AI."
+        "desc": "Ningún bot se une a tu llamada. El audio no sale de este Mac. Pulsa Grabar y Jotva lo captura todo localmente con Whisper AI."
       },
       "list": {
         "title": "Tus reuniones, organizadas",
@@ -915,7 +915,7 @@
     "noAnswer": "No se encontró respuesta en tus reuniones",
     "matches_one": "{{count}} coincidencia",
     "matches_other": "{{count}} coincidencias",
-    "askCta": "Preguntar a Aguacate sobre «{{query}}»",
+    "askCta": "Preguntar a Jotva sobre «{{query}}»",
     "hint": "Escribe para buscar por título, notas, transcripciones o acciones."
   },
   "zero": {
@@ -935,7 +935,7 @@
     "rangeLabel": "{{range}} · {{count}} reuniones · {{minutes}}m grabados",
     "weekly": "Semanal",
     "daily": "Diario",
-    "summaryBy": "Resumen de Aguacate",
+    "summaryBy": "Resumen de Jotva",
     "heroSentence": "Tu equipo dedicó {{periodWord}} principalmente a {{topic}}, con {{count}} acciones abiertas pendientes.",
     "heroSentenceNoTopic": "{{count}} acciones abiertas pendientes este período.",
     "meetings": "Reuniones",
@@ -947,9 +947,9 @@
   },
   "capture": {
     "idleTitle": "Listo para capturar",
-    "idleSubtitle": "Inicia una grabación y Aguacate escuchará.",
+    "idleSubtitle": "Inicia una grabación y Jotva escuchará.",
     "recordingTitle": "Nueva grabación",
-    "recordingSubtitle": "Aguacate está escuchando · {{time}}",
+    "recordingSubtitle": "Jotva está escuchando · {{time}}",
     "rec": "REC",
     "startRecording": "Iniciar grabación",
     "viewMeeting": "Ver reunión",
@@ -965,12 +965,12 @@
   },
   "upcomingToast": {
     "startsIn": "{{title}} empieza en {{minutes}} min",
-    "willTranscribe": "Aguacate transcribirá automáticamente en cuanto te unas a la llamada.",
+    "willTranscribe": "Jotva transcribirá automáticamente en cuanto te unas a la llamada.",
     "join": "Unirse",
     "dismiss": "Descartar"
   },
   "pdf": {
-    "eyebrow": "Aguacate — Notas de la reunión",
+    "eyebrow": "Jotva — Notas de la reunión",
     "execSummary": "Resumen ejecutivo",
     "keyDiscussions": "Temas discutidos",
     "decisionsMade": "Decisiones tomadas",
@@ -982,7 +982,7 @@
     "nextSteps": "Próximos pasos",
     "complianceFlags": "Alertas de cumplimiento",
     "noneIdentified": "Ninguna identificada",
-    "generatedBy": "Generado por Aguacate",
+    "generatedBy": "Generado por Jotva",
     "participantCount_one": "{{count}} participante",
     "participantCount_other": "{{count}} participantes"
   }

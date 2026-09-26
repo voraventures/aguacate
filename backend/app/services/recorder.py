@@ -27,7 +27,7 @@ import numpy as np
 from ..config import RECORDINGS_DIR, secure_file, touch_secure
 from ..events import hub
 
-log = logging.getLogger("aguacate.recorder")
+log = logging.getLogger("jotva.recorder")
 
 TARGET_SR = 16000
 IS_WINDOWS = sys.platform == "win32"

@@ -14,7 +14,7 @@ from ..db import get_setting
 from ..events import hub
 from .keychain import get_secret
 
-log = logging.getLogger("aguacate.notes")
+log = logging.getLogger("jotva.notes")
 
 _PROVIDER_KEYS = {
     "anthropic": "anthropic_api_key",

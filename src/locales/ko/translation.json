@@ -141,7 +141,7 @@
       },
       "series": {
         "head": "아직 반복 회의 없음",
-        "sub": "같은 회의가 두 번 열리면 Aguacate가 시리즈 추적을 시작합니다"
+        "sub": "같은 회의가 두 번 열리면 Jotva가 시리즈 추적을 시작합니다"
       },
       "conflicts": {
         "head": "감지된 충돌 없음",
@@ -286,15 +286,15 @@
     },
     "recording": {
       "startup": "시작",
-      "launchLogin": "로그인 시 Aguacate 실행",
+      "launchLogin": "로그인 시 Jotva 실행",
       "launchLoginDesc": "자동 녹음되는 회의를 놓치지 마세요.",
       "on": "켜짐",
       "off": "꺼짐",
       "globalShortcut": "전역 단축키",
-      "globalShortcutDesc": "어디서나 녹음을 시작하거나 중지하세요 — Aguacate가 트레이에 있을 때도요.",
+      "globalShortcutDesc": "어디서나 녹음을 시작하거나 중지하세요 — Jotva가 트레이에 있을 때도요.",
       "capture": "캡처",
       "autoMode": "자동 녹음 모드",
-      "autoModeDesc": "Aguacate가 언제 녹음을 시작할지 결정하는 방식입니다.",
+      "autoModeDesc": "Jotva가 언제 녹음을 시작할지 결정하는 방식입니다.",
       "modeAll": "모든 회의 자동 녹음",
       "mode30": "각 회의 30초 전에 물어보기",
       "modeManual": "수동 전용 (캘린더만 표시, 묻지 않음)",
@@ -305,8 +305,8 @@
       "micLoopbackWarning": "⚠ 이 장치는 실제 마이크가 아닌 가상/루프백 장치입니다 — 오디오가 명시적으로 라우팅되지 않으면 녹음이 무음으로 저장됩니다. 실제 마이크를 선택하세요.",
       "systemDefault": "시스템 기본값",
       "systemAudio": "시스템 오디오 장치",
-      "winHint": "Windows: 스피커와 일치하는 \"(loopback)\" 항목을 선택하세요 — Aguacate는 드라이버 없이 WASAPI를 통해 시스템 오디오를 가져옵니다.",
-      "macHint": "macOS: BlackHole(무료)을 설치하고 여기서 선택하면 Zoom/Meet의 회의 오디오를 캡처합니다. Aguacate가 로컬에서 마이크와 혼합합니다.",
+      "winHint": "Windows: 스피커와 일치하는 \"(loopback)\" 항목을 선택하세요 — Jotva는 드라이버 없이 WASAPI를 통해 시스템 오디오를 가져옵니다.",
+      "macHint": "macOS: BlackHole(무료)을 설치하고 여기서 선택하면 Zoom/Meet의 회의 오디오를 캡처합니다. Jotva가 로컬에서 마이크와 혼합합니다.",
       "none": "없음",
       "loopbackSuffix": "  ← loopback",
       "transcription": "전사",
@@ -326,11 +326,11 @@
       "modelDesc": "노트 작성에 사용할 {{name}} 모델을 선택하세요.",
       "loading": "불러오는 중…",
       "keyLabel": {
-        "anthropic": "Anthropic API 키 (선택 사항 — AI 노트는 Aguacate에 기본 포함)",
+        "anthropic": "Anthropic API 키 (선택 사항 — AI 노트는 Jotva에 기본 포함)",
         "openai": "OpenAI API 키",
         "google": "Google API 키"
       },
-      "includedNote": "AI 노트는 Aguacate에 기본 포함되어 있어 API 키가 필요 없습니다. 자신의 계정을 사용하고 싶다면 Anthropic, OpenAI 또는 Google API 키를 추가하세요. OpenAI와 Google은 본인의 키가 필요합니다."
+      "includedNote": "AI 노트는 Jotva에 기본 포함되어 있어 API 키가 필요 없습니다. 자신의 계정을 사용하고 싶다면 Anthropic, OpenAI 또는 Google API 키를 추가하세요. OpenAI와 Google은 본인의 키가 필요합니다."
     },
     "calendars": {
       "connected": "연결된 캘린더",
@@ -348,8 +348,8 @@
       "accessDenied": "캘린더 접근이 거부되었습니다. 시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 접근을 허용하세요.",
       "disable": "사용 안 함",
       "enable": "사용",
-      "pollNote": "Aguacate는 30초마다 연결된 캘린더를 확인하고 캘린더 간 중복 일정을 자동으로 병합합니다. Apple Calendar를 처음 사용 설정하면 macOS가 캘린더 권한을 요청합니다.",
-      "intro": "캘린더를 연결하면 회의에 참여하는 순간 Aguacate가 자동으로 전사를 시작해요 — 녹음 버튼을 누를 필요가 없어요.",
+      "pollNote": "Jotva는 30초마다 연결된 캘린더를 확인하고 캘린더 간 중복 일정을 자동으로 병합합니다. Apple Calendar를 처음 사용 설정하면 macOS가 캘린더 권한을 요청합니다.",
+      "intro": "캘린더를 연결하면 회의에 참여하는 순간 Jotva가 자동으로 전사를 시작해요 — 녹음 버튼을 누를 필요가 없어요.",
       "autoTranscribe": "캘린더 회의 자동 전사",
       "autoTranscribeDesc": "확인 없이 Zoom, Meet, Teams에 자동으로 참여해요.",
       "notify5min": "1분 전에 알림",
@@ -433,7 +433,7 @@
       "timelinePdfDesc": "시간순 결정 기록.",
       "timelineExported": "타임라인 내보냄",
       "mobile": "모바일",
-      "iosSoon": "iOS용 Aguacate — 곧 출시",
+      "iosSoon": "iOS용 Jotva — 곧 출시",
       "mobileBlurb": "모바일 동반 앱으로 iPhone에서 노트를 검토하고, 할 일을 완료하고, 회의를 검색할 수 있습니다. 연결된 기기는 아래에 표시되며 언제든지 해제할 수 있습니다.",
       "qrToken": "QR 설정 토큰",
       "connectMobile": "모바일 앱 연결",
@@ -472,7 +472,7 @@
       "joinedDate": "{{date}} 참여",
       "syncFolder": "동기화 폴더",
       "sharedPath": "공유 폴더 경로",
-      "syncNote": "모든 멤버가 접근할 수 있는 공유 네트워크 드라이브나 Dropbox 폴더를 지정하세요. 팀에 공유할 때 Aguacate가 여기에 회의 JSON 파일을 저장합니다.",
+      "syncNote": "모든 멤버가 접근할 수 있는 공유 네트워크 드라이브나 Dropbox 폴더를 지정하세요. 팀에 공유할 때 Jotva가 여기에 회의 JSON 파일을 저장합니다.",
       "syncPlaceholder": "/Volumes/SharedDrive  또는  ~/Dropbox/team",
       "syncSaved": "동기화 경로 저장됨",
       "savePath": "경로 저장"
@@ -514,8 +514,8 @@
     },
     "oauth": {
       "connectCalendar": "{{provider}} Calendar 연결",
-      "explain": "Aguacate는 {{provider}}의 공식 로그인(OAuth)으로 캘린더에 연결합니다 — 브라우저에서 접근을 승인하며 비밀번호는 Aguacate와 공유되지 않습니다.",
-      "setupNote": "먼저 간단한 일회성 설정이 필요합니다: Aguacate가 캘린더 접근을 요청할 수 있도록 {{provider}} 계정에 앱으로 등록되어야 합니다. 아래 가이드가 약 2분 만에 안내해 드립니다 — 그런 다음 여기로 돌아와 다시 연결을 누르세요.",
+      "explain": "Jotva는 {{provider}}의 공식 로그인(OAuth)으로 캘린더에 연결합니다 — 브라우저에서 접근을 승인하며 비밀번호는 Jotva와 공유되지 않습니다.",
+      "setupNote": "먼저 간단한 일회성 설정이 필요합니다: Jotva가 캘린더 접근을 요청할 수 있도록 {{provider}} 계정에 앱으로 등록되어야 합니다. 아래 가이드가 약 2분 만에 안내해 드립니다 — 그런 다음 여기로 돌아와 다시 연결을 누르세요.",
       "learnMore": "자세히 알아보기",
       "close": "닫기"
     }
@@ -610,7 +610,7 @@
       "discussions": "주요 논의",
       "nextSteps": "다음 단계",
       "compliance": "컴플라이언스 알림",
-      "summaryBy": "Aguacate 요약",
+      "summaryBy": "Jotva 요약",
       "noSummary": "아직 요약이 없어요.",
       "highlight": "하이라이트",
       "flaggedMoment": "표시된 순간"
@@ -641,12 +641,12 @@
       "micDenied": "마이크 접근이 거부되었습니다 — 시스템 설정 → 개인정보 보호 및 보안 → 마이크를 여세요",
       "processingFailed": "처리 실패",
       "recordingFailed": "녹음 실패",
-      "joinWatching": "통화를 여는 중 — 대화가 시작되면 Aguacate가 녹음을 제안해요.",
+      "joinWatching": "통화를 여는 중 — 대화가 시작되면 Jotva가 녹음을 제안해요.",
       "joinFailed": "회의 링크를 열 수 없어요"
     },
     "notify": {
       "recordingStartedTitle": "녹음 시작됨",
-      "recordingStartedBody": "Aguacate가 이 회의를 로컬에서 캡처하고 있습니다.",
+      "recordingStartedBody": "Jotva가 이 회의를 로컬에서 캡처하고 있습니다.",
       "briefReadyTitle": "회의 브리핑 준비됨",
       "briefReadyBody": "{{title}}이(가) {{minutes}}분 후 시작됩니다 — 이 그룹과 이력이 있습니다.",
       "pulseTitle": "할 일 알림",
@@ -766,7 +766,7 @@
     "previousMeetings": "이전 회의"
   },
   "onboarding": {
-    "title": "Aguacate에 오신 것을 환영합니다",
+    "title": "Jotva에 오신 것을 환영합니다",
     "sub": "AI 회의 노트. 봇 없음. 클라우드 없음.",
     "loadDemo": "데모 회의 불러오기",
     "loading": "불러오는 중…",
@@ -802,7 +802,7 @@
     "steps": {
       "record": {
         "title": "어떤 회의든 녹음",
-        "desc": "봇이 통화에 참여하지 않습니다. 오디오가 이 Mac을 벗어나지 않습니다. 녹음을 누르면 Aguacate가 Whisper AI로 모든 것을 로컬에서 캡처합니다."
+        "desc": "봇이 통화에 참여하지 않습니다. 오디오가 이 Mac을 벗어나지 않습니다. 녹음을 누르면 Jotva가 Whisper AI로 모든 것을 로컬에서 캡처합니다."
       },
       "list": {
         "title": "정리된 내 회의",
@@ -906,7 +906,7 @@
     "fromMeetings": "내 회의에서",
     "noAnswer": "회의에서 답을 찾지 못했어요",
     "matches_other": "결과 {{count}}건",
-    "askCta": "Aguacate에게 “{{query}}” 물어보기",
+    "askCta": "Jotva에게 “{{query}}” 물어보기",
     "hint": "제목, 노트, 전사, 실행 항목을 검색하려면 입력하세요."
   },
   "zero": {
@@ -926,7 +926,7 @@
     "rangeLabel": "{{range}} · 회의 {{count}}개 · {{minutes}}분 녹음",
     "weekly": "주간",
     "daily": "일간",
-    "summaryBy": "Aguacate 요약",
+    "summaryBy": "Jotva 요약",
     "heroSentence": "{{periodWord}} 팀은 주로 {{topic}}에 집중했고, 아직 {{count}}개의 실행 항목이 남아 있어요.",
     "heroSentenceNoTopic": "이번 기간 아직 {{count}}개의 실행 항목이 남아 있어요.",
     "meetings": "회의",
@@ -938,9 +938,9 @@
   },
   "capture": {
     "idleTitle": "캡처 준비 완료",
-    "idleSubtitle": "녹음을 시작하면 Aguacate가 듣기 시작해요.",
+    "idleSubtitle": "녹음을 시작하면 Jotva가 듣기 시작해요.",
     "recordingTitle": "새 녹음",
-    "recordingSubtitle": "Aguacate가 듣고 있어요 · {{time}}",
+    "recordingSubtitle": "Jotva가 듣고 있어요 · {{time}}",
     "rec": "REC",
     "startRecording": "녹음 시작",
     "viewMeeting": "회의 보기",
@@ -953,12 +953,12 @@
   },
   "upcomingToast": {
     "startsIn": "{{title}}이(가) {{minutes}}분 후에 시작해요",
-    "willTranscribe": "통화에 참여하면 Aguacate가 자동으로 전사를 시작해요.",
+    "willTranscribe": "통화에 참여하면 Jotva가 자동으로 전사를 시작해요.",
     "join": "참여",
     "dismiss": "닫기"
   },
   "pdf": {
-    "eyebrow": "Aguacate — 회의 노트",
+    "eyebrow": "Jotva — 회의 노트",
     "execSummary": "요약",
     "keyDiscussions": "주요 논의",
     "decisionsMade": "결정 사항",
@@ -970,7 +970,7 @@
     "nextSteps": "다음 단계",
     "complianceFlags": "컴플라이언스 플래그",
     "noneIdentified": "발견된 사항 없음",
-    "generatedBy": "Aguacate에서 생성됨",
+    "generatedBy": "Jotva에서 생성됨",
     "participantCount_other": "참가자 {{count}}명"
   }
 }

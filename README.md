@@ -1,8 +1,8 @@
-# Aguacate
+# Jotva
 
 **AI meeting notes. No bot. No cloud.**
 
-Aguacate is a local-first AI meeting intelligence app for macOS. It records meetings
+Jotva is a local-first AI meeting intelligence app for macOS. It records meetings
 on-device, transcribes them locally with Whisper, has Claude write structured
 executive notes, and surfaces cross-meeting intelligence: actions, decisions,
 topics, and people.
@@ -24,7 +24,7 @@ Anthropic API to generate notes.
 - Node 20+ and Python 3.11 or 3.12 (`brew install python@3.11` / `winget install Python.Python.3.11`)
 - An Anthropic API key (entered in Settings → AI, stored in the OS keychain)
 - System audio: macOS uses [BlackHole](https://existential.audio/blackhole/)
-  (optional, free); **Windows needs nothing** — Aguacate taps WASAPI loopback natively
+  (optional, free); **Windows needs nothing** — Jotva taps WASAPI loopback natively
 
 ## Setup
 
@@ -44,8 +44,8 @@ npm run dev
 
 Installers (signed-ready; add your certs/identity to sign):
 ```bash
-npm run dist:mac     # → release/Aguacate-*.dmg
-npm run dist:win     # → release/Aguacate-Setup-*.exe (NSIS, x64 + arm64)
+npm run dist:mac     # → release/Jotva-*.dmg
+npm run dist:win     # → release/Jotva-Setup-*.exe (NSIS, x64 + arm64)
 ```
 
 First launch: open **Settings → AI** and paste your Anthropic API key.
@@ -59,7 +59,7 @@ toggle in Settings → Recording, and a global **⌘/Ctrl+Shift+R** record short
 ### Calendar auto-record (optional)
 
 Copy `credentials.example.json` to
-`~/Library/Application Support/Aguacate/credentials.json` and add your own
+`~/Library/Application Support/Jotva/credentials.json` and add your own
 **public** OAuth client IDs (PKCE — no client secrets are ever stored or
 shipped). Apple Calendar needs no setup — just enable it in Settings.
 
@@ -69,13 +69,13 @@ shipped). Apple Calendar needs no setup — just enable it in Settings.
 |---|---|
 | No secrets in build | No `extraResources`; electron-builder excludes `credentials*.json` and `.env*`; PKCE-only OAuth |
 | Backend auth | Random per-launch token, handed to renderer via IPC only; required on every route; WS requires token + Origin check |
-| CORS / rebinding | Explicit origin allowlist (dev server + `app://aguacate`); Host-header allowlist middleware |
+| CORS / rebinding | Explicit origin allowlist (dev server + `app://jotva`); Host-header allowlist middleware |
 | XSS | Markdown parsed into React elements — zero `innerHTML` / `dangerouslySetInnerHTML` |
 | File permissions | Data dir `700`; DB, audio, transcripts, notes, exports `600` |
 | IPC | `contextIsolation` + `sandbox` on; `openExternal` allowlisted to https/http/mailto; `showItemInFolder` restricted to the data dir |
 | Rate limiting | Token buckets per route class (license, recording, calendar sync, notes) |
 | Error handling | Generic 500s externally; tracebacks logged server-side only |
-| OAuth | PKCE with single-use CSRF state + 10-min TTL; `aguacate://` protocol registered |
+| OAuth | PKCE with single-use CSRF state + 10-min TTL; `jotva://` protocol registered |
 | Secrets at rest | macOS Keychain via `keyring` for API keys, tokens, webhooks |
 
 ## License tiers

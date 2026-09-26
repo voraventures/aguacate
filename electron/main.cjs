@@ -1,4 +1,4 @@
-// Aguacate Electron main process (macOS + Windows).
+// Jotva Electron main process (macOS + Windows).
 // Spawns the Python backend, reads the {port, token} handshake from stdout,
 // and exposes it to the renderer over IPC only (C2). Hardened window (C6).
 const {
@@ -26,7 +26,7 @@ const IS_DEV = !app.isPackaged;
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
 const IS_WIN = process.platform === "win32";
 const PROJECT_ROOT = path.join(__dirname, "..");
-const DATA_DIR = path.join(app.getPath("appData"), "Aguacate");
+const DATA_DIR = path.join(app.getPath("appData"), "Jotva");
 
 // ---------- native-UI localization ----------
 // English is loaded as the base/fallback at startup; applyLocale() overlays the
@@ -61,7 +61,7 @@ let backendInfo = null; // { port, token }
 let isQuitting = false;
 const pendingBackendWaiters = [];
 // Preserve the backend's existing data location, including its legacy Windows path.
-const speakerDataDir = process.env.AGUACATE_DATA_DIR || path.join(app.getPath('home'), 'Library', 'Application Support', 'Aguacate');
+const speakerDataDir = process.env.JOTVA_DATA_DIR || path.join(app.getPath('home'), 'Library', 'Application Support', 'Jotva');
 const speakerIntegration = require('./speakers.cjs')({app, systemPreferences, shell, getInfo: () => backendInfo, resolveBackend, dataDir: speakerDataDir});
 app.on('before-quit', () => speakerIntegration.stop());
 
@@ -72,17 +72,17 @@ if (!gotLock) {
 }
 app.on("second-instance", (_event, argv) => {
   showWindow();
-  // On Windows the aguacate:// URL arrives in the second instance's argv.
-  const link = argv.find((a) => typeof a === "string" && a.startsWith("aguacate://"));
+  // On Windows the jotva:// URL arrives in the second instance's argv.
+  const link = argv.find((a) => typeof a === "string" && a.startsWith("jotva://"));
   if (link && mainWindow) {
-    mainWindow.webContents.send("aguacate:deep-link", link.slice(0, 2048));
+    mainWindow.webContents.send("jotva:deep-link", link.slice(0, 2048));
   }
 });
 
 // ---------- backend lifecycle ----------
 function resolveBackend() {
   if (app.isPackaged) {
-    const bundled = path.join(process.resourcesPath, "backend", "dist", "aguacate-backend", IS_WIN ? "aguacate-backend.exe" : "aguacate-backend");
+    const bundled = path.join(process.resourcesPath, "backend", "dist", "jotva-backend", IS_WIN ? "jotva-backend.exe" : "jotva-backend");
     if (fs.existsSync(bundled)) return { exe: bundled, useExe: true };
   }
   // Dev fallback: use .venv python
@@ -100,7 +100,7 @@ function startBackend() {
     cwd: useExe ? path.dirname(exe) : path.join(PROJECT_ROOT, "backend"),
     // DEV ONLY: signal dev mode to the backend so it can register
     // developer-testing endpoints (never set true in packaged builds).
-    env: { ...process.env, PYTHONUNBUFFERED: "1", AGUACATE_DEV: IS_DEV ? "1" : "0" },
+    env: { ...process.env, PYTHONUNBUFFERED: "1", JOTVA_DEV: IS_DEV ? "1" : "0" },
     stdio: ["ignore", "pipe", "pipe"],
     windowsHide: true,
   });
@@ -164,7 +164,7 @@ function createWindow() {
     height: 860,
     minWidth: 900,
     minHeight: 600,
-    title: "Aguacate",
+    title: "Jotva",
     icon: path.join(__dirname, "assets", process.platform === "win32" ? "icon.ico" : "icon.png"),
     backgroundColor: "#fbfaf6",
     ...platformChrome,
@@ -188,7 +188,7 @@ function createWindow() {
   if (IS_DEV) {
     mainWindow.loadURL("http://localhost:5173");
   } else {
-    mainWindow.loadURL("app://aguacate/index.html");
+    mainWindow.loadURL("app://jotva/index.html");
   }
 
   // Closing hides to tray; Quit (tray/menu/Cmd+Q) really exits.
@@ -242,7 +242,7 @@ function applyContentSecurityPolicy() {
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' app:; " +
     "style-src 'self' 'unsafe-inline' app:; " +
-    "connect-src 'self' app: http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* https://license.aguacatenotes.com; " +
+    "connect-src 'self' app: http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* https://license.jotva.com; " +
     // Audio playback from the local backend — must match index.html's meta CSP,
     // since the effective policy is the stricter of the two.
     "media-src 'self' http://127.0.0.1:* http://localhost:*";
@@ -296,7 +296,7 @@ function createTray() {
 // ---------- global shortcut ----------
 function sendShortcut(name) {
   if (mainWindow) {
-    mainWindow.webContents.send("aguacate:shortcut", name);
+    mainWindow.webContents.send("jotva:shortcut", name);
   }
 }
 
@@ -344,13 +344,13 @@ function setTrayRecording(recording) {
   }
 }
 
-ipcMain.handle("aguacate:recording-state", (_event, recording) => {
+ipcMain.handle("jotva:recording-state", (_event, recording) => {
   if (typeof recording !== "boolean") return { ok: false };
   setTrayRecording(recording);
   return { ok: true };
 });
 
-ipcMain.handle('aguacate:speaker-setup', (_event, action) => {
+ipcMain.handle('jotva:speaker-setup', (_event, action) => {
   if (!['status', 'zoom', 'meet'].includes(action)) return {error: 'invalid_action'};
   try { return action === 'status' ? speakerIntegration.status() : speakerIntegration.setup(action); }
   catch { return {error: 'setup_failed'}; }
@@ -371,13 +371,13 @@ function registerShortcuts() {
 }
 
 // ---------- IPC (all inputs validated, C6) ----------
-ipcMain.handle("aguacate:get-backend", async () => {
+ipcMain.handle("jotva:get-backend", async () => {
   const info = await getBackendInfo();
   return { port: info.port, token: info.token };
 });
 
 const SAFE_EXTERNAL = /^(https:|http:|mailto:)/i;
-ipcMain.handle("aguacate:open-external", async (_event, url) => {
+ipcMain.handle("jotva:open-external", async (_event, url) => {
   if (typeof url !== "string" || url.length > 2048 || !SAFE_EXTERNAL.test(url)) {
     return { ok: false, error: "Blocked URL" };
   }
@@ -385,14 +385,14 @@ ipcMain.handle("aguacate:open-external", async (_event, url) => {
   return { ok: true };
 });
 
-ipcMain.handle("aguacate:show-in-folder", async (_event, filePath) => {
+ipcMain.handle("jotva:show-in-folder", async (_event, filePath) => {
   if (typeof filePath !== "string" || filePath.length > 1024) {
     return { ok: false, error: "Invalid path" };
   }
   const resolved = path.resolve(filePath);
   // Sandbox: only files inside our data directory may be revealed (C6).
   if (!resolved.startsWith(DATA_DIR + path.sep)) {
-    return { ok: false, error: "Path outside Aguacate data directory" };
+    return { ok: false, error: "Path outside Jotva data directory" };
   }
   if (!fs.existsSync(resolved)) {
     return { ok: false, error: "File not found" };
@@ -406,7 +406,7 @@ ipcMain.handle("aguacate:show-in-folder", async (_event, filePath) => {
 // Chromium itself, so the export matches the HTML/CSS template exactly
 // instead of a separate PDF-drawing library re-implementing the design.
 const EXPORTS_DIR = path.join(DATA_DIR, "exports");
-ipcMain.handle("aguacate:export-pdf", async (event, filename) => {
+ipcMain.handle("jotva:export-pdf", async (event, filename) => {
   if (typeof filename !== "string" || filename.length > 120) {
     return { ok: false, error: "Invalid filename" };
   }
@@ -431,7 +431,7 @@ ipcMain.handle("aguacate:export-pdf", async (event, filename) => {
 });
 
 const WINDOW_ACTIONS = new Set(["minimize", "maximize", "close"]);
-ipcMain.handle("aguacate:window-control", (_event, action) => {
+ipcMain.handle("jotva:window-control", (_event, action) => {
   if (typeof action !== "string" || !WINDOW_ACTIONS.has(action) || !mainWindow) {
     return { ok: false };
   }
@@ -443,7 +443,7 @@ ipcMain.handle("aguacate:window-control", (_event, action) => {
   return { ok: true };
 });
 
-ipcMain.handle("aguacate:notify", (_event, title, body) => {
+ipcMain.handle("jotva:notify", (_event, title, body) => {
   if (
     typeof title !== "string" ||
     typeof body !== "string" ||
@@ -460,7 +460,7 @@ ipcMain.handle("aguacate:notify", (_event, title, body) => {
   return { ok: true };
 });
 
-ipcMain.handle("aguacate:get-auto-launch", () => {
+ipcMain.handle("jotva:get-auto-launch", () => {
   try {
     return { enabled: app.getLoginItemSettings().openAtLogin === true };
   } catch {
@@ -468,7 +468,7 @@ ipcMain.handle("aguacate:get-auto-launch", () => {
   }
 });
 
-ipcMain.handle("aguacate:set-auto-launch", (_event, enabled) => {
+ipcMain.handle("jotva:set-auto-launch", (_event, enabled) => {
   if (typeof enabled !== "boolean") return { ok: false };
   try {
     app.setLoginItemSettings({ openAtLogin: enabled, path: process.execPath });
@@ -479,13 +479,13 @@ ipcMain.handle("aguacate:set-auto-launch", (_event, enabled) => {
 });
 
 // ---------- app lifecycle ----------
-app.setAsDefaultProtocolClient("aguacate"); // license/Stripe callbacks (C9)
+app.setAsDefaultProtocolClient("jotva"); // license/Stripe callbacks (C9)
 
 app.on("open-url", (event, url) => {
   event.preventDefault();
-  // macOS deep links: aguacate://license/activated etc.
-  if (mainWindow && typeof url === "string" && url.startsWith("aguacate://")) {
-    mainWindow.webContents.send("aguacate:deep-link", url.slice(0, 2048));
+  // macOS deep links: jotva://license/activated etc.
+  if (mainWindow && typeof url === "string" && url.startsWith("jotva://")) {
+    mainWindow.webContents.send("jotva:deep-link", url.slice(0, 2048));
   }
 });
 

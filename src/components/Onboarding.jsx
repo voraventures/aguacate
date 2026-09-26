@@ -42,7 +42,7 @@ export default function Onboarding({ onDone }) {
   const { refreshMeetings, selectMeeting, showToast } = useStore();
   const [loading, setLoading] = useState(false);
 
-  const markOnboarded = () => localStorage.setItem("aguacate_onboarded", "true");
+  const markOnboarded = () => localStorage.setItem("jotva_onboarded", "true");
 
   const loadDemo = () => {
     setLoading(true);

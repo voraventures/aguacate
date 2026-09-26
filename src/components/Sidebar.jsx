@@ -1,4 +1,4 @@
-// Left rail — recreated from design-reference/AguacateChrome.dc.html: wordmark,
+// Left rail — recreated from design-reference/JotvaChrome.dc.html: wordmark,
 // Record button, the auto-record card, a minimal nav (Meetings/Digest), Settings,
 // user chip. Nav is intentionally minimal per the design spec — Today/Library/
 // Search/Meeting Zero were cut as redundant/undefined; search now lives in the
@@ -96,7 +96,7 @@ export default function Sidebar() {
     <aside className="rail">
       <div className="rail-logo">
         <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" />
-        Aguacate
+        Jotva
       </div>
 
       <nav className="rail-nav" data-tour="nav-section">

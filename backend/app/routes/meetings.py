@@ -241,7 +241,7 @@ def create_share(meeting_id: str):
     )
     db.commit()
     return {
-        "share_url": f"aguacate://share/{token}",
+        "share_url": f"jotva://share/{token}",
         "token": token,
         "expires_at": expires.isoformat(),
     }

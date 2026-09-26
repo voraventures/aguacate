@@ -121,13 +121,13 @@ def apple_toggle(body: AppleToggle):
 
 
 _CALLBACK_HTML = """<!doctype html><html><head><meta charset="utf-8">
-<title>Aguacate</title>
+<title>Jotva</title>
 <style>body{font-family:-apple-system,sans-serif;display:flex;align-items:center;
 justify-content:center;height:100vh;background:#fbfaf6;color:#1e281d}
 .card{text-align:center;padding:40px;border-radius:16px;background:#fff;
 box-shadow:0 4px 24px rgba(30,40,29,.08)}h1{color:#3f8b45;font-size:22px}</style>
 </head><body><div class="card"><h1>{title}</h1><p>{message}</p>
-<p>You can close this tab and return to Aguacate.</p></div></body></html>"""
+<p>You can close this tab and return to Jotva.</p></div></body></html>"""
 
 
 @oauth_router.get("/oauth/google/callback")
@@ -153,6 +153,6 @@ def google_callback(
     hub.emit("google_connected", {})
     sync.sync_now()
     html = _CALLBACK_HTML.replace("{title}", "Google Calendar connected").replace(
-        "{message}", "Aguacate will now watch this calendar for meetings."
+        "{message}", "Jotva will now watch this calendar for meetings."
     )
     return HTMLResponse(html)

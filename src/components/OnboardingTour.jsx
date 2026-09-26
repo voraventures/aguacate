@@ -89,8 +89,8 @@ export default function OnboardingTour({ onComplete }) {
   });
 
   const finish = useCallback(() => {
-    localStorage.setItem("aguacate_onboarded", "true");
-    localStorage.setItem("aguacate_tour_done", "true");
+    localStorage.setItem("jotva_onboarded", "true");
+    localStorage.setItem("jotva_tour_done", "true");
     onComplete?.();
   }, [onComplete]);
 

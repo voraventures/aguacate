@@ -1,14 +1,14 @@
-"""Paths, data-directory setup, and runtime configuration for Aguacate."""
+"""Paths, data-directory setup, and runtime configuration for Jotva."""
 import json
 import os
 import stat
 from pathlib import Path
 
-APP_NAME = "Aguacate"
+APP_NAME = "Jotva"
 
 DATA_DIR = Path(
     os.environ.get(
-        "AGUACATE_DATA_DIR",
+        "JOTVA_DATA_DIR",
         Path.home() / "Library" / "Application Support" / APP_NAME,
     )
 )
@@ -17,14 +17,14 @@ TRANSCRIPTS_DIR = DATA_DIR / "transcripts"
 NOTES_DIR = DATA_DIR / "notes"
 EXPORTS_DIR = DATA_DIR / "exports"
 LOGS_DIR = DATA_DIR / "logs"
-DB_PATH = DATA_DIR / "aguacate.db"
+DB_PATH = DATA_DIR / "jotva.db"
 
 # Origins allowed to talk to the backend. Dev server + packaged custom protocol.
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "app://aguacate",
-    "aguacate-ios://app",  # Mobile companion app
+    "app://jotva",
+    "jotva-ios://app",  # Mobile companion app
 ]
 # Host headers we accept (DNS-rebinding defense). Port is appended at startup.
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
@@ -32,16 +32,16 @@ ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 # Default to the cheapest current model that is accurate for structured notes
 # extraction (~$0.025/meeting-hour). Users with their own key can pick another
 # model in Settings; the bundled proxy allows haiku-4-5 and sonnet-5.
-CLAUDE_MODEL = os.environ.get("AGUACATE_CLAUDE_MODEL", "claude-haiku-4-5")
-DEFAULT_AI_PROVIDER = os.environ.get("AGUACATE_AI_PROVIDER", "anthropic")
-DEFAULT_OPENAI_MODEL = os.environ.get("AGUACATE_OPENAI_MODEL", "gpt-4o")
-DEFAULT_GEMINI_MODEL = os.environ.get("AGUACATE_GEMINI_MODEL", "gemini-2.0-flash")
+CLAUDE_MODEL = os.environ.get("JOTVA_CLAUDE_MODEL", "claude-haiku-4-5")
+DEFAULT_AI_PROVIDER = os.environ.get("JOTVA_AI_PROVIDER", "anthropic")
+DEFAULT_OPENAI_MODEL = os.environ.get("JOTVA_OPENAI_MODEL", "gpt-4o")
+DEFAULT_GEMINI_MODEL = os.environ.get("JOTVA_GEMINI_MODEL", "gemini-2.0-flash")
 # Default to "small": measurably better on names/numbers than "base" for a modest
 # speed cost (~9s extra per 3 min of audio on Apple Silicon). A user's explicit
 # whisper_model setting still overrides this.
-WHISPER_MODEL = os.environ.get("AGUACATE_WHISPER_MODEL", "small")
+WHISPER_MODEL = os.environ.get("JOTVA_WHISPER_MODEL", "small")
 LICENSE_SERVER_URL = os.environ.get(
-    "AGUACATE_LICENSE_SERVER", "https://license.aguacatenotes.com/api"
+    "JOTVA_LICENSE_SERVER", "https://license.jotva.com/api"
 )
 # Bundled-AI proxy base URL. The Anthropic SDK appends /v1/messages; the proxy
 # authenticates by install_id and holds the real API key server-side.
@@ -50,7 +50,7 @@ AI_PROXY_URL = LICENSE_SERVER_URL + "/ai"
 # Public half of the license-signing keypair. Licenses fetched from the license
 # server are only trusted if their RSA-SHA256 signature verifies against this
 # key AND they name this install AND they have not expired — so neither a spoofed
-# AGUACATE_LICENSE_SERVER nor a MITM'd response can grant Pro.
+# JOTVA_LICENSE_SERVER nor a MITM'd response can grant Pro.
 LICENSE_PUBLIC_KEY_PEM = """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo/bfN5nkOUQn1TKSGLYL
 XRaoWvF0tqni5b3EV+yEl4mJRxQApCg8OcOKjT5d+v40q4j5Ih4yG5nkQ4auEkIL
@@ -61,7 +61,7 @@ Oz4dBfqqeSwFsew5nKqxAuFviT7mkqPsD8Lug1pQIvLD+ITaXJ3FAAnrWPqYwfY2
 NQIDAQAB
 -----END PUBLIC KEY-----"""
 STRIPE_CHECKOUT_URL = os.environ.get(
-    "AGUACATE_CHECKOUT_URL", "https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04"
+    "JOTVA_CHECKOUT_URL", "https://buy.stripe.com/cNieVf0mZ0iN7ml6AL6sw04"
 )
 FREE_TIER_LIMIT = 5
 
@@ -71,7 +71,7 @@ FREE_TIER_LIMIT = 5
 # environment variables are deliberately not consulted.
 DEV_MODE = (
     os.environ.get("DEV_MODE", "").lower() == "true"
-    or os.environ.get("AGUACATE_DEV") == "1"
+    or os.environ.get("JOTVA_DEV") == "1"
 )
 
 # OAuth client config is user-supplied (never bundled). See credentials.example.json.

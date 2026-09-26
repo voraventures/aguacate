@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from ..config import DATA_DIR, DB_PATH, EXPORTS_DIR, NOTES_DIR, TRANSCRIPTS_DIR, secure_file
 
-log = logging.getLogger("aguacate.vault")
+log = logging.getLogger("jotva.vault")
 
 MAGIC = b"AGUAVAULT1"
 ITERATIONS = 600_000
@@ -37,7 +37,7 @@ def export_vault(password: str, include_audio: bool = False) -> str:
 
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tar:
-        tar.add(DB_PATH, arcname="aguacate.db")
+        tar.add(DB_PATH, arcname="jotva.db")
         for directory, name in ((NOTES_DIR, "notes"), (TRANSCRIPTS_DIR, "transcripts")):
             if directory.exists():
                 tar.add(directory, arcname=name)
@@ -50,7 +50,7 @@ def export_vault(password: str, include_audio: bool = False) -> str:
     token = Fernet(_derive_key(password, salt)).encrypt(buf.getvalue())
 
     stamp = time.strftime("%Y-%m-%d")
-    path = EXPORTS_DIR / f"aguacate-vault-{stamp}.aguavault"
+    path = EXPORTS_DIR / f"jotva-vault-{stamp}.aguavault"
     with open(path, "wb") as f:
         f.write(MAGIC + salt + token)
     secure_file(path)
@@ -65,7 +65,7 @@ def import_vault(path: str, password: str) -> int:
     with open(path, "rb") as f:
         raw = f.read()
     if not raw.startswith(MAGIC):
-        raise RuntimeError("Not an Aguacate vault file")
+        raise RuntimeError("Not an Jotva vault file")
     salt, token = raw[len(MAGIC) : len(MAGIC) + 16], raw[len(MAGIC) + 16 :]
     try:
         payload = Fernet(_derive_key(password, salt)).decrypt(token)

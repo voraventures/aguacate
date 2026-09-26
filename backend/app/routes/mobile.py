@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from ..db import get_db, new_id, now_iso, row_to_dict
 
-log = logging.getLogger("aguacate.mobile")
+log = logging.getLogger("jotva.mobile")
 
 router = APIRouter(prefix="/api/mobile", tags=["mobile"])
 

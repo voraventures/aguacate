@@ -11,7 +11,7 @@ import zh from "./locales/zh/translation.json";
 import ko from "./locales/ko/translation.json";
 
 export const SUPPORTED = ["en", "es", "pt", "fr", "zh", "ko"];
-const STORAGE_KEY = "aguacate_language";
+const STORAGE_KEY = "jotva_language";
 
 const resources = {
   en: { translation: en },

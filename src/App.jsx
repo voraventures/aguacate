@@ -18,7 +18,7 @@ import Titlebar from "./components/Titlebar.jsx";
 import UpcomingToast from "./components/UpcomingToast.jsx";
 import { DigestView, MeetingZeroView, SearchView, TodayView } from "./components/Views.jsx";
 
-const platform = window.aguacate?.platform || "darwin";
+const platform = window.jotva?.platform || "darwin";
 const MIN_LIST = 260;
 const MAX_LIST = 480;
 
@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    console.error("[Aguacate] Render error caught by ErrorBoundary:", error, info);
+    console.error("[Jotva] Render error caught by ErrorBoundary:", error, info);
   }
 
   render() {
@@ -41,7 +41,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="boot">
           <div className="logo">
-            <img className="logo-img" src={this.props.logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Aguacate</span>
+            <img className="logo-img" src={this.props.logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Jotva</span>
           </div>
           <h2 style={{ margin: "16px 0 4px", fontSize: 18, fontWeight: 600, color: "var(--text)" }}>
             {i18n.t("app.error.title")}
@@ -62,7 +62,7 @@ export default function App() {
   const { ready, connectionFailed, nav, toasts, dismissToast } = useStore();
   const logoUrl = useLogo();
   const [listWidth, setListWidth] = useState(() => {
-    const saved = Number(localStorage.getItem("aguacate_list_width"));
+    const saved = Number(localStorage.getItem("jotva_list_width"));
     return saved >= MIN_LIST && saved <= MAX_LIST ? saved : 300;
   });
   const [dragging, setDragging] = useState(false);
@@ -70,13 +70,13 @@ export default function App() {
   const dragRef = useRef(null);
 
   // Start the interactive tour once the app is ready and the welcome onboarding
-  // has been completed (separate "aguacate_tour_done" flag so the tour and the
+  // has been completed (separate "jotva_tour_done" flag so the tour and the
   // welcome screen never fight over a single flag).
   useEffect(() => {
     if (!ready) return undefined;
-    if (localStorage.getItem("aguacate_tour_done") === "true") return undefined;
+    if (localStorage.getItem("jotva_tour_done") === "true") return undefined;
     const tryStart = () => {
-      if (localStorage.getItem("aguacate_onboarded") === "true") {
+      if (localStorage.getItem("jotva_onboarded") === "true") {
         setTourActive(true);
         return true;
       }
@@ -107,7 +107,7 @@ export default function App() {
         window.removeEventListener("mouseup", onUp);
         setDragging(false);
         const w = Math.min(MAX_LIST, Math.max(MIN_LIST, startW + ev.clientX - startX));
-        localStorage.setItem("aguacate_list_width", String(w));
+        localStorage.setItem("jotva_list_width", String(w));
       };
       window.addEventListener("mousemove", onMove);
       window.addEventListener("mouseup", onUp);
@@ -119,7 +119,7 @@ export default function App() {
     return (
       <div className="boot">
         <div className="logo">
-          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Aguacate</span>
+          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Jotva</span>
         </div>
         <div className="boot-sub">{t("app.engine.unreachable")}</div>
       </div>
@@ -130,7 +130,7 @@ export default function App() {
     return (
       <div className="boot">
         <div className="logo">
-          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Aguacate</span>
+          <img className="logo-img" src={logoUrl} alt="" aria-hidden="true" /> <span className="brand-wordmark brand-wordmark-large">Jotva</span>
         </div>
         <div className="processing-ring" />
         <div className="boot-sub">{t("app.engine.starting")}</div>

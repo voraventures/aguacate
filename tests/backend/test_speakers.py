@@ -7,7 +7,7 @@ from types import SimpleNamespace as NS
 import json
 import wave
 
-os.environ['AGUACATE_DATA_DIR'] = tempfile.mkdtemp(prefix='aguacate-speaker-tests-')
+os.environ['JOTVA_DATA_DIR'] = tempfile.mkdtemp(prefix='jotva-speaker-tests-')
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'backend'))
 import pytest
 import numpy as np

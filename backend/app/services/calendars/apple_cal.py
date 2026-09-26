@@ -4,7 +4,7 @@ import logging
 import subprocess
 from datetime import datetime, timedelta, timezone
 
-log = logging.getLogger("aguacate.applecal")
+log = logging.getLogger("jotva.applecal")
 
 # JXA script: today's window events from all local calendars as JSON.
 #

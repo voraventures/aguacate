@@ -8,7 +8,7 @@ import vm from 'node:vm';
 import {build} from 'esbuild';
 import {transcriptText} from '../src/transcriptText.js';
 const require=createRequire(import.meta.url);
-const {JSDOM}=require(join(process.env.AGUACATE_TEST_DEPS,'node_modules/jsdom'));
+const {JSDOM}=require(join(process.env.JOTVA_TEST_DEPS,'node_modules/jsdom'));
 
 test('transcript copy/download retain names, timestamps and text',()=>{
  const data={_segments:[{speaker:'Maya',start:65,text:'First turn.'},{speaker:'Room 4',start:70,text:'Second turn.'},{text:'Unknown.',start:NaN}]};
@@ -20,11 +20,11 @@ test('Meet adapter abstains without explicit speaking semantics',async()=>{
  const dom=new JSDOM('<div data-participant-id="p1" data-participant-name="Maya"></div><div data-participant-id="p2" data-participant-name="Room 4" data-is-speaking="true"></div>');
  const context={document:dom.window.document};vm.createContext(context);
  vm.runInContext(await readFile('extensions/meet/adapter.js','utf8'),context);
- assert.deepEqual(JSON.parse(JSON.stringify(context.AguacateMeetAdapter.read())),[{id:'p2',name:'Room 4'}]);
+ assert.deepEqual(JSON.parse(JSON.stringify(context.JotvaMeetAdapter.read())),[{id:'p2',name:'Room 4'}]);
  dom.window.document.querySelector('[data-participant-id=p2]').setAttribute('data-participant-name','Renamed room');
- assert.equal(context.AguacateMeetAdapter.read()[0].name,'Renamed room');
+ assert.equal(context.JotvaMeetAdapter.read()[0].name,'Renamed room');
  dom.window.document.querySelector('[data-participant-id=p2]').removeAttribute('data-is-speaking');
- assert.equal(context.AguacateMeetAdapter.read().length,0);
+ assert.equal(context.JotvaMeetAdapter.read().length,0);
  dom.window.close();
 });
 
@@ -44,7 +44,7 @@ for(const state of ['speakers','speakers-failed']) test(`named transcript, timel
  for(const name of ['window','document','location','localStorage','HTMLElement','Node','Event','MouseEvent','KeyboardEvent','requestAnimationFrame','cancelAnimationFrame'])Object.defineProperty(globalThis,name,{configurable:true,value:dom.window[name]});
  Object.defineProperty(globalThis,'navigator',{configurable:true,value:dom.window.navigator});
  dom.window.HTMLElement.prototype.scrollTo=()=>{};dom.window.HTMLElement.prototype.scrollIntoView=()=>{};
- const output=join(await mkdtemp(join(tmpdir(),'aguacate-speaker-dom-')),'preview.cjs');
+ const output=join(await mkdtemp(join(tmpdir(),'jotva-speaker-dom-')),'preview.cjs');
  await build({entryPoints:[resolve('tests/visual/preview.jsx')],outfile:output,bundle:true,platform:'node',format:'cjs',loader:{'.css':'empty','.svg':'text','.woff2':'empty'},define:{'import.meta.env.DEV':'true'},logLevel:'silent'});
  globalThis.IS_REACT_ACT_ENVIRONMENT=false;
  const {act,previewRoot}=require(output);await new Promise(r=>setTimeout(r,80));globalThis.IS_REACT_ACT_ENVIRONMENT=true;

@@ -351,7 +351,7 @@ export function MeetingZeroView() {
   );
 }
 
-/* ---------- Digest — Aguacate Meeting.dc.html #5j ----------
+/* ---------- Digest — Jotva Meeting.dc.html #5j ----------
    Auto-generated rollup: real meetings/topics/actions/decisions in the
    period, reusing the Overview recipe (.summary-hero, .ov-*) rather than
    a new visual system, per the design spec's own "reuse that recipe here". */

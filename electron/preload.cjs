@@ -5,48 +5,48 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 const VALID_WINDOW_ACTIONS = new Set(["minimize", "maximize", "close"]);
 
-contextBridge.exposeInMainWorld("aguacate", {
+contextBridge.exposeInMainWorld("jotva", {
   platform: process.platform, // 'darwin' | 'win32' | 'linux'
-  speakerSetup: action => ['status', 'zoom', 'meet'].includes(action) ? ipcRenderer.invoke('aguacate:speaker-setup', action) : Promise.resolve({error: 'invalid_action'}),
+  speakerSetup: action => ['status', 'zoom', 'meet'].includes(action) ? ipcRenderer.invoke('jotva:speaker-setup', action) : Promise.resolve({error: 'invalid_action'}),
 
-  getBackend: () => ipcRenderer.invoke("aguacate:get-backend"),
+  getBackend: () => ipcRenderer.invoke("jotva:get-backend"),
 
   openExternal: (url) => {
     if (typeof url !== "string") return Promise.resolve({ ok: false });
-    return ipcRenderer.invoke("aguacate:open-external", url);
+    return ipcRenderer.invoke("jotva:open-external", url);
   },
 
   showInFolder: (filePath) => {
     if (typeof filePath !== "string") return Promise.resolve({ ok: false });
-    return ipcRenderer.invoke("aguacate:show-in-folder", filePath);
+    return ipcRenderer.invoke("jotva:show-in-folder", filePath);
   },
 
   exportPdf: (filename) => {
     if (typeof filename !== "string") return Promise.resolve({ ok: false });
-    return ipcRenderer.invoke("aguacate:export-pdf", filename);
+    return ipcRenderer.invoke("jotva:export-pdf", filename);
   },
 
   windowControl: (action) => {
     if (!VALID_WINDOW_ACTIONS.has(action)) return Promise.resolve({ ok: false });
-    return ipcRenderer.invoke("aguacate:window-control", action);
+    return ipcRenderer.invoke("jotva:window-control", action);
   },
 
   notify: (title, body) => {
     if (typeof title !== "string" || typeof body !== "string") {
       return Promise.resolve({ ok: false });
     }
-    return ipcRenderer.invoke("aguacate:notify", title, body);
+    return ipcRenderer.invoke("jotva:notify", title, body);
   },
 
   setRecordingState: (recording) => {
     if (typeof recording !== "boolean") return Promise.resolve({ ok: false });
-    return ipcRenderer.invoke("aguacate:recording-state", recording);
+    return ipcRenderer.invoke("jotva:recording-state", recording);
   },
 
-  getAutoLaunch: () => ipcRenderer.invoke("aguacate:get-auto-launch"),
+  getAutoLaunch: () => ipcRenderer.invoke("jotva:get-auto-launch"),
   setAutoLaunch: (enabled) => {
     if (typeof enabled !== "boolean") return Promise.resolve({ ok: false });
-    return ipcRenderer.invoke("aguacate:set-auto-launch", enabled);
+    return ipcRenderer.invoke("jotva:set-auto-launch", enabled);
   },
 
   onShortcut: (callback) => {
@@ -54,14 +54,14 @@ contextBridge.exposeInMainWorld("aguacate", {
     const handler = (_event, name) => {
       if (typeof name === "string") callback(name);
     };
-    ipcRenderer.on("aguacate:shortcut", handler);
-    return () => ipcRenderer.removeListener("aguacate:shortcut", handler);
+    ipcRenderer.on("jotva:shortcut", handler);
+    return () => ipcRenderer.removeListener("jotva:shortcut", handler);
   },
 
   onDeepLink: (callback) => {
     if (typeof callback !== "function") return () => {};
     const handler = (_event, url) => callback(url);
-    ipcRenderer.on("aguacate:deep-link", handler);
-    return () => ipcRenderer.removeListener("aguacate:deep-link", handler);
+    ipcRenderer.on("jotva:deep-link", handler);
+    return () => ipcRenderer.removeListener("jotva:deep-link", handler);
   },
 });

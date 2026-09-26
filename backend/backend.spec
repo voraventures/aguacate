@@ -1,8 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for the Aguacate FastAPI backend.
+"""PyInstaller spec for the Jotva FastAPI backend.
 
-Produces a self-contained onedir bundle (backend/dist/aguacate-backend/, with the
-executable at backend/dist/aguacate-backend/aguacate-backend) so the app runs on
+Produces a self-contained onedir bundle (backend/dist/jotva-backend/, with the
+executable at backend/dist/jotva-backend/jotva-backend) so the app runs on
 any Mac without a Python install and launches instantly (no --onefile self-extract).
 """
 from PyInstaller.utils.hooks import collect_all, collect_submodules
@@ -82,7 +82,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="aguacate-backend",
+    name="jotva-backend",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -104,5 +104,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="aguacate-backend",
+    name="jotva-backend",
 )

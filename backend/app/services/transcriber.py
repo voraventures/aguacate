@@ -12,7 +12,7 @@ from ..config import TRANSCRIPTS_DIR, WHISPER_MODEL, write_secure_text
 from ..db import get_db, get_setting
 from ..events import hub
 
-log = logging.getLogger("aguacate.transcriber")
+log = logging.getLogger("jotva.transcriber")
 
 _model = None
 _model_lock = threading.Lock()

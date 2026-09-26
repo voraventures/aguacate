@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter
 
-log = logging.getLogger("aguacate.system")
+log = logging.getLogger("jotva.system")
 
 router = APIRouter(prefix="/api/system", tags=["system"])
 

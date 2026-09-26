@@ -1,5 +1,5 @@
 // The meeting workspace — header + tabs recreated from
-// design_handoff_aguacate_workspace/Aguacate Meeting.dc.html (#5i, canonical).
+// design_handoff_jotva_workspace/Jotva Meeting.dc.html (#5i, canonical).
 // Title is static (zero manual labor: nothing here is ever typed by the
 // user), a green-gradient summary hero dominates, then Actions/Decisions
 // (left, heavier) and Topics/Open Questions/Highlight (right, lighter).
@@ -211,7 +211,7 @@ export default function NotesPanel() {
   const [shareModal, setShareModal] = useState(null); // { url }
   const [showAllActions, setShowAllActions] = useState(false);
   const [onboarded, setOnboarded] = useState(
-    () => localStorage.getItem("aguacate_onboarded") === "true"
+    () => localStorage.getItem("jotva_onboarded") === "true"
   );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef(null);
@@ -346,11 +346,11 @@ export default function NotesPanel() {
       // Prints the live #pdf-print-root (design-reference/Meeting Note PDF.dc.html)
       // via Electron's own Chromium instead of the fpdf2 drawing library, so the
       // export matches the real HTML/CSS template exactly.
-      if (!window.aguacate?.exportPdf) {
+      if (!window.jotva?.exportPdf) {
         showToast(t("notes.toast.pdfDesktopOnly"), "error");
         return;
       }
-      window.aguacate
+      window.jotva
         .exportPdf(m.title)
         .then((res) => {
           if (!res?.ok) throw new Error(res?.error || "Export failed");
@@ -466,7 +466,7 @@ export default function NotesPanel() {
                 )}
               </span>
             )}
-            {/* Public share button removed: it minted aguacate:// URLs no recipient
+            {/* Public share button removed: it minted jotva:// URLs no recipient
                 could open (backend is loopback-only). Team sharing via the
                 workspace folder still works from the menu. */}
             <div className="row-menu" style={{ position: "relative", top: 0, right: 0 }} ref={menuRef}>

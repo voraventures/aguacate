@@ -1,6 +1,6 @@
 """Anonymous lifecycle telemetry — six events, nothing else.
 
-Contract (see vora-aguacate-license/AGUACATE_INSTRUMENTATION_SPEC.md and
+Contract (see vora-jotva-license/JOTVA_INSTRUMENTATION_SPEC.md and
 landing TELEMETRY_DISCLOSURE.md): no meeting content, no transcripts, no
 personal data ever. Fixed event enum, random install_id, user-disableable.
 Adding an event here requires updating the spec, FAQ, privacy policy, and
@@ -24,7 +24,7 @@ import httpx
 from ..config import LICENSE_SERVER_URL
 from ..db import get_setting, set_setting
 
-log = logging.getLogger("aguacate.telemetry")
+log = logging.getLogger("jotva.telemetry")
 
 EVENTS = frozenset({
     "app_first_run",

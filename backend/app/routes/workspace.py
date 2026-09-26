@@ -11,11 +11,11 @@ from pydantic import BaseModel, Field
 
 from ..db import get_db, get_setting, new_id, now_iso, row_to_dict
 
-log = logging.getLogger("aguacate.workspace")
+log = logging.getLogger("jotva.workspace")
 
 router = APIRouter(prefix="/api/workspace", tags=["workspace"])
 
-WORKSPACE_DIR = Path.home() / "Aguacate" / "workspace"
+WORKSPACE_DIR = Path.home() / "Jotva" / "workspace"
 
 # Polling thread for incoming shared meetings from network folder
 _poll_thread: threading.Thread | None = None

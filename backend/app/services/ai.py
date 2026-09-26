@@ -7,7 +7,7 @@ import re
 from ..db import get_db
 from .notes import current_model, get_client
 
-log = logging.getLogger("aguacate.ai")
+log = logging.getLogger("jotva.ai")
 
 TONES = {
     "professional": "professional and polished — courteous, direct, no fluff",

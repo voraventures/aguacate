@@ -6,7 +6,7 @@ const EXTENSION_ID = 'hjifgailamaffpncpidoechbgfpkekjg';
 module.exports = function createSpeakers({app, systemPreferences, shell, getInfo, resolveBackend, dataDir}) {
   let timer, busy = false, child, pending, buffer = '';
   const root = app.isPackaged ? process.resourcesPath : path.join(__dirname, '..');
-  const zoomPath = path.join(root, 'native', 'bin', 'aguacate-zoom-speakers');
+  const zoomPath = path.join(root, 'native', 'bin', 'jotva-zoom-speakers');
   const manifestPath = path.join(dataDir, 'speaker-native-host.json');
   async function request(action, body) {
     const info = getInfo();
@@ -74,27 +74,27 @@ module.exports = function createSpeakers({app, systemPreferences, shell, getInfo
   }
   function setupMeet() {
     fs.mkdirSync(dataDir, {recursive: true});
-    let executable = path.join(root, 'speaker-host', process.platform === 'win32' ? 'aguacate-speaker-host.exe' : 'aguacate-speaker-host');
+    let executable = path.join(root, 'speaker-host', process.platform === 'win32' ? 'jotva-speaker-host.exe' : 'jotva-speaker-host');
     if (!app.isPackaged && process.platform !== 'win32') {
       const python = resolveBackend().exe;
       if (!fs.existsSync(python)) return {error: 'runtime_missing'};
       executable = path.join(dataDir, 'speaker-native-host');
       const quote = s => "'" + s.replaceAll("'", "'\\''") + "'";
-      fs.writeFileSync(executable, `#!/bin/sh\nexport AGUACATE_DATA_DIR=${quote(dataDir)}\nexec ${quote(python)} ${quote(path.join(root, 'backend/native_host.py'))} "$@"\n`, {mode: 0o700});
+      fs.writeFileSync(executable, `#!/bin/sh\nexport JOTVA_DATA_DIR=${quote(dataDir)}\nexec ${quote(python)} ${quote(path.join(root, 'backend/native_host.py'))} "$@"\n`, {mode: 0o700});
     }
     if (!fs.existsSync(executable)) return {error: 'runtime_missing'};
-    const manifest = JSON.stringify({name: 'app.aguacate.speakers', description: 'Aguacate meeting speaker metadata', path: executable,
+    const manifest = JSON.stringify({name: 'app.jotva.speakers', description: 'Jotva meeting speaker metadata', path: executable,
       type: 'stdio', allowed_origins: [`chrome-extension://${EXTENSION_ID}/`]}, null, 2);
     fs.writeFileSync(manifestPath, manifest, {mode: 0o600});
     if (process.platform === 'win32') {
       for (const browser of ['Google\\Chrome', 'Microsoft\\Edge', 'BraveSoftware\\Brave-Browser']) {
-        execFileSync('reg.exe', ['ADD', `HKCU\\Software\\${browser}\\NativeMessagingHosts\\app.aguacate.speakers`, '/ve', '/t', 'REG_SZ', '/d', manifestPath, '/f'], {windowsHide: true, stdio: 'ignore'});
+        execFileSync('reg.exe', ['ADD', `HKCU\\Software\\${browser}\\NativeMessagingHosts\\app.jotva.speakers`, '/ve', '/t', 'REG_SZ', '/d', manifestPath, '/f'], {windowsHide: true, stdio: 'ignore'});
       }
     } else {
       for (const browser of ['Google/Chrome', 'Microsoft Edge', 'BraveSoftware/Brave-Browser']) {
         const directory = path.join(app.getPath('appData'), browser, 'NativeMessagingHosts');
         fs.mkdirSync(directory, {recursive: true});
-        fs.writeFileSync(path.join(directory, 'app.aguacate.speakers.json'), manifest, {mode: 0o600});
+        fs.writeFileSync(path.join(directory, 'app.jotva.speakers.json'), manifest, {mode: 0o600});
       }
     }
     shell.openPath(path.join(root, 'extensions', 'meet'));

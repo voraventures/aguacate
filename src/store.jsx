@@ -28,7 +28,7 @@ export function StoreProvider({ children }) {
   const [health, setHealth] = useState({});
   const [theme, setThemeState] = useState(() => {
     // migrate stored values for removed themes (sky/warm etc.) to default
-    const stored = localStorage.getItem("aguacate_theme");
+    const stored = localStorage.getItem("jotva_theme");
     return THEMES.includes(stored) ? stored : "default";
   });
   const [nav, setNav] = useState("meetings"); // meetings|actions|decisions|topics|people
@@ -84,7 +84,7 @@ export function StoreProvider({ children }) {
   licenseRef.current = license;
 
   const notify = useCallback((title, body) => {
-    window.aguacate?.notify?.(title, body || "");
+    window.jotva?.notify?.(title, body || "");
   }, []);
 
   // opts.action: { label, onAction } renders a button inside the toast (e.g. Undo).
@@ -104,7 +104,7 @@ export function StoreProvider({ children }) {
 
   const setTheme = useCallback((name) => {
     setThemeState(name);
-    localStorage.setItem("aguacate_theme", name);
+    localStorage.setItem("jotva_theme", name);
     document.documentElement.dataset.theme = name;
     api.post("/api/settings", { key: "theme", value: name }).catch(() => {});
   }, []);
@@ -117,9 +117,9 @@ export function StoreProvider({ children }) {
   // Font size is applied via a [data-fontsize] attribute (CSS sets --font-size-base);
   // mirrored to localStorage so it applies instantly before server settings load.
   useEffect(() => {
-    const size = settings.font_size || localStorage.getItem("aguacate_fontsize") || "medium";
+    const size = settings.font_size || localStorage.getItem("jotva_fontsize") || "medium";
     document.documentElement.dataset.fontsize = size;
-    if (settings.font_size) localStorage.setItem("aguacate_fontsize", settings.font_size);
+    if (settings.font_size) localStorage.setItem("jotva_fontsize", settings.font_size);
     document.body.classList.toggle("reduce-motion", !!settings.reduce_motion);
   }, [settings.font_size, settings.reduce_motion]);
 
@@ -443,7 +443,7 @@ export function StoreProvider({ children }) {
   const recordingRef = useRef(recording);
   recordingRef.current = recording;
   useEffect(() => {
-    const off = window.aguacate?.onShortcut?.((name) => {
+    const off = window.jotva?.onShortcut?.((name) => {
       if (name === "toggle-record") {
         if (recordingRef.current.active) stopRecording();
         else startRecording().catch(() => {});
@@ -460,7 +460,7 @@ export function StoreProvider({ children }) {
 
   // Keep the tray pulse in sync with recording state
   useEffect(() => {
-    window.aguacate?.setRecordingState?.(recording.active);
+    window.jotva?.setRecordingState?.(recording.active);
   }, [recording.active]);
 
   // Feature 3: poll for active video-call apps every 30 seconds

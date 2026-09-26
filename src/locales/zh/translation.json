@@ -141,7 +141,7 @@
       },
       "series": {
         "head": "暂无重复会议",
-        "sub": "当同一个会议进行两次时，Aguacate 会开始追踪该系列"
+        "sub": "当同一个会议进行两次时，Jotva 会开始追踪该系列"
       },
       "conflicts": {
         "head": "未检测到冲突",
@@ -286,15 +286,15 @@
     },
     "recording": {
       "startup": "启动",
-      "launchLogin": "登录时启动 Aguacate",
+      "launchLogin": "登录时启动 Jotva",
       "launchLoginDesc": "绝不错过任何自动录制的会议。",
       "on": "开",
       "off": "关",
       "globalShortcut": "全局快捷键",
-      "globalShortcutDesc": "在任何地方开始或停止录制 — 即使 Aguacate 在托盘中。",
+      "globalShortcutDesc": "在任何地方开始或停止录制 — 即使 Jotva 在托盘中。",
       "capture": "采集",
       "autoMode": "自动录制模式",
-      "autoModeDesc": "Aguacate 如何决定何时开始录制。",
+      "autoModeDesc": "Jotva 如何决定何时开始录制。",
       "modeAll": "自动录制所有会议",
       "mode30": "每个会议开始前 30 秒询问我",
       "modeManual": "仅手动（显示日历，绝不提示）",
@@ -305,8 +305,8 @@
       "micLoopbackWarning": "⚠ 这是一个虚拟/环回设备，不是真正的麦克风 — 除非显式将音频路由到该设备，否则录音将是静音的。请选择你的实际麦克风。",
       "systemDefault": "系统默认",
       "systemAudio": "系统音频设备",
-      "winHint": "Windows：选择与你扬声器匹配的 \"(loopback)\" 项 — Aguacate 通过 WASAPI 接入系统音频，无需驱动。",
-      "macHint": "macOS：安装 BlackHole（免费）并在此选择它，以采集来自 Zoom/Meet 的会议音频。Aguacate 会在本地将其与你的麦克风混合。",
+      "winHint": "Windows：选择与你扬声器匹配的 \"(loopback)\" 项 — Jotva 通过 WASAPI 接入系统音频，无需驱动。",
+      "macHint": "macOS：安装 BlackHole（免费）并在此选择它，以采集来自 Zoom/Meet 的会议音频。Jotva 会在本地将其与你的麦克风混合。",
       "none": "无",
       "loopbackSuffix": "  ← 环回",
       "transcription": "转录",
@@ -326,11 +326,11 @@
       "modelDesc": "选择用于撰写你笔记的 {{name}} 模型。",
       "loading": "加载中…",
       "keyLabel": {
-        "anthropic": "Anthropic API 密钥（可选 — AI 笔记已包含在 Aguacate 中）",
+        "anthropic": "Anthropic API 密钥（可选 — AI 笔记已包含在 Jotva 中）",
         "openai": "OpenAI API 密钥",
         "google": "Google API 密钥"
       },
-      "includedNote": "AI 笔记已包含在 Aguacate 中 — 无需 API 密钥。想使用自己的账户？添加你的 Anthropic、OpenAI 或 Google API 密钥即可。使用 OpenAI 和 Google 需要你自己的密钥。"
+      "includedNote": "AI 笔记已包含在 Jotva 中 — 无需 API 密钥。想使用自己的账户？添加你的 Anthropic、OpenAI 或 Google API 密钥即可。使用 OpenAI 和 Google 需要你自己的密钥。"
     },
     "calendars": {
       "connected": "已连接的日历",
@@ -348,8 +348,8 @@
       "accessDenied": "日历访问被拒绝。请在系统设置 → 隐私与安全性 → 日历中授予访问权限。",
       "disable": "禁用",
       "enable": "启用",
-      "pollNote": "Aguacate 每 30 秒轮询一次已连接的日历，并自动合并跨日历的重复事件。首次启用 Apple Calendar 时，macOS 会请求日历权限。",
-      "intro": "连接日历后，Aguacate 会在你加入会议的那一刻自动转录——无需手动点击录制。",
+      "pollNote": "Jotva 每 30 秒轮询一次已连接的日历，并自动合并跨日历的重复事件。首次启用 Apple Calendar 时，macOS 会请求日历权限。",
+      "intro": "连接日历后，Jotva 会在你加入会议的那一刻自动转录——无需手动点击录制。",
       "autoTranscribe": "自动转录日历会议",
       "autoTranscribeDesc": "自动加入 Zoom、Meet 和 Teams，无需确认。",
       "notify5min": "提前 1 分钟提醒",
@@ -433,7 +433,7 @@
       "timelinePdfDesc": "按时间顺序的决策日志。",
       "timelineExported": "时间线已导出",
       "mobile": "移动端",
-      "iosSoon": "Aguacate for iOS — 即将推出",
+      "iosSoon": "Jotva for iOS — 即将推出",
       "mobileBlurb": "移动端配套应用让你能在 iPhone 上查看笔记、完成行动项和搜索会议。已连接的设备列在下方，可随时撤销。",
       "qrToken": "QR 设置令牌",
       "connectMobile": "连接移动端应用",
@@ -472,7 +472,7 @@
       "joinedDate": "加入于 {{date}}",
       "syncFolder": "同步文件夹",
       "sharedPath": "共享文件夹路径",
-      "syncNote": "指向一个所有成员都能访问的共享网络驱动器或 Dropbox 文件夹。当你共享给团队时，Aguacate 会在此处写入会议 JSON 文件。",
+      "syncNote": "指向一个所有成员都能访问的共享网络驱动器或 Dropbox 文件夹。当你共享给团队时，Jotva 会在此处写入会议 JSON 文件。",
       "syncPlaceholder": "/Volumes/SharedDrive  或  ~/Dropbox/team",
       "syncSaved": "同步路径已保存",
       "savePath": "保存路径"
@@ -514,8 +514,8 @@
     },
     "oauth": {
       "connectCalendar": "连接 {{provider}} Calendar",
-      "explain": "Aguacate 通过 {{provider}} 的官方登录（OAuth）连接到你的日历 — 你在浏览器中授权访问，你的密码绝不会与 Aguacate 共享。",
-      "setupNote": "首先需要一次快速的一次性设置：必须将 Aguacate 注册为你 {{provider}} 账户中的一个应用，这样它才被允许请求日历访问权限。下面的指南将引导你完成，大约需要两分钟 — 然后回到这里再次点击连接。",
+      "explain": "Jotva 通过 {{provider}} 的官方登录（OAuth）连接到你的日历 — 你在浏览器中授权访问，你的密码绝不会与 Jotva 共享。",
+      "setupNote": "首先需要一次快速的一次性设置：必须将 Jotva 注册为你 {{provider}} 账户中的一个应用，这样它才被允许请求日历访问权限。下面的指南将引导你完成，大约需要两分钟 — 然后回到这里再次点击连接。",
       "learnMore": "了解更多",
       "close": "关闭"
     }
@@ -610,7 +610,7 @@
       "discussions": "重点讨论",
       "nextSteps": "后续步骤",
       "compliance": "合规提示",
-      "summaryBy": "由 Aguacate 生成的摘要",
+      "summaryBy": "由 Jotva 生成的摘要",
       "noSummary": "暂无摘要。",
       "highlight": "亮点",
       "flaggedMoment": "已标记时刻"
@@ -641,12 +641,12 @@
       "micDenied": "麦克风访问被拒绝 — 打开系统设置 → 隐私与安全性 → 麦克风",
       "processingFailed": "处理失败",
       "recordingFailed": "录制失败",
-      "joinWatching": "正在打开通话 — 有人开始说话后 Aguacate 会提示录制。",
+      "joinWatching": "正在打开通话 — 有人开始说话后 Jotva 会提示录制。",
       "joinFailed": "无法打开会议链接"
     },
     "notify": {
       "recordingStartedTitle": "录制已开始",
-      "recordingStartedBody": "Aguacate 正在本地采集这次会议。",
+      "recordingStartedBody": "Jotva 正在本地采集这次会议。",
       "briefReadyTitle": "会议简报已就绪",
       "briefReadyBody": "{{title}} 将在 {{minutes}} 分钟后开始 — 你与这个群组有过往记录。",
       "pulseTitle": "行动脉搏",
@@ -766,7 +766,7 @@
     "previousMeetings": "以往会议"
   },
   "onboarding": {
-    "title": "欢迎使用 Aguacate",
+    "title": "欢迎使用 Jotva",
     "sub": "AI 会议笔记。无机器人。无云端。",
     "loadDemo": "加载演示会议",
     "loading": "加载中…",
@@ -802,7 +802,7 @@
     "steps": {
       "record": {
         "title": "录制任何会议",
-        "desc": "没有机器人加入通话。音频不会离开这台 Mac。点击录制，Aguacate 用 Whisper AI 在本地捕获一切。"
+        "desc": "没有机器人加入通话。音频不会离开这台 Mac。点击录制，Jotva 用 Whisper AI 在本地捕获一切。"
       },
       "list": {
         "title": "井然有序的会议",
@@ -906,7 +906,7 @@
     "fromMeetings": "来自你的会议",
     "noAnswer": "在你的会议中没有找到答案",
     "matches_other": "{{count}} 条结果",
-    "askCta": "向 Aguacate 询问“{{query}}”",
+    "askCta": "向 Jotva 询问“{{query}}”",
     "hint": "输入以搜索标题、笔记、转录和行动项。"
   },
   "zero": {
@@ -926,7 +926,7 @@
     "rangeLabel": "{{range}} · {{count}} 场会议 · 已录制 {{minutes}} 分钟",
     "weekly": "每周",
     "daily": "每日",
-    "summaryBy": "Aguacate 摘要",
+    "summaryBy": "Jotva 摘要",
     "heroSentence": "团队{{periodWord}}主要聚焦于 {{topic}}，还有 {{count}} 项行动未完成。",
     "heroSentenceNoTopic": "本期还有 {{count}} 项行动未完成。",
     "meetings": "会议",
@@ -938,9 +938,9 @@
   },
   "capture": {
     "idleTitle": "准备好开始记录",
-    "idleSubtitle": "开始录音，Aguacate 会倾听。",
+    "idleSubtitle": "开始录音，Jotva 会倾听。",
     "recordingTitle": "新录音",
-    "recordingSubtitle": "Aguacate 正在倾听 · {{time}}",
+    "recordingSubtitle": "Jotva 正在倾听 · {{time}}",
     "rec": "录制",
     "startRecording": "开始录音",
     "viewMeeting": "查看会议",
@@ -953,12 +953,12 @@
   },
   "upcomingToast": {
     "startsIn": "{{title}} 将在 {{minutes}} 分钟后开始",
-    "willTranscribe": "加入通话后 Aguacate 会自动转录。",
+    "willTranscribe": "加入通话后 Jotva 会自动转录。",
     "join": "加入",
     "dismiss": "关闭"
   },
   "pdf": {
-    "eyebrow": "Aguacate — 会议纪要",
+    "eyebrow": "Jotva — 会议纪要",
     "execSummary": "执行摘要",
     "keyDiscussions": "主要讨论",
     "decisionsMade": "已做决定",
@@ -970,7 +970,7 @@
     "nextSteps": "后续步骤",
     "complianceFlags": "合规提醒",
     "noneIdentified": "未发现问题",
-    "generatedBy": "由 Aguacate 生成",
+    "generatedBy": "由 Jotva 生成",
     "participantCount_other": "{{count}} 位参与者"
   }
 }

@@ -18,7 +18,7 @@ import numpy as np
 from ..events import hub
 from .recorder import TARGET_SR, recorder
 
-log = logging.getLogger("aguacate.coach")
+log = logging.getLogger("jotva.coach")
 
 FILLER_RE = re.compile(
     r"\b(um+|uh+|erm+|like|you know|sort of|kind of|basically|actually)\b", re.I

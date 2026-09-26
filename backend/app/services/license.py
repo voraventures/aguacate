@@ -16,14 +16,14 @@ from ..config import (
 from ..db import get_db, get_setting, set_setting
 from .keychain import get_secret, set_secret
 
-log = logging.getLogger("aguacate.license")
+log = logging.getLogger("jotva.license")
 
 # Offline grace: a previously-validated license stays valid 72h without re-check.
 OFFLINE_GRACE_SEC = 72 * 3600
 
 # DEV ONLY: local development license — activates Pro indefinitely without
 # ever contacting the license server. Never publish this key.
-DEV_LICENSE_KEY = os.environ.get("AGUACATE_DEV_KEY", "")
+DEV_LICENSE_KEY = os.environ.get("JOTVA_DEV_KEY", "")
 
 
 try:
@@ -31,7 +31,7 @@ try:
 except Exception:  # pragma: no cover
     _keyring = None
 
-_KC_SERVICE = "Aguacate"
+_KC_SERVICE = "Jotva"
 _KC_COUNTER = "lifetime_meeting_counter"
 
 
@@ -130,7 +130,7 @@ def set_tier(tier: str) -> dict:  # DEV ONLY
 def _verify_signed_license(data: dict, install_id: str) -> bool:
     """A license is valid only if its RSA-SHA256 signature verifies against the
     bundled public key, it names THIS install, and it has not expired. An HTTP
-    200 from whatever AGUACATE_LICENSE_SERVER points at proves nothing."""
+    200 from whatever JOTVA_LICENSE_SERVER points at proves nothing."""
     payload = data.get("payload")
     signature_b64 = data.get("signature")
     if not isinstance(payload, dict) or not isinstance(signature_b64, str):

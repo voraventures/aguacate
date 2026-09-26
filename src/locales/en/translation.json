@@ -141,7 +141,7 @@
       },
       "series": {
         "head": "No recurring meetings yet",
-        "sub": "When the same meeting happens twice, Aguacate starts tracking the series"
+        "sub": "When the same meeting happens twice, Jotva starts tracking the series"
       },
       "conflicts": {
         "head": "No conflicts detected",
@@ -286,15 +286,15 @@
     },
     "recording": {
       "startup": "Startup",
-      "launchLogin": "Launch Aguacate at login",
+      "launchLogin": "Launch Jotva at login",
       "launchLoginDesc": "Never miss an auto-recorded meeting.",
       "on": "On",
       "off": "Off",
       "globalShortcut": "Global shortcut",
-      "globalShortcutDesc": "Start or stop recording from anywhere — even when Aguacate is in the tray.",
+      "globalShortcutDesc": "Start or stop recording from anywhere — even when Jotva is in the tray.",
       "capture": "Capture",
       "autoMode": "Auto-record mode",
-      "autoModeDesc": "How Aguacate decides when to start recording.",
+      "autoModeDesc": "How Jotva decides when to start recording.",
       "modeAll": "Record all meetings automatically",
       "mode30": "Ask me 30 seconds before each meeting",
       "modeManual": "Manual only (show calendar, never prompt)",
@@ -305,8 +305,8 @@
       "micLoopbackWarning": "⚠ This is a virtual/loopback device, not a real microphone — recordings will be silent unless audio is explicitly routed into it. Pick your actual microphone.",
       "systemDefault": "System default",
       "systemAudio": "System audio device",
-      "winHint": "Windows: pick the \"(loopback)\" entry matching your speakers — Aguacate taps system audio via WASAPI, no driver needed.",
-      "macHint": "macOS: install BlackHole (free) and select it here to capture meeting audio from Zoom/Meet. Aguacate mixes it with your mic locally.",
+      "winHint": "Windows: pick the \"(loopback)\" entry matching your speakers — Jotva taps system audio via WASAPI, no driver needed.",
+      "macHint": "macOS: install BlackHole (free) and select it here to capture meeting audio from Zoom/Meet. Jotva mixes it with your mic locally.",
       "none": "None",
       "loopbackSuffix": "  ← loopback",
       "transcription": "Transcription",
@@ -326,11 +326,11 @@
       "modelDesc": "Choose the {{name}} model used to write your notes.",
       "loading": "Loading…",
       "keyLabel": {
-        "anthropic": "Anthropic API key (optional — AI notes are included with Aguacate)",
+        "anthropic": "Anthropic API key (optional — AI notes are included with Jotva)",
         "openai": "OpenAI API key",
         "google": "Google API key"
       },
-      "includedNote": "AI notes are included with Aguacate — no API key needed. Prefer your own account? Add your API key from Anthropic, OpenAI, or Google and Aguacate will use it instead. OpenAI and Google require your own key."
+      "includedNote": "AI notes are included with Jotva — no API key needed. Prefer your own account? Add your API key from Anthropic, OpenAI, or Google and Jotva will use it instead. OpenAI and Google require your own key."
     },
     "calendars": {
       "connected": "Connected calendars",
@@ -348,8 +348,8 @@
       "accessDenied": "Calendar access denied. Grant access in System Settings → Privacy & Security → Calendars.",
       "disable": "Disable",
       "enable": "Enable",
-      "pollNote": "Aguacate polls connected calendars every 30 seconds and merges duplicate events across calendars automatically. macOS will ask for Calendar permission the first time Apple Calendar is enabled.",
-      "intro": "Connect a calendar so Aguacate can auto-transcribe meetings the moment you join — no need to hit record.",
+      "pollNote": "Jotva polls connected calendars every 30 seconds and merges duplicate events across calendars automatically. macOS will ask for Calendar permission the first time Apple Calendar is enabled.",
+      "intro": "Connect a calendar so Jotva can auto-transcribe meetings the moment you join — no need to hit record.",
       "autoTranscribe": "Auto-transcribe calendar meetings",
       "autoTranscribeDesc": "Joins Zoom, Meet, and Teams automatically — no confirmation needed.",
       "notify5min": "Notify 1 minute before",
@@ -433,7 +433,7 @@
       "timelinePdfDesc": "Chronological decision log.",
       "timelineExported": "Timeline exported",
       "mobile": "Mobile",
-      "iosSoon": "Aguacate for iOS — coming soon",
+      "iosSoon": "Jotva for iOS — coming soon",
       "mobileBlurb": "The mobile companion app lets you review notes, complete actions, and search meetings on your iPhone. Connected devices are listed below and can be revoked at any time.",
       "qrToken": "QR Setup Token",
       "connectMobile": "Connect mobile app",
@@ -472,7 +472,7 @@
       "joinedDate": "joined {{date}}",
       "syncFolder": "Sync folder",
       "sharedPath": "Shared folder path",
-      "syncNote": "Point to a shared network drive or Dropbox folder that all members can access. Aguacate writes meeting JSON files here when you share to team.",
+      "syncNote": "Point to a shared network drive or Dropbox folder that all members can access. Jotva writes meeting JSON files here when you share to team.",
       "syncPlaceholder": "/Volumes/SharedDrive  or  ~/Dropbox/team",
       "syncSaved": "Sync path saved",
       "savePath": "Save path"
@@ -514,8 +514,8 @@
     },
     "oauth": {
       "connectCalendar": "Connect {{provider}} Calendar",
-      "explain": "Aguacate connects to your calendar with {{provider}}'s official sign-in (OAuth) — you approve access in your browser and your password is never shared with Aguacate.",
-      "setupNote": "One quick one-time setup is needed first: Aguacate has to be registered as an app in your {{provider}} account so it's allowed to ask for calendar access. The guide below walks you through it in about two minutes — then come back here and hit Connect again.",
+      "explain": "Jotva connects to your calendar with {{provider}}'s official sign-in (OAuth) — you approve access in your browser and your password is never shared with Jotva.",
+      "setupNote": "One quick one-time setup is needed first: Jotva has to be registered as an app in your {{provider}} account so it's allowed to ask for calendar access. The guide below walks you through it in about two minutes — then come back here and hit Connect again.",
       "learnMore": "Learn more",
       "close": "Close"
     }
@@ -611,7 +611,7 @@
       "discussions": "Key discussions",
       "nextSteps": "Next steps",
       "compliance": "Compliance flags",
-      "summaryBy": "Summary by Aguacate",
+      "summaryBy": "Summary by Jotva",
       "noSummary": "No summary yet.",
       "highlight": "Highlight",
       "flaggedMoment": "Flagged moment"
@@ -642,12 +642,12 @@
       "micDenied": "Microphone access denied — open System Settings → Privacy & Security → Microphone",
       "processingFailed": "Processing failed",
       "recordingFailed": "Recording failed",
-      "joinWatching": "Opening the call — Aguacate will offer to record once people start talking.",
+      "joinWatching": "Opening the call — Jotva will offer to record once people start talking.",
       "joinFailed": "Couldn't open the meeting link"
     },
     "notify": {
       "recordingStartedTitle": "Recording started",
-      "recordingStartedBody": "Aguacate is capturing this meeting locally.",
+      "recordingStartedBody": "Jotva is capturing this meeting locally.",
       "briefReadyTitle": "Meeting brief ready",
       "briefReadyBody": "{{title}} starts in {{minutes}} min — you have history with this group.",
       "pulseTitle": "Action Pulse",
@@ -769,7 +769,7 @@
     "previousMeetings": "Previous meetings"
   },
   "onboarding": {
-    "title": "Welcome to Aguacate",
+    "title": "Welcome to Jotva",
     "sub": "AI meeting notes. No bot. No cloud.",
     "loadDemo": "Load demo meeting",
     "loading": "Loading…",
@@ -915,7 +915,7 @@
     "noAnswer": "No answer found in your meetings",
     "matches_one": "{{count}} match",
     "matches_other": "{{count}} matches",
-    "askCta": "Ask Aguacate about “{{query}}”",
+    "askCta": "Ask Jotva about “{{query}}”",
     "hint": "Type to search titles, notes, transcripts, and action items."
   },
   "zero": {
@@ -935,7 +935,7 @@
     "rangeLabel": "{{range}} · {{count}} meetings · {{minutes}}m recorded",
     "weekly": "Weekly",
     "daily": "Daily",
-    "summaryBy": "Digest by Aguacate",
+    "summaryBy": "Digest by Jotva",
     "heroSentence": "Your team spent {{periodWord}} mostly on {{topic}}, with {{count}} open actions still outstanding.",
     "heroSentenceNoTopic": "{{count}} open actions still outstanding this period.",
     "meetings": "Meetings",
@@ -947,9 +947,9 @@
   },
   "capture": {
     "idleTitle": "Ready to capture",
-    "idleSubtitle": "Start a recording and Aguacate will listen.",
+    "idleSubtitle": "Start a recording and Jotva will listen.",
     "recordingTitle": "New recording",
-    "recordingSubtitle": "Aguacate is listening · {{time}}",
+    "recordingSubtitle": "Jotva is listening · {{time}}",
     "rec": "REC",
     "startRecording": "Start recording",
     "viewMeeting": "View meeting",
@@ -965,12 +965,12 @@
   },
   "upcomingToast": {
     "startsIn": "{{title}} starts in {{minutes}} min",
-    "willTranscribe": "Aguacate will auto-transcribe once you join the call.",
+    "willTranscribe": "Jotva will auto-transcribe once you join the call.",
     "join": "Join",
     "dismiss": "Dismiss"
   },
   "pdf": {
-    "eyebrow": "Aguacate — Meeting Notes",
+    "eyebrow": "Jotva — Meeting Notes",
     "execSummary": "Executive Summary",
     "keyDiscussions": "Key Discussions",
     "decisionsMade": "Decisions Made",
@@ -982,7 +982,7 @@
     "nextSteps": "Next Steps",
     "complianceFlags": "Compliance Flags",
     "noneIdentified": "None identified",
-    "generatedBy": "Generated by Aguacate",
+    "generatedBy": "Generated by Jotva",
     "participantCount_one": "{{count}} participant",
     "participantCount_other": "{{count}} participants"
   }

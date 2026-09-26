@@ -20,7 +20,7 @@ export default function AppHeader() {
     .filter(e => e.minutes >= 0 && e.minutes <= 60).sort((a, b) => a.minutes - b.minutes)[0];
   const initials = (name || "A").split(/\s+/).map(s => s[0]).join("").slice(0, 2).toUpperCase();
   return <header className="app-header">
-    <div className="app-brand"><img src={logo} alt="" /><span className="brand-wordmark">Aguacate</span></div>
+    <div className="app-brand"><img src={logo} alt="" /><span className="brand-wordmark">Jotva</span></div>
     <div className="header-status">
       {activeCall && !recording.active ? <div className="header-call">
         <span>{t("sidebar.call.prompt", { app: activeCall.app })}</span>

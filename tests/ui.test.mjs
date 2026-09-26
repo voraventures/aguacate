@@ -1,4 +1,4 @@
-// Run: AGUACATE_TEST_DEPS=/path/to/temporary/jsdom/install node --test tests/ui.test.mjs
+// Run: JOTVA_TEST_DEPS=/path/to/temporary/jsdom/install node --test tests/ui.test.mjs
 // jsdom is deliberately not added to the existing dirty dependency lockfile.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -18,7 +18,7 @@ test("every settings section has one dock destination", () => {
 
 for (const fixtureState of ["cards", "no-today", "empty", "boot-loading", "boot-error"]) test(`meeting cards, navigation, and existing screens (${fixtureState})`, async () => {
   const require = createRequire(import.meta.url);
-  const { JSDOM } = require(process.env.AGUACATE_TEST_DEPS ? join(process.env.AGUACATE_TEST_DEPS, "node_modules/jsdom") : "jsdom");
+  const { JSDOM } = require(process.env.JOTVA_TEST_DEPS ? join(process.env.JOTVA_TEST_DEPS, "node_modules/jsdom") : "jsdom");
   const dom = new JSDOM('<div id="root"></div>', { url: `http://127.0.0.1:5198/tests/visual/frame.html?state=${fixtureState}`, pretendToBeVisual: true });
   for (const name of ["window", "document", "location", "localStorage", "HTMLElement", "Node", "Event", "MouseEvent", "KeyboardEvent", "requestAnimationFrame", "cancelAnimationFrame"])
     Object.defineProperty(globalThis, name, { configurable: true, value: dom.window[name] });
@@ -31,7 +31,7 @@ for (const fixtureState of ["cards", "no-today", "empty", "boot-loading", "boot-
     if (ms === 60000) clockCallbacks.push(callback);
     return interval(callback, ms, ...args);
   };
-  const output = join(await mkdtemp(join(tmpdir(), "aguacate-dom-")), "preview.cjs");
+  const output = join(await mkdtemp(join(tmpdir(), "jotva-dom-")), "preview.cjs");
   globalThis.IS_REACT_ACT_ENVIRONMENT = false;
   await build({ entryPoints: [resolve("tests/visual/preview.jsx")], outfile: output, bundle: true, platform: "node", format: "cjs", loader: { ".css": "empty", ".svg": "text", ".woff2": "empty" }, define: { "import.meta.env.DEV": "true" }, logLevel: "silent" });
   const { act, previewRoot } = require(output);
@@ -42,12 +42,12 @@ for (const fixtureState of ["cards", "no-today", "empty", "boot-loading", "boot-
   const button = label => [...document.querySelectorAll("button")].find(e => e.textContent.trim() === label);
   try {
     if (fixtureState.startsWith('boot-')) {
-      assert.equal(document.querySelector('.boot .brand-wordmark-large').textContent, 'Aguacate');
+      assert.equal(document.querySelector('.boot .brand-wordmark-large').textContent, 'Jotva');
       assert.ok(document.querySelector('.boot .logo-img'));
       assert.equal(!!document.querySelector('.processing-ring'), fixtureState === 'boot-loading');
       return;
     }
-    assert.equal(document.querySelector('.app-brand .brand-wordmark').textContent, 'Aguacate');
+    assert.equal(document.querySelector('.app-brand .brand-wordmark').textContent, 'Jotva');
     assert.equal(document.querySelectorAll(".dock-button").length, 5);
     assert.equal(document.querySelector('.meeting-day-header h2').textContent, "Today");
     assert.equal(document.querySelectorAll('.date-badge').length, 0);
@@ -176,7 +176,7 @@ for (const fixtureState of ["cards", "no-today", "empty", "boot-loading", "boot-
     await click(document.getElementById("dock-record"));
     await click([...document.querySelectorAll('[role="menuitem"]')].find(e => e.textContent === "Start recording"));
     assert.ok(document.querySelector(".capture-card"));
-    assert.equal(document.querySelector('.capture-wordmark.brand-wordmark').textContent, 'Aguacate');
+    assert.equal(document.querySelector('.capture-wordmark.brand-wordmark').textContent, 'Jotva');
     await key(document.activeElement, "Escape");
     assert.equal(document.querySelector(".capture-card"), null);
   } finally {

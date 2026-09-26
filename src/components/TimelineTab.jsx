@@ -1,4 +1,4 @@
-// Timeline tab — recreated from Aguacate Meeting.dc.html #5c: a vertical
+// Timeline tab — recreated from Jotva Meeting.dc.html #5c: a vertical
 // rail (time · dot · card). Milestones (start/wrap) are hollow dots with no
 // card. Real data only: the mockup also tags cards TOPIC/DECISION/ACTIONS,
 // but our backend has no in-meeting timestamp for a decision/topic/action

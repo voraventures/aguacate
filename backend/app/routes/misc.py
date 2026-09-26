@@ -106,7 +106,7 @@ def license_portal_url():
 
     def _post(token):
         return httpx.post(
-            "https://license.aguacatenotes.com/api/portal",
+            "https://license.jotva.com/api/portal",
             json={"install_id": install, "portal_token": token},
             timeout=10,
         )
@@ -407,7 +407,7 @@ def vault_import(body: VaultImportBody):
     if not is_safe_managed_path(body.path) or not body.path.endswith(".aguavault"):
         raise HTTPException(
             status_code=422,
-            detail="Vault file must be an .aguavault inside the Aguacate data folder",
+            detail="Vault file must be an .aguavault inside the Jotva data folder",
         )
     try:
         count = import_vault(body.path, body.password)

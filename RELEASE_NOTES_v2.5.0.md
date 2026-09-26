@@ -2,9 +2,9 @@
 
 **Notes are ready seconds after the call ends.** Transcription now runs live during the meeting, so only the last few seconds are processed when you stop recording instead of the whole file.
 
-**Join from the calendar alert.** One minute before a meeting with a video link, Aguacate shows a banner with a Join button. Click it to open the call; once people start talking, Aguacate offers to record (or starts on its own, depending on your recording mode).
+**Join from the calendar alert.** One minute before a meeting with a video link, Jotva shows a banner with a Join button. Click it to open the call; once people start talking, Jotva offers to record (or starts on its own, depending on your recording mode).
 
-**Bundled AI — no API key needed.** Meeting notes are now generated through Aguacate's included AI (Claude Haiku 4.5) for free and Pro users alike. Adding your own Anthropic, OpenAI, or Google key in Settings is still supported and switches Aguacate to your own account.
+**Bundled AI — no API key needed.** Meeting notes are now generated through Jotva's included AI (Claude Haiku 4.5) for free and Pro users alike. Adding your own Anthropic, OpenAI, or Google key in Settings is still supported and switches Jotva to your own account.
 
 **Payment path repaired.** The in-app "Get Pro" flow previously could not reach the license server (blocked by the app's own security policy) and the sidebar upgrade button took payment without linking a license. Both are fixed; checkout now activates your license automatically.
 

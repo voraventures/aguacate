@@ -1,7 +1,7 @@
-# Handoff: Aguacate — Meeting Workspace UI
+# Handoff: Jotva — Meeting Workspace UI
 
 ## Overview
-Aguacate is a desktop conversation workspace: it records meetings, transcribes them, and
+Jotva is a desktop conversation workspace: it records meetings, transcribes them, and
 auto-generates knowledge (title, summary, actions, decisions, topics, questions, timeline,
 highlights). This package covers the redesigned workspace: the **capture flow**
 (record → grow → ready), the **Meeting detail** (Overview / Timeline / Transcript / Ask),
@@ -16,7 +16,7 @@ the "Ready" stage.
 The files in this bundle are **design references authored in HTML** (a streaming
 "Design Component" format) — prototypes showing intended look and behavior, **not**
 production code to copy verbatim. The task is to **recreate these designs in the existing
-Aguacate codebase**, using its established framework, component library, and patterns.
+Jotva codebase**, using its established framework, component library, and patterns.
 If a component library exists, map these to it; only the visual spec (tokens, layout,
 type, motion) below is authoritative.
 
@@ -71,7 +71,7 @@ Window traffic lights: `#F0655A` / `#F5BE4F` / `#61C554`
 ### Typography
 - **Newsreader** (serif): weights 400/500/600 + italics.
   - Meeting title: 32–34px / 500 / letter-spacing −.015em
-  - Wordmark "Aguacate": 20px / 500
+  - Wordmark "Jotva": 20px / 500
   - AI summary body: 22–23px / 400 / line-height 1.5 (italic green for the key phrase)
 - **Hanken Grotesk** (sans): 400/500/600/700.
   - Nav items 14px; body 13.5–15px / line-height 1.6–1.7; buttons 13.5–15px/500
@@ -105,7 +105,7 @@ list: 1 Recording, 2 Processing, 3 Ready. Pull-quote in italic serif. Not a nav 
 ### 2. Capture flow (state machine — see `CaptureFlow.dc.html`)
 560 × 640 card. Phases:
 - **idle** → title "Ready to capture", big dark "Start recording" (mic) button.
-- **recording** → REC pill (pulsing), title "New recording", subtitle "Aguacate is
+- **recording** → REC pill (pulsing), title "New recording", subtitle "Jotva is
   listening · 10:30 AM". The **logo's black waveform bars animate to the live audio
   amplitude**. Controls: mic / pause / red Stop.
 - **processing** → two counter-rotating dashed rings around the mark, "Growing your
@@ -124,7 +124,7 @@ list: 1 Recording, 2 Processing, 3 Ready. Pull-quote in italic serif. Not a nav 
 Overview / Timeline / Transcript / Ask (active = ink text + 2px `#6FA83C` underline).
 Body:
 - **Summary hero** — soft green gradient card, faint avocado watermark, row of
-  [primary logo mark 26px] + mono eyebrow "SUMMARY BY AGUACATE", then the serif summary
+  [primary logo mark 26px] + mono eyebrow "SUMMARY BY JOTVA", then the serif summary
   with the key phrase in italic green.
 - Two columns (left 1.5 / right 1, divided by a hairline):
   - Left: **Actions** (mono eyebrow + count) — rows: check-circle · task · owner · due(mono);
@@ -145,7 +145,7 @@ Same shell + header, tab active accordingly.
   grounded answer, "Sources" with clickable timestamp chips, thumbs up/down). Bottom:
   suggested-question chips + "Ask a question…" input with dark send button.
 
-### 5. Sidebar + meeting list (shared chrome — `AguacateChrome.dc.html`)
+### 5. Sidebar + meeting list (shared chrome — `JotvaChrome.dc.html`)
 - Sidebar: wordmark; nav Meetings(active)/Today/Library/Search/Meeting Zero/Digest;
   Settings; user chip (avatar · Daniel Kim · Acme Inc. · chevron). Active nav = `#EFEFEA`
   pill; icons `#4A4A44` active / `#9A9A90` inactive.
@@ -206,10 +206,10 @@ full layout). Motion end-states shown where relevant.
 - `03-capture.png` — Capture flow · **ready** (name + typed summary + chips)
 
 ## Files
-- `Aguacate Meeting.dc.html` — main canvas. Anchors: `#5g` capture flow, `#5i` Overview
+- `Jotva Meeting.dc.html` — main canvas. Anchors: `#5g` capture flow, `#5i` Overview
   (canonical), `#5c` Timeline, `#5d` Transcript, `#5e` Ask, `#5f` Home, `#5b` moments.
   (`#5a` tinted + `#5h` white are earlier **comparison** variants — ignore; `#5i` is final.)
-- `AguacateChrome.dc.html` — shared sidebar + meeting list.
+- `JotvaChrome.dc.html` — shared sidebar + meeting list.
 - `CaptureFlow.dc.html` — animated capture state machine (logic + template).
 - `logo-*.svg` — brand mark variants.
 - `CLAUDE.md` — project principles (kept in sync with this doc).

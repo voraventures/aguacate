@@ -202,7 +202,7 @@ _BUILTIN_IDS = {t["id"] for t in BUILTINS}
 def compose_system_prompt(template: dict) -> str:
     body = template["body"].replace("{SHARED_TAIL}", SHARED_TAIL)
     return (
-        "You are Aguacate, an elite meeting-intelligence analyst. You turn raw "
+        "You are Jotva, an elite meeting-intelligence analyst. You turn raw "
         "meeting transcripts into precise, outcome-focused notes for busy "
         f"executives.\n\n{GROUNDING_RULE}\n\nProduce ONLY markdown with exactly "
         f"these level-2 sections, in this order:\n\n{body}\n\n{SHARED_RULES}"

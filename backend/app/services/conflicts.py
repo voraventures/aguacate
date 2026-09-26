@@ -7,7 +7,7 @@ from ..events import hub
 from .ai import _extract_json
 from .notes import current_model, get_client
 
-log = logging.getLogger("aguacate.conflicts")
+log = logging.getLogger("jotva.conflicts")
 
 
 def detect_conflicts(meeting_id: str) -> list[dict]:

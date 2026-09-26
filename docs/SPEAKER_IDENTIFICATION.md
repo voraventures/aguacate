@@ -1,6 +1,6 @@
 # Speaker identification — development handoff
 
-Status: **local pipeline implemented; platform attribution is experimental, not production-qualified.** The installed Aguacate app was not replaced. No extension was installed/published, no customer meeting was used, and no paid AI request was made. Speaker identification defaults off until the user enables it in Recording settings.
+Status: **local pipeline implemented; platform attribution is experimental, not production-qualified.** The installed Jotva app was not replaced. No extension was installed/published, no customer meeting was used, and no paid AI request was made. Speaker identification defaults off until the user enables it in Recording settings.
 
 ## What is implemented
 
@@ -60,11 +60,11 @@ Install `backend/requirements.txt` into a development virtual environment. Build
 
 ```sh
 python -m pytest tests/backend/test_speakers.py -q
-AGUACATE_TEST_DEPS=/path/to/temporary/jsdom-install node --test --test-force-exit tests/ui.test.mjs tests/meeting-cards.test.mjs tests/speakers.test.mjs
+JOTVA_TEST_DEPS=/path/to/temporary/jsdom-install node --test --test-force-exit tests/ui.test.mjs tests/meeting-cards.test.mjs tests/speakers.test.mjs
 npm run build
 ```
 
-The tests override `AGUACATE_DATA_DIR` with temporary directories. `tests/backend/speaker_smoke.py` accepts a temporary folder containing the two pinned assets and locally synthesized 16 kHz mono `voice-a.wav` / `voice-b.wav`. It makes no network requests.
+The tests override `JOTVA_DATA_DIR` with temporary directories. `tests/backend/speaker_smoke.py` accepts a temporary folder containing the two pinned assets and locally synthesized 16 kHz mono `voice-a.wav` / `voice-b.wav`. It makes no network requests.
 
 For an explicitly authorized **development** platform call, launch a separate source app with a temporary data directory, enable speaker identification, download the models, and use Recording settings setup. Zoom requires Accessibility approval for the actual helper/app identity. Meet setup registers the native host for user-level Chrome/Edge/Brave and opens `extensions/meet`; load it unpacked through the browser's extension UI. Merely registering the host does not install the extension. Do not grant or exercise permissions on unrelated real meetings.
 

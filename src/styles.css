@@ -1,5 +1,5 @@
 /* ============================================================
- * Aguacate design system — per design_handoff_aguacate_workspace
+ * Jotva design system — per design_handoff_jotva_workspace
  * README.md (locked, authoritative). Paper-warm neutral shell,
  * ONE brand accent (green, used semantically only), editorial
  * serif for display moments, flat cards over hard shadows.
@@ -34,7 +34,7 @@
   --accent: #6fa83c;      /* primary green: checks, dots, active underline, today badge */
   --accent-deep: #5f9e2b; /* deep green: avatars, wordmark accents */
   --accent-ink: #4c7e22;  /* green text on light */
-  --accent-soft: #eff4e6; /* green tint bg (chips, hover, summary-by-aguacate row) */
+  --accent-soft: #eff4e6; /* green tint bg (chips, hover, summary-by-jotva row) */
   --accent-softer: #f3f7ea; /* lightest green tint (summary hero gradient start) */
   --accent-border: #e1ebcd; /* tinted border for green chips/summary hero */
   --logo-outline: #7dbe3a; /* brand mark outline green — decorative SVG strokes only */
@@ -212,7 +212,7 @@ body.reduce-motion *::after {
   background: var(--bg);
 }
 
-/* ========== left rail — AguacateChrome.dc.html ========== */
+/* ========== left rail — JotvaChrome.dc.html ========== */
 .rail {
   display: flex;
   flex-direction: column;
@@ -323,7 +323,7 @@ body.reduce-motion *::after {
 }
 
 /* auto-record card — real upcoming calendar event with a video-call link,
-   shown only when one genuinely qualifies (AguacateChrome.dc.html §6) */
+   shown only when one genuinely qualifies (JotvaChrome.dc.html §6) */
 .auto-record-card {
   padding: 10px 11px;
   border-radius: 11px;
@@ -474,7 +474,7 @@ body.reduce-motion *::after {
   color: var(--text);
 }
 
-/* ========== meeting list (middle column) — AguacateChrome.dc.html ========== */
+/* ========== meeting list (middle column) — JotvaChrome.dc.html ========== */
 .list-panel {
   display: flex;
   flex-direction: column;
@@ -897,7 +897,7 @@ body.reduce-motion *::after {
   animation: grow-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
-/* ========== Overview — Aguacate Meeting.dc.html #5i ==========
+/* ========== Overview — Jotva Meeting.dc.html #5i ==========
    One deliberate green moment (the summary hero); everything else is a
    white sheet or unboxed text. Left column (1.5fr) carries Actions +
    Decisions; right column (1fr, hairline-divided) carries Topics, Open
@@ -1367,7 +1367,7 @@ body.reduce-motion *::after {
   max-width: 700px;
 }
 
-/* ========== timeline tab — Aguacate Meeting.dc.html #5c ========== */
+/* ========== timeline tab — Jotva Meeting.dc.html #5c ========== */
 .timeline {
   max-width: 820px;
   position: relative;
@@ -1723,7 +1723,7 @@ body.reduce-motion *::after {
   font-weight: 600;
 }
 
-/* ========== ask tab — Aguacate Meeting.dc.html #5e ========== */
+/* ========== ask tab — Jotva Meeting.dc.html #5e ========== */
 .ask-tabbody {
   display: flex;
   flex-direction: column;
@@ -2343,7 +2343,7 @@ body.reduce-motion *::after {
   margin: 0 auto;
   padding: 64px 48px 72px;
 }
-/* Digest — Aguacate Meeting.dc.html #5j: wider, to fit the two-column body */
+/* Digest — Jotva Meeting.dc.html #5j: wider, to fit the two-column body */
 .digest-inner {
   max-width: 1100px;
   padding-top: 30px;

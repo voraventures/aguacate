@@ -14,7 +14,7 @@ import resource
 from pathlib import Path
 
 artifacts=Path(sys.argv[1]).resolve()
-os.environ['AGUACATE_DATA_DIR']=tempfile.mkdtemp(prefix='aguacate-speaker-smoke-')
+os.environ['JOTVA_DATA_DIR']=tempfile.mkdtemp(prefix='jotva-speaker-smoke-')
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'backend'))
 import numpy as np
 from app.config import ensure_dirs
@@ -45,7 +45,7 @@ def read(name):
 a,b=read('voice-a.wav'),read('voice-b.wav')
 silence=np.zeros(16000*5,dtype=np.int16)
 samples=np.concatenate([a,silence,b,silence,a,b])
-path=Path(os.environ['AGUACATE_DATA_DIR'])/'synthetic.wav'
+path=Path(os.environ['JOTVA_DATA_DIR'])/'synthetic.wav'
 with wave.open(str(path),'wb') as wav:
     wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(16000);wav.writeframes(samples.tobytes())
 start=time.monotonic();turns=speakers.acoustic_turns(path);elapsed=time.monotonic()-start

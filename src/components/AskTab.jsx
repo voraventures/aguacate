@@ -1,4 +1,4 @@
-// Ask tab — recreated from Aguacate Meeting.dc.html #5e: right-aligned
+// Ask tab — recreated from Jotva Meeting.dc.html #5e: right-aligned
 // green-tint question bubbles, answer cards fronted by a small logo-mark
 // tile with real "Sources" (quoted, grounded text — never a fabricated
 // timestamp we can't verify), thumbs up/down, suggested-question chips, and
@@ -9,7 +9,7 @@ import { api } from "../api.js";
 import { useStore, useLogo } from "../store.jsx";
 import { SendIcon, ThumbDownIcon, ThumbUpIcon } from "./icons.jsx";
 
-const storageKey = (meetingId) => `aguacate_ask_${meetingId}`;
+const storageKey = (meetingId) => `jotva_ask_${meetingId}`;
 const SUGGESTIONS = ["risks", "pricing", "unresolved"];
 
 function loadThread(meetingId) {

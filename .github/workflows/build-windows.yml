@@ -44,8 +44,8 @@ jobs:
       - name: Verify backend executable exists
         shell: pwsh
         run: |
-          if (-not (Test-Path "backend/dist/aguacate-backend/aguacate-backend.exe")) {
-            Write-Error "Backend executable not found at backend/dist/aguacate-backend/aguacate-backend.exe"
+          if (-not (Test-Path "backend/dist/jotva-backend/jotva-backend.exe")) {
+            Write-Error "Backend executable not found at backend/dist/jotva-backend/jotva-backend.exe"
             exit 1
           }
           Write-Host "Backend executable verified."

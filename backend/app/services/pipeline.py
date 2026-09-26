@@ -12,7 +12,7 @@ from ..db import close_db, get_db, now_iso
 from ..events import hub
 from . import intelligence, notes, transcriber, speakers
 
-log = logging.getLogger("aguacate.pipeline")
+log = logging.getLogger("jotva.pipeline")
 
 # Real speech peaks well above this even at low mic gain; digital silence
 # (dead input device, e.g. a virtual/loopback device with nothing routed
